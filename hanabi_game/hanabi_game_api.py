@@ -13,14 +13,28 @@ class IHanabiCard:
 
 
 class IHandType:
+    def __repr__(self):
+        return ", ".join(
+            str(self.get_card(i)) for i in range(self.get_amount_of_cards())
+        )
+
     def get_amount_of_cards(self) -> int:
         raise NotImplementedError("")
 
     def get_card(self, index: int) -> IHanabiCard:
         raise NotImplementedError("")
 
+    def pop_card(self, index: int) -> IHanabiCard:
+        raise NotImplementedError("")
+
+    def add_card(self, card: IHanabiCard) -> None:
+        raise NotImplementedError("")
+
 
 class IHanabiState:
+    def get_active_player(self) -> PlayerIdType:
+        raise NotImplementedError("")
+
     def get_pile_top(self, color: HanabiColor) -> Optional[HanabiNumber]:
         raise NotImplementedError("")
 
@@ -40,6 +54,14 @@ class IHanabiState:
         raise NotImplementedError("")
 
     def get_deck_size(self) -> int:
+        raise NotImplementedError("")
+
+
+class IHanabiDeck:
+    def take_a_card(self) -> IHanabiCard:
+        raise NotImplementedError("")
+
+    def get_size(self) -> int:
         raise NotImplementedError("")
 
 

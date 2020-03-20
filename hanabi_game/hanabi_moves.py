@@ -1,5 +1,3 @@
-from typing import NamedTuple
-
 from hanabi_game.defs import (
     HanabiMoveType,
     PlayerIdType,
@@ -9,33 +7,48 @@ from hanabi_game.defs import (
 )
 
 
-class IHanabiMove(NamedTuple):
-    type: HanabiMoveType
+class IHanabiMove:
+    def __init__(self, move_type: HanabiMoveType, performer: PlayerIdType):
+        self.move_type = move_type
+        self.performer = performer
 
 
-class HanabiPlaceMove(IHanabiMove):
-    placer: PlayerIdType
-    card_hand_index: int
+class IHanabiPlaceMove(IHanabiMove):
+    def __init__(self, performer: PlayerIdType, card_hand_index: int):
+        super().__init__(move_type=HanabiMoveType.PLACE, performer=performer)
+        self.card_hand_index = card_hand_index
 
 
-class HanabiBurnMove(IHanabiMove):
-    burner: PlayerIdType
-    card_hand_index: int
+class IHanabiBurnMove(IHanabiMove):
+    def __init__(self, performer: PlayerIdType, card_hand_index: int):
+        super().__init__(move_type=HanabiMoveType.BURN, performer=performer)
+        self.card_hand_index = card_hand_index
 
 
 class HanabiUpdate:
-    type: InfromType
+    def __init__(self, update_type: InfromType):
+        self.update_type = update_type
 
 
 class HanabiColorUpdate(HanabiUpdate):
-    color: HanabiColor
+    def __init__(self, color: HanabiColor):
+        super().__init__(update_type=InfromType.COLOR)
+        self.color = color
 
 
 class HanabiNumberUpdate(HanabiUpdate):
-    number: HanabiNumber
+    def __init__(self, number: HanabiNumber):
+        super().__init__(update_type=InfromType.NUMBER)
+        self.number = number
 
 
-class HanabiInfromMove(IHanabiMove):
-    informer: PlayerIdType
-    informee: PlayerIdType
-    update: HanabiUpdate
+class IHanabiInfromMove(IHanabiMove):
+    def __init__(
+        self,
+        performer: PlayerIdType,
+        informed_player: PlayerIdType,
+        update: HanabiUpdate,
+    ):
+        super().__init__(move_type=HanabiMoveType.INFORM, performer=performer)
+        self.update = update
+        self.informed_player = informed_player
