@@ -1,7 +1,12 @@
-from typing import Set, NamedTuple, Optional
+from typing import Set, NamedTuple, Optional, Dict, List, Tuple
+
+from hanabi_game.defs import HanabiColor, HanabiNumber
 
 GameIdType = int
 PlayerIdType = str
+TableState = Dict[HanabiColor, Optional[HanabiNumber]]
+HandState = Tuple[PlayerIdType, List[Tuple[HanabiColor, HanabiNumber]]]
+HandsState = List[HandState]
 
 
 class GameAction(NamedTuple):
@@ -15,7 +20,11 @@ class GameAction(NamedTuple):
 
 
 class GameState(NamedTuple):
-    pass
+    deck_size: int
+    blue_token_amount: int
+    red_token_amount: int
+    table_state: TableState
+    hands_state: HandsState
 
 
 class IGamesRepository:
