@@ -1,6 +1,6 @@
 from typing import List
 
-from hanabi_game.defs import HanabiMoveType, InfromType, HanabiNumber
+from hanabi_game.defs import HanabiNumber
 from hanabi_game.hanabi_deck import HanabiDeck
 from hanabi_game.hanabi_game import HanabiGame
 from hanabi_game.hanabi_game_api import IHanabiState

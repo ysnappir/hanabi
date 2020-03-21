@@ -1,30 +1,12 @@
-from typing import Set, NamedTuple, Optional, Dict, List, Tuple
+from typing import Set, Optional
 
-from hanabi_game.defs import HanabiColor, HanabiNumber
-
-GameIdType = int
-PlayerIdType = str
-TableState = Dict[HanabiColor, Optional[HanabiNumber]]
-HandState = Tuple[PlayerIdType, List[Tuple[HanabiColor, HanabiNumber]]]
-HandsState = List[HandState]
-
-
-class GameAction(NamedTuple):
-    acting_player: PlayerIdType
-    game_id: GameIdType
-    action_type: str
-    informed_player: Optional[PlayerIdType]
-    information_data: Optional[str]
-    placed_card_index: Optional[int]
-    burn_card_index: Optional[int]
-
-
-class GameState(NamedTuple):
-    deck_size: int
-    blue_token_amount: int
-    red_token_amount: int
-    table_state: TableState
-    hands_state: HandsState
+from games_repository.defs import (
+    GameIdType,
+    GameAction,
+    NetworkPlayerIdType,
+    GameState,
+    MoveCardRequest,
+)
 
 
 class IGamesRepository:
@@ -34,11 +16,33 @@ class IGamesRepository:
     def create_game(self, game_id: GameIdType) -> bool:
         raise NotImplementedError("")
 
+    def start_game(self, game_id: GameIdType) -> bool:
+        raise NotImplementedError("")
+
     def perform_action(self, action: GameAction) -> bool:
+        raise NotImplementedError("")
+
+    def perform_card_motion(self, card_motion_request: MoveCardRequest) -> bool:
         raise NotImplementedError("")
 
     def get_active_games(self) -> Set[GameIdType]:
         raise NotImplementedError("")
 
-    def get_game_state(self, game_id: GameIdType, player_id: PlayerIdType) -> GameState:
+    def get_game_state(
+        self, game_id: GameIdType, player_id: NetworkPlayerIdType
+    ) -> GameState:
+        raise NotImplementedError("")
+
+    def register_player(
+        self,
+        player_id: NetworkPlayerIdType,
+        display_name: str,
+        game_id: Optional[GameIdType] = None,
+        clothes_color_number: int = 1,
+    ) -> bool:
+        raise NotImplementedError("")
+
+    def assign_player_to_game(
+        self, player_id: NetworkPlayerIdType, game_id: GameIdType
+    ) -> bool:
         raise NotImplementedError("")

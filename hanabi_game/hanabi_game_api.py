@@ -27,7 +27,7 @@ class IHandType:
     def pop_card(self, index: int) -> IHanabiCard:
         raise NotImplementedError("")
 
-    def add_card(self, card: IHanabiCard) -> None:
+    def add_card(self, card: IHanabiCard, index: int) -> None:
         raise NotImplementedError("")
 
 
@@ -56,6 +56,9 @@ class IHanabiState:
     def get_deck_size(self) -> int:
         raise NotImplementedError("")
 
+    def get_burnt_pile(self) -> List[IHanabiCard]:
+        raise NotImplementedError("")
+
 
 class IHanabiDeck:
     def take_a_card(self) -> IHanabiCard:
@@ -70,4 +73,10 @@ class IHanabiGame:
         raise NotImplementedError("")
 
     def get_state(self) -> IHanabiState:
+        raise NotImplementedError("")
+
+    def get_players_ids(self) -> List[PlayerIdType]:
+        raise NotImplementedError("")
+
+    def get_cards_per_player(self) -> int:
         raise NotImplementedError("")

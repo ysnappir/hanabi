@@ -31,6 +31,7 @@ class HanabiState(IHanabiState):
         hands_dict: Dict[PlayerIdType, IHandType],
         pile_tops: Dict[HanabiColor, Optional[HanabiNumber]],
         acting_player: PlayerIdType,
+        burnt_pile: List[IHanabiCard],
     ):
         self._pile_tops = pile_tops
         self._hands = hands_dict
@@ -40,6 +41,7 @@ class HanabiState(IHanabiState):
         self._red_tokens_amount = red_tokens_amount
         self._deck_size = deck_size
         self._acting_player = acting_player
+        self._burnt_pile = burnt_pile
 
     def _player_repr(self, player_id: PlayerIdType) -> str:
         sign = "-> "
@@ -48,16 +50,34 @@ class HanabiState(IHanabiState):
             f"{self._hands[player_id]}"
         )
 
+    def _table_repr(self) -> str:
+        return str(
+            {
+                str(color.value).upper(): self._pile_tops[color].value
+                if color in self._pile_tops
+                else 0
+                for color in HanabiColor
+            }
+        )
+
     def __repr__(self) -> str:
-        return f"""
+        return (
+            f"""
         Tokens: Blue {self._blue_tokens_amount}, Red {self._red_tokens_amount}
         
         Deck has {self._deck_size} cards
         
-        Table: {self._pile_tops}
+        Table: {self._table_repr()}
         
-        \n""" + "\n".join(
-            [self._player_repr(player_id=player_id) for player_id in self._hands.keys()]
+        \n"""
+            + "\n".join(
+                [
+                    self._player_repr(player_id=player_id)
+                    for player_id in self._hands.keys()
+                ]
+            )
+            + "\n"
+            + ("=" * 50)
         )
 
     def get_pile_top(self, color: HanabiColor) -> Optional[HanabiNumber]:
@@ -84,6 +104,9 @@ class HanabiState(IHanabiState):
     def get_active_player(self) -> PlayerIdType:
         return self._acting_player
 
+    def get_burnt_pile(self) -> List[IHanabiCard]:
+        return self._burnt_pile
+
 
 class HanabiHand(IHandType):
     def __init__(self, initial_cards: Optional[List[IHanabiCard]]):
@@ -98,8 +121,8 @@ class HanabiHand(IHandType):
     def pop_card(self, index: int) -> IHanabiCard:
         return self._cards.pop(index)
 
-    def add_card(self, card: IHanabiCard) -> None:
-        self._cards.append(card)
+    def add_card(self, card: IHanabiCard, index: int) -> None:
+        self._cards = self._cards[:index] + [card] + self._cards[index:]
 
 
 class HanabiGame(IHanabiGame):
@@ -118,7 +141,7 @@ class HanabiGame(IHanabiGame):
         )
         self._deck: IHanabiDeck = HanabiDeck() if predifined_deck is None else predifined_deck
         self._burnt_pile: List[IHanabiCard] = []
-        self._players_ids = list(range(self._n_players))
+        self._players_ids: List[PlayerIdType] = list(range(self._n_players))
         self._piles: Dict[HanabiColor, Optional[HanabiNumber]] = {}
         self._players_hands: Dict[PlayerIdType, IHandType] = {
             player_id: HanabiHand(
@@ -162,7 +185,9 @@ class HanabiGame(IHanabiGame):
             self._players_hands[move.performer].pop_card(move.card_hand_index)
         )
         if self._deck.get_size() > 0:
-            self._players_hands[move.performer].add_card(self._deck.take_a_card())
+            self._players_hands[move.performer].add_card(
+                card=self._deck.take_a_card(), index=move.card_hand_index
+            )
 
         self._blue_tokens_amount += 1
         # TODO 20/03/2020 ysnappir: Consider check if game is over
@@ -170,7 +195,9 @@ class HanabiGame(IHanabiGame):
     def _perform_place(self, move: IHanabiPlaceMove) -> None:
         placed_card = self._players_hands[move.performer].pop_card(move.card_hand_index)
         if self._deck.get_size() > 0:
-            self._players_hands[move.performer].add_card(self._deck.take_a_card())
+            self._players_hands[move.performer].add_card(
+                card=self._deck.take_a_card(), index=move.card_hand_index
+            )
 
         required_top = get_number_to_place_on_top_of(placed_card.get_number())
         if self._piles.get(placed_card.get_color()) is required_top:
@@ -220,4 +247,11 @@ class HanabiGame(IHanabiGame):
             hands_dict=self._players_hands,
             pile_tops=self._piles,
             acting_player=self._acting_player,
+            burnt_pile=self._burnt_pile,
         )
+
+    def get_players_ids(self) -> List[PlayerIdType]:
+        return self._players_ids
+
+    def get_cards_per_player(self) -> int:
+        return self._number_of_cards_per_player
