@@ -136,7 +136,7 @@ class HanabiGame(IHanabiGame):
         )
         self._deck: IHanabiDeck = HanabiDeck() if predifined_deck is None else predifined_deck
         self._burnt_pile: List[IHanabiCard] = []
-        self._players_ids = list(range(self._n_players))
+        self._players_ids: List[PlayerIdType] = list(range(self._n_players))
         self._piles: Dict[HanabiColor, Optional[HanabiNumber]] = {}
         self._players_hands: Dict[PlayerIdType, IHandType] = {
             player_id: HanabiHand(
@@ -239,3 +239,6 @@ class HanabiGame(IHanabiGame):
             pile_tops=self._piles,
             acting_player=self._acting_player,
         )
+
+    def get_players_ids(self) -> List[PlayerIdType]:
+        return self._players_ids

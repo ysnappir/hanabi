@@ -71,3 +71,6 @@ class IHanabiGame:
 
     def get_state(self) -> IHanabiState:
         raise NotImplementedError("")
+
+    def get_players_ids(self) -> List[PlayerIdType]:
+        raise NotImplementedError("")
