@@ -48,16 +48,34 @@ class HanabiState(IHanabiState):
             f"{self._hands[player_id]}"
         )
 
+    def _table_repr(self) -> str:
+        return str(
+            {
+                str(color.value).upper(): self._pile_tops[color].value
+                if color in self._pile_tops
+                else 0
+                for color in HanabiColor
+            }
+        )
+
     def __repr__(self) -> str:
-        return f"""
+        return (
+            f"""
         Tokens: Blue {self._blue_tokens_amount}, Red {self._red_tokens_amount}
         
         Deck has {self._deck_size} cards
         
-        Table: {self._pile_tops}
+        Table: {self._table_repr()}
         
-        \n""" + "\n".join(
-            [self._player_repr(player_id=player_id) for player_id in self._hands.keys()]
+        \n"""
+            + "\n".join(
+                [
+                    self._player_repr(player_id=player_id)
+                    for player_id in self._hands.keys()
+                ]
+            )
+            + "\n"
+            + ("=" * 50)
         )
 
     def get_pile_top(self, color: HanabiColor) -> Optional[HanabiNumber]:
