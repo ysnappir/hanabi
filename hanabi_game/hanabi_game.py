@@ -31,6 +31,7 @@ class HanabiState(IHanabiState):
         hands_dict: Dict[PlayerIdType, IHandType],
         pile_tops: Dict[HanabiColor, Optional[HanabiNumber]],
         acting_player: PlayerIdType,
+        burnt_pile: List[IHanabiCard],
     ):
         self._pile_tops = pile_tops
         self._hands = hands_dict
@@ -40,6 +41,7 @@ class HanabiState(IHanabiState):
         self._red_tokens_amount = red_tokens_amount
         self._deck_size = deck_size
         self._acting_player = acting_player
+        self._burnt_pile = burnt_pile
 
     def _player_repr(self, player_id: PlayerIdType) -> str:
         sign = "-> "
@@ -101,6 +103,9 @@ class HanabiState(IHanabiState):
 
     def get_active_player(self) -> PlayerIdType:
         return self._acting_player
+
+    def get_burnt_pile(self) -> List[IHanabiCard]:
+        return self._burnt_pile
 
 
 class HanabiHand(IHandType):
@@ -242,7 +247,11 @@ class HanabiGame(IHanabiGame):
             hands_dict=self._players_hands,
             pile_tops=self._piles,
             acting_player=self._acting_player,
+            burnt_pile=self._burnt_pile,
         )
 
     def get_players_ids(self) -> List[PlayerIdType]:
         return self._players_ids
+
+    def get_cards_per_player(self) -> int:
+        return self._number_of_cards_per_player
