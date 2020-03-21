@@ -27,7 +27,7 @@ class IHandType:
     def pop_card(self, index: int) -> IHanabiCard:
         raise NotImplementedError("")
 
-    def add_card(self, card: IHanabiCard) -> None:
+    def add_card(self, card: IHanabiCard, index: int) -> None:
         raise NotImplementedError("")
 
 

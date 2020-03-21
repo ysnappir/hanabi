@@ -116,8 +116,8 @@ class HanabiHand(IHandType):
     def pop_card(self, index: int) -> IHanabiCard:
         return self._cards.pop(index)
 
-    def add_card(self, card: IHanabiCard) -> None:
-        self._cards.append(card)
+    def add_card(self, card: IHanabiCard, index: int) -> None:
+        self._cards = self._cards[:index] + [card] + self._cards[index:]
 
 
 class HanabiGame(IHanabiGame):
@@ -180,7 +180,9 @@ class HanabiGame(IHanabiGame):
             self._players_hands[move.performer].pop_card(move.card_hand_index)
         )
         if self._deck.get_size() > 0:
-            self._players_hands[move.performer].add_card(self._deck.take_a_card())
+            self._players_hands[move.performer].add_card(
+                card=self._deck.take_a_card(), index=move.card_hand_index
+            )
 
         self._blue_tokens_amount += 1
         # TODO 20/03/2020 ysnappir: Consider check if game is over
@@ -188,7 +190,9 @@ class HanabiGame(IHanabiGame):
     def _perform_place(self, move: IHanabiPlaceMove) -> None:
         placed_card = self._players_hands[move.performer].pop_card(move.card_hand_index)
         if self._deck.get_size() > 0:
-            self._players_hands[move.performer].add_card(self._deck.take_a_card())
+            self._players_hands[move.performer].add_card(
+                card=self._deck.take_a_card(), index=move.card_hand_index
+            )
 
         required_top = get_number_to_place_on_top_of(placed_card.get_number())
         if self._piles.get(placed_card.get_color()) is required_top:
