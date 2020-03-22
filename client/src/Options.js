@@ -18,6 +18,7 @@ class JoinGame extends Component {
     }
 
     join_pin_click() {
+        this.props.
         this.setState({join_pin: true});
     }
 
@@ -79,6 +80,10 @@ class Options extends Component {
 
       }
 
+      start_game() {
+          this.setState({start_game: true})
+      }
+
       render_start_game() {
           return (
         <div className='main__container'>
@@ -94,7 +99,7 @@ class Options extends Component {
                 <button className='button'>
                     Start Game
                 </button> <br/> <br/>
-                <JoinGame/>
+                <JoinGame start_game_func={this.start_game} />
             </div>
             )
       }
