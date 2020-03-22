@@ -17,5 +17,5 @@ class ICardMapper:
 
     def move_a_card(
         self, fe_card_initial_index: FECardIndex, fe_card_final_index: FECardIndex
-    ) -> None:
+    ) -> bool:
         raise NotImplementedError("")

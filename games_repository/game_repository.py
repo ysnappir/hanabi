@@ -100,8 +100,8 @@ class HanabiPlayerWrapper:
 
     def move_a_card(
         self, card_initial_index: FECardIndex, card_final_index: FECardIndex
-    ) -> None:
-        self._card_mapper.move_a_card(
+    ) -> bool:
+        return self._card_mapper.move_a_card(
             fe_card_initial_index=card_initial_index,
             fe_card_final_index=card_final_index,
         )
@@ -342,11 +342,9 @@ class HanabiGamesRepository(IGamesRepository):
             return False
 
         try:
-            self._players[card_motion_request.player_id].move_a_card(
+            return self._players[card_motion_request.player_id].move_a_card(
                 card_initial_index=card_motion_request.initial_card_index,
                 card_final_index=card_motion_request.final_card_index,
             )
         except AssertionError:
             return False
-
-        return True
