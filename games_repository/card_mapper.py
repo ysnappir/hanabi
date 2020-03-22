@@ -38,7 +38,10 @@ class CardMapper(ICardMapper):
 
     def move_a_card(
         self, fe_card_initial_index: FECardIndex, fe_card_final_index: FECardIndex
-    ) -> None:
+    ) -> bool:
+        if fe_card_final_index > self._pinned_cards:
+            return False
+
         if fe_card_initial_index > self._pinned_cards:
             self._pinned_cards += 1
 
@@ -50,3 +53,4 @@ class CardMapper(ICardMapper):
             self._mapping[fe_card_index] = self._mapping[fe_card_index + step]
 
         self._mapping[fe_card_final_index] = game_card_index
+        return True

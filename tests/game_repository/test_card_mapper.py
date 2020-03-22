@@ -27,6 +27,14 @@ def test_correct_mapping_after_disposing():
     assert mapper.get_hanabi_card_index(4) == 3
 
 
+def test_move_only_to_pinned_section():
+    mapper: ICardMapper = CardMapper(5)
+
+    mapper.move_a_card(4, 0)
+    assert mapper.move_a_card(4, 2) is False
+    assert mapper.move_a_card(4, 1)
+
+
 def test_correct_mapping_after_moving_and_disposing():
     mapper: ICardMapper = CardMapper(5)
 
