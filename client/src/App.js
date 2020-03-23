@@ -37,8 +37,8 @@ const BAD_INPUT_MSG = "Empty Display Name or Color Num not a number"
 const GOOD_INPUT_MSG = "Let's GO!"
 
 class App extends Component {
-  constructor () {
-    super()
+  constructor (props) {
+    super(props)
     this.state = {
       load_options: false,
       user_msg: ''
@@ -51,8 +51,6 @@ class App extends Component {
   validateInput() {
     var disp_name_val = this.display_name.current.value;
     var color_num_val = this.color_num.current.value;
-    console.log(disp_name_val)
-    console.log(color_num_val)
     if (color_num_val.trim() === "" || isNaN(color_num_val) || disp_name_val.trim() === "") {
       return false;
     }

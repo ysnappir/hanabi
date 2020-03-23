@@ -3,8 +3,8 @@ import axios from 'axios'
 import GamePlay from './GamePlay';
 
 class JoinGame extends Component {
-    constructor () {
-        super()
+    constructor (props) {
+        super(props)
         this.state = {
             join_game: false
           }  
@@ -62,8 +62,8 @@ class JoinGame extends Component {
 }
 
 class Options extends Component {
-    constructor () {
-        super()
+    constructor (props) {
+        super(props)
         this.state = {
             start_game: false
           }  
