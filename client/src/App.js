@@ -43,12 +43,14 @@ class App extends Component {
       load_options: false,
       user_msg: ''
     }  
+    this.disp_name = React.createRef();
+    this.color_num = React.createRef();
     this.handleClick = this.handleClick.bind(this)
   }
   
   validateInput() {
-    var disp_name = this.refs.disp_name.value;
-    var color_num = this.refs.color_num.value;
+    var disp_name = this.disp_name.value;
+    var color_num = this.color_num.value;
     if (color_num.trim() === "" || isNaN(color_num) || disp_name.trim() === "") {
       return false;
     }
@@ -84,8 +86,8 @@ class App extends Component {
     else {
       return (
         <div className='main__container'>
-          Display Name: <input type="text" ref="disp_name" /><br/>
-          How many colors are you wearing: <input type="text" ref="color_num" /><br/><br/>
+          Display Name: <input type="text" ref={this.display_name} /><br/>
+          How many colors are you wearing: <input type="text" ref={this.color_num} /><br/><br/>
           <button className='button' onClick={this.handleClick}>
             Lets Start!
           </button>
