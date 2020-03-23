@@ -63,16 +63,22 @@ class App extends Component {
       return;
     }
     this.setState({user_msg: GOOD_INPUT_MSG});
-    this.setState({load_options: true});
-    /*
+
+    axios.post('http://127.0.0.1:8080/register', 
+      { display_name: this.display_name.current.value, 
+        number_of_colors_in_clothes: this.color_num.current.value}
+      ).then(response => this.handleResponse(response));
+      /*
     axios.get('https://api.github.com/users/maecapozzi')
       .then(response => this.handleResponse(response));
-      */
+        */
+    //this.setState({load_options: true});
+    
   }
   
   handleResponse(res) {
     console.log(res);
-    this.setState({username: res.data.name});
+    //this.setState({username: res.data.name});
   }
 
   render () {
