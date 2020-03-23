@@ -9,6 +9,7 @@ class JoinGame extends Component {
             join_game: false,
             join_pin: false
           }  
+          this.PIN_code = React.createRef();
           this.join_game_click = this.join_game_click.bind(this)
           this.join_pin_click = this.join_pin_click.bind(this)
       }
@@ -29,7 +30,7 @@ class JoinGame extends Component {
                     Don't Join Game
                 </button> <br/>
                 PIN code:
-                <input type="text" ref="PIN_code" />
+                <input type="text" ref={this.PIN_code} />
 
                 <button className='button' onClick={this.join_pin_click}>
                     Join!
