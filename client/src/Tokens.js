@@ -4,8 +4,8 @@ import miss_token from './img/miss.png'
 
 const TOKENS_ARR = { "clue" : clue_token, "miss" : miss_token }
 
-const MAX_CLUE_TOKENS = 8
-const MAX_MISS_TOKENS = 3
+const MAX_CLUE_TOKENS = '8'
+const MAX_MISS_TOKENS = '3'
 
 class SingleTokenPile extends Component {
     constructor (props) {
@@ -14,6 +14,37 @@ class SingleTokenPile extends Component {
             clue_tokens: this.props.initial_clue_tokens_num,
             miss_tokens: this.props.initial_miss_tokens_num
         }
+        this.get_available_clue_tokens = this.get_available_clue_tokens.bind(this);
+    }
+
+    get_available_clue_tokens() {
+        return this.state.clue_tokens;
+    }
+
+    get_available_miss_tokens() {
+        return this.state.miss_tokens;
+    }
+
+    use_clue_token() {
+        if (this.get_available_clue_tokens() > '0') {
+            this.setState({clue_tokens: +this.state.clue_tokens - 1})
+        }
+    }
+
+    use_miss_token() {
+        if (this.get_available_miss_tokens() > '0') {
+            this.setState({miss_tokens: +this.state.miss_tokens - 1})
+        }
+    }
+
+    add_clue_token() {
+        console.log(this.state.clue_tokens)
+        this.setState({clue_tokens: +this.state.clue_tokens+1})
+        console.log(this.state.clue_tokens)
+    }
+
+    add_miss_token() {
+        this.setState({miss_tokens: +this.state.miss_tokens + 1})
     }
 
     draw_tokens (token_type, num_of_tokens) {
@@ -39,12 +70,63 @@ class SingleTokenPile extends Component {
 }
 
 class FullTokenPile extends Component {
+    constructor (props) {
+        super(props)
+        this.available_tokens_pile = React.createRef();
+        this.used_tokens_pile = React.createRef();
+
+        this.use_clue_token = this.use_clue_token.bind(this);
+        this.use_miss_token = this.use_miss_token.bind(this);
+      }
+
+    get_available_clue_tokens() {
+        return this.available_tokens_pile.current.get_available_clue_tokens()
+    }
+
+    get_available_miss_tokens() {
+        return this.available_tokens_pile.current.get_available_miss_tokens()
+    }
+
+    has_available_clue_tokens() {
+        return this.get_available_clue_tokens() != '0';
+    }
+
+    has_available_miss_tokens() {
+        return this.get_available_miss_tokens() != '0';
+    }
+
+    use_miss_token() {
+        if (this.has_available_miss_tokens()) {
+            this.available_tokens_pile.current.use_miss_token();
+            this.used_tokens_pile.current.add_miss_token();
+        }
+        else {
+            /* No Tokens Available! */
+        }
+    }
+
+    use_clue_token() {
+        if (this.has_available_clue_tokens()) {
+            this.available_tokens_pile.current.use_clue_token();
+            this.used_tokens_pile.current.add_clue_token();
+        }
+        else {
+            /* No Tokens Available! */
+        }
+    }
+
     render () {
         return (
             <div>
-                Available Tokens: <SingleTokenPile initial_clue_tokens_num={MAX_CLUE_TOKENS} initial_miss_tokens_num={MAX_MISS_TOKENS}/>
+                Available Tokens: <SingleTokenPile 
+                    initial_clue_tokens_num={MAX_CLUE_TOKENS} initial_miss_tokens_num={MAX_MISS_TOKENS}
+                    ref={this.available_tokens_pile}/>
                 <br/><br/>
-                Used Tokens: <SingleTokenPile initial_clue_tokens_num="0" initial_miss_tokens_num="0"/>
+                Used Tokens: <SingleTokenPile initial_clue_tokens_num='0' initial_miss_tokens_num='0'
+                    ref={this.used_tokens_pile}/>
+                <br/><br/>
+                <button onClick={this.use_clue_token}>Give Clue!</button>
+                <button onClick={this.use_miss_token}>Miss!</button>
             </div>
         )
     }
