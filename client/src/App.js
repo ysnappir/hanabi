@@ -43,15 +43,17 @@ class App extends Component {
       load_options: false,
       user_msg: ''
     }  
-    this.disp_name = React.createRef();
+    this.display_name = React.createRef();
     this.color_num = React.createRef();
     this.handleClick = this.handleClick.bind(this)
   }
   
   validateInput() {
-    var disp_name = this.disp_name.value;
-    var color_num = this.color_num.value;
-    if (color_num.trim() === "" || isNaN(color_num) || disp_name.trim() === "") {
+    var disp_name_val = this.display_name.current.value;
+    var color_num_val = this.color_num.current.value;
+    console.log(disp_name_val)
+    console.log(color_num_val)
+    if (color_num_val.trim() === "" || isNaN(color_num_val) || disp_name_val.trim() === "") {
       return false;
     }
     return true;
