@@ -245,6 +245,11 @@ class HanabiGamesRepository(IGamesRepository):
         )
         self._games: Dict[GameIdType, HanabiGameWrapper] = {}
         self._players: Dict[NetworkPlayerIdType, HanabiPlayerWrapper] = {}
+        self._players_counter: int = 0
+
+    def _generate_player_id(self) -> NetworkPlayerIdType:
+        self._players_counter += 1
+        return str(self._players_counter)
 
     def get_available_id(self) -> GameIdType:
         return max(self._games.keys(), default=0) + 1
@@ -271,13 +276,11 @@ class HanabiGamesRepository(IGamesRepository):
 
     def register_player(
         self,
-        player_id: NetworkPlayerIdType,
         display_name: str,
         game_id: Optional[GameIdType] = None,
         clothes_color_number: int = 1,
-    ) -> bool:
-        if player_id in self._players:
-            return False
+    ) -> NetworkPlayerIdType:
+        player_id = self._generate_player_id()
 
         self._players[player_id] = HanabiPlayerWrapper(
             network_id=player_id,
@@ -286,8 +289,9 @@ class HanabiGamesRepository(IGamesRepository):
             card_mapper_factory=self._card_mapper_factory,
         )
         if game_id is not None:
-            return self.assign_player_to_game(player_id=player_id, game_id=game_id)
-        return True
+            self.assign_player_to_game(player_id=player_id, game_id=game_id)
+
+        return player_id
 
     def _get_players_game(
         self, player_id: NetworkPlayerIdType

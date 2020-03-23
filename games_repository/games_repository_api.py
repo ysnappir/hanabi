@@ -35,7 +35,6 @@ class IGamesRepository:
 
     def register_player(
         self,
-        player_id: NetworkPlayerIdType,
         display_name: str,
         game_id: Optional[GameIdType] = None,
         clothes_color_number: int = 1,
