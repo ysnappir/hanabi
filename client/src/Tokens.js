@@ -38,9 +38,7 @@ class SingleTokenPile extends Component {
     }
 
     add_clue_token() {
-        console.log(this.state.clue_tokens)
         this.setState({clue_tokens: +this.state.clue_tokens+1})
-        console.log(this.state.clue_tokens)
     }
 
     add_miss_token() {
