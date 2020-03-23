@@ -18,7 +18,7 @@ class JoinGame extends Component {
     }
 
     join_pin_click() {
-        this.props.
+        //this.props.
         this.setState({join_pin: true});
     }
 
