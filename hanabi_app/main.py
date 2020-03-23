@@ -15,9 +15,15 @@
 # [START gae_python37_render_template]
 import datetime
 
-from flask import Flask, render_template
+from flask import Flask, render_template, request
+from flask_cors import CORS
+
+from games_repository.game_repository import HanabiGamesRepository
+from games_repository.games_repository_api import IGamesRepository
 
 app = Flask(__name__)
+cors = CORS(app, resources={r"/*": {"origins": "*"}})
+game_repository: IGamesRepository = HanabiGamesRepository()
 
 
 @app.route('/')
@@ -30,6 +36,18 @@ def root():
                    ]
 
     return render_template('index.html', times=dummy_times)
+
+
+@app.route("/register", methods=["post"])
+def register():
+    try:
+        print(request.json)
+        player_id = game_repository.register_player(display_name=request.json["display_name"],
+                                                    clothes_color_number=request.json["number_of_colors_in_clothes"],
+                                                    )
+        return {"id": player_id}, 200
+    except KeyError:
+        return "", 400
 
 
 if __name__ == '__main__':
