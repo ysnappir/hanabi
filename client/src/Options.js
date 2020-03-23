@@ -6,21 +6,14 @@ class JoinGame extends Component {
     constructor () {
         super()
         this.state = {
-            join_game: false,
-            join_pin: false
+            join_game: false
           }  
           this.PIN_code = React.createRef();
           this.join_game_click = this.join_game_click.bind(this)
-          this.join_pin_click = this.join_pin_click.bind(this)
       }
 
     join_game_click() {
         this.setState({join_game: !this.state.join_game});
-    }
-
-    join_pin_click() {
-        //this.props.
-        this.setState({join_pin: true});
     }
 
     render_join_game() {
@@ -32,7 +25,7 @@ class JoinGame extends Component {
                 PIN code:
                 <input type="text" ref={this.PIN_code} />
 
-                <button className='button' onClick={this.join_pin_click}>
+                <button className='button' onClick={this.props.start_game_func}>
                     Join!
                 </button> <br/>
             </div>
@@ -58,10 +51,6 @@ class JoinGame extends Component {
     }
 
     render () {
-        if (this.state.join_pin) {
-            return this.render_game();
-        }
-
         if (!this.state.join_game) {
             return this.render_regular();
         }
@@ -78,7 +67,7 @@ class Options extends Component {
         this.state = {
             start_game: false
           }  
-
+          this.start_game = this.start_game.bind(this)
       }
 
       start_game() {
