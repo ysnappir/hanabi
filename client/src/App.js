@@ -34,7 +34,7 @@ import Options from './Options';
 
 
 const BAD_INPUT_MSG = "Empty Display Name or Color Num not a number"
-const GOOD_INPUT_MSG = "Let's GO!"
+const WAIT_STR = "Please Wait..."
 
 class App extends Component {
   constructor (props) {
@@ -62,23 +62,24 @@ class App extends Component {
       this.setState({user_msg: BAD_INPUT_MSG});
       return;
     }
-    this.setState({user_msg: GOOD_INPUT_MSG});
+    this.setState({user_msg: WAIT_STR});
 
     axios.post('http://127.0.0.1:8080/register', 
       { display_name: this.display_name.current.value, 
         number_of_colors_in_clothes: this.color_num.current.value}
-      ).then(response => this.handleResponse(response));
-      /*
-    axios.get('https://api.github.com/users/maecapozzi')
-      .then(response => this.handleResponse(response));
-        */
-    //this.setState({load_options: true});
-    
+      ).then(response => this.handleResponse(response), reason => this.handleError(reason));
   }
   
+  handleError(reason) {
+    console.log(reason);
+    this.setState({user_msg: "Connection Error: " + reason});
+  }
+
+
   handleResponse(res) {
     console.log(res);
-    //this.setState({username: res.data.name});
+    this.setState({user_msg: res.data.id});
+    this.setState({load_options: true});
   }
 
   render () {
