@@ -18,8 +18,10 @@ import datetime
 from flask import Flask, render_template, request
 from flask_cors import CORS
 
+from games_repository.defs import GameIdType
 from games_repository.game_repository import HanabiGamesRepository
 from games_repository.games_repository_api import IGamesRepository
+from games_repository.utils import jsonify_game_state
 
 app = Flask(__name__)
 cors = CORS(app, resources={r"/*": {"origins": "*"}})
@@ -41,11 +43,47 @@ def root():
 @app.route("/register", methods=["post"])
 def register():
     try:
-        print(request.json)
         player_id = game_repository.register_player(display_name=request.json["display_name"],
                                                     clothes_color_number=request.json["number_of_colors_in_clothes"],
                                                     )
         return {"id": player_id}, 200
+    except KeyError:
+        return "", 400
+
+
+@app.route("/create_game/<player_id>", methods=["post"])
+def create_game(player_id: str):
+    try:
+        game_id = game_repository.create_game()
+        assert game_repository.assign_player_to_game(player_id=player_id, game_id=game_id)
+        return {"game_id": game_id}, 200
+    except KeyError:
+        return "", 400
+
+
+@app.route("/join_game/<player_id>/<game_id>", methods=["post"])
+def join_game(player_id: str, game_id: str):
+    try:
+        assert game_repository.assign_player_to_game(player_id=player_id, game_id=GameIdType(game_id))
+        return {}, 200
+    except KeyError:
+        return "", 400
+
+
+@app.route("/start_game/<game_id>", methods=["post"])
+def start_game(game_id: str):
+    try:
+        assert game_repository.start_game(game_id=GameIdType(game_id))
+        return {}, 200
+    except KeyError:
+        return "", 400
+
+
+@app.route("/game_state/<player_id>/<game_id>", methods=["post"])
+def game_state(player_id: str, game_id: str):
+    try:
+        ret_val = jsonify_game_state(game_repository.get_game_state(game_id=GameIdType(game_id), player_id=player_id))
+        return ret_val, 200
     except KeyError:
         return "", 400
 

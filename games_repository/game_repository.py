@@ -52,6 +52,7 @@ class HanabiPlayerWrapper:
 
     def assign_to_game(self, hanabi_game_id: GameIdType) -> bool:
         if self._hanabi_game_id is not None:
+            print("Player already assigned to a game!s")
             return False
 
         self._hanabi_game_id = hanabi_game_id
@@ -163,6 +164,7 @@ class HanabiGameWrapper:
         return len(self._players)
 
     def start(self) -> bool:
+        print(f"Starting game {self._game_id}")
         index_of_player_with_most_colors: int = max(
             range(self.get_number_of_players()),
             key=lambda i: self._players[
@@ -310,10 +312,17 @@ class HanabiGamesRepository(IGamesRepository):
             or self._games[game_id].get_status() is not GameStatus.CREATED
             or player_id not in self._players
         ):
+            if game_id not in self._games:
+                print("Game not found")
+            if self._games[game_id].get_status() is not GameStatus.CREATED:
+                print("Game already started!")
+            if player_id not in self._players:
+                print("Player not found")
             return False
 
         players_game = self._get_players_game(player_id=player_id)
         if players_game and players_game.get_status() is not GameStatus.FINISHED:
+            print("Game already started")
             return False
 
         return self._games[game_id].assign_player(self._players[player_id])
@@ -323,13 +332,17 @@ class HanabiGamesRepository(IGamesRepository):
             game_id not in self._games
             or self._games[game_id].get_status() is not GameStatus.CREATED
         ):
+            if game_id not in self._games:
+                print("Game not found")
+            if self._games[game_id].get_status() is not GameStatus.CREATED:
+                print("Game already started!")
             return False
 
-        if (
-            not MAXIMAL_PLAYERS
-            > self._games[game_id].get_number_of_players()
-            > MINIMAL_PLAYERS
-        ):
+        if not (MAXIMAL_PLAYERS
+                >= self._games[game_id].get_number_of_players()
+                >= MINIMAL_PLAYERS
+                ):
+            print("Wrong number of players!")
             return False
 
         return self._games[game_id].start()
