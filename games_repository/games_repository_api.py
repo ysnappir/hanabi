@@ -10,10 +10,8 @@ from games_repository.defs import (
 
 
 class IGamesRepository:
-    def get_available_id(self) -> GameIdType:
-        raise NotImplementedError("")
 
-    def create_game(self, game_id: GameIdType) -> bool:
+    def create_game(self) -> GameIdType:
         raise NotImplementedError("")
 
     def start_game(self, game_id: GameIdType) -> bool:
