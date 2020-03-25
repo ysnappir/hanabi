@@ -246,20 +246,25 @@ class HanabiGamesRepository(IGamesRepository):
         self._games: Dict[GameIdType, HanabiGameWrapper] = {}
         self._players: Dict[NetworkPlayerIdType, HanabiPlayerWrapper] = {}
         self._players_counter: int = 0
+        self._games_counter: int = 0
 
     def _generate_player_id(self) -> NetworkPlayerIdType:
         self._players_counter += 1
         return str(self._players_counter)
 
+    def _generate_game_id(self) -> GameIdType:
+        self._games_counter += 1
+        return self._games_counter
+
     def get_available_id(self) -> GameIdType:
         return max(self._games.keys(), default=0) + 1
 
-    def create_game(self, game_id: GameIdType) -> bool:
-        if game_id in self._games:
-            return False
+    def create_game(self) -> GameIdType:
+        game_id = self._generate_game_id()
+        assert game_id not in self._games
 
         self._games[game_id] = HanabiGameWrapper(game_id=game_id)
-        return True
+        return game_id
 
     def get_active_games(self) -> Set[GameIdType]:
         return set(
@@ -281,6 +286,7 @@ class HanabiGamesRepository(IGamesRepository):
         clothes_color_number: int = 1,
     ) -> NetworkPlayerIdType:
         player_id = self._generate_player_id()
+        assert player_id not in self._players
 
         self._players[player_id] = HanabiPlayerWrapper(
             network_id=player_id,
