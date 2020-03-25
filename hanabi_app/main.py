@@ -50,6 +50,28 @@ def register():
         return "", 400
 
 
+@app.route("/create_game/<player_id>", methods=["post"])
+def create_game(player_id: str):
+    try:
+        print(request.json)
+        game_id = game_repository.create_game()
+        assert game_repository.assign_player_to_game(player_id=player_id, game_id=game_id)
+        return {"game_id": game_id}, 200
+    except KeyError:
+        return "", 400
+
+
+@app.route("/join_game/<player_id>/<game_id>", methods=["post"])
+def join_game(player_id: str, game_id: int):
+    try:
+        print("Hi")
+        print(request.json)
+        assert game_repository.assign_player_to_game(player_id=player_id, game_id=int(game_id))
+        return {}, 200
+    except KeyError:
+        return "", 400
+
+
 if __name__ == '__main__':
     # This is used when running locally only. When deploying to Google App
     # Engine, a webserver process such as Gunicorn will serve the app. This

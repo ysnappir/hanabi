@@ -261,8 +261,6 @@ class HanabiGamesRepository(IGamesRepository):
 
     def create_game(self) -> GameIdType:
         game_id = self._generate_game_id()
-        assert game_id not in self._games
-
         self._games[game_id] = HanabiGameWrapper(game_id=game_id)
         return game_id
 
@@ -312,10 +310,17 @@ class HanabiGamesRepository(IGamesRepository):
             or self._games[game_id].get_status() is not GameStatus.CREATED
             or player_id not in self._players
         ):
+            if game_id not in self._games:
+                print("Game not found")
+            if self._games[game_id].get_status() is not GameStatus.CREATED:
+                print("Game already started!")
+            if player_id not in self._players:
+                print("Player not found")
             return False
 
         players_game = self._get_players_game(player_id=player_id)
         if players_game and players_game.get_status() is not GameStatus.FINISHED:
+            print("Game already started")
             return False
 
         return self._games[game_id].assign_player(self._players[player_id])
