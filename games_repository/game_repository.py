@@ -261,8 +261,6 @@ class HanabiGamesRepository(IGamesRepository):
 
     def create_game(self) -> GameIdType:
         game_id = self._generate_game_id()
-        assert game_id not in self._games
-
         self._games[game_id] = HanabiGameWrapper(game_id=game_id)
         return game_id
 
