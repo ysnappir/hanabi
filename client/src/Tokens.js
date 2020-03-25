@@ -25,6 +25,14 @@ class SingleTokenPile extends Component {
         return this.state.miss_tokens;
     }
 
+    set_available_clue_tokens(num_of_tokens) {
+        this.setState({clue_tokens: num_of_tokens})
+    }
+
+    set_available_miss_tokens(num_of_tokens) {
+        this.setState({miss_tokens: num_of_tokens})
+    }
+
     use_clue_token() {
         if (this.get_available_clue_tokens() > '0') {
             this.setState({clue_tokens: +this.state.clue_tokens - 1})
@@ -111,6 +119,16 @@ class FullTokenPile extends Component {
         else {
             /* No Tokens Available! */
         }
+    }
+
+    set_available_clue_tokens(num_of_tokens) {
+        this.available_tokens_pile.current.set_available_clue_tokens(num_of_tokens);
+        this.used_tokens_pile.current.set_available_clue_tokens(+MAX_CLUE_TOKENS - num_of_tokens);
+    }
+
+    set_available_miss_tokens(num_of_tokens) {
+        this.available_tokens_pile.current.set_available_miss_tokens(num_of_tokens);
+        this.used_tokens_pile.current.set_available_miss_tokens(+MAX_MISS_TOKENS - num_of_tokens);
     }
 
     render () {

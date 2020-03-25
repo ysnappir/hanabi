@@ -9,8 +9,9 @@ class GamePlay extends Component {
     constructor (props) {
         super(props)
         this.state = {
-            num_of_players: props.num_of_players
+            players: []
         }
+        this.tokens_pile = React.createRef();
         this.player = React.createRef();
       }
 
@@ -22,6 +23,15 @@ class GamePlay extends Component {
       }
       
       update_game(game_json) {
+        var myJson = JSON.parse(game_json);
+
+        var clue_tokens = myJson['blue_tokens']
+        var miss_tokens = myJson['red_tokens']
+        this.tokens_pile.current.set_available_clue_tokens(clue_tokens)
+        this.tokens_pile.current.set_available_miss_tokens(miss_tokens)
+
+        var players = myJson['hands'];
+        
 
         this.player.current.update_cards(TEST_CARDS);
       }
@@ -31,7 +41,7 @@ class GamePlay extends Component {
         <div>
             Full game play <br/> <br/>
             Tokens Status: <br/>
-            <FullTokenPile/>
+            <FullTokenPile ref={this.tokens_pile}/>
             <br/><br/>
             <Player display_name='asdf' ref={this.player}/>
         </div>

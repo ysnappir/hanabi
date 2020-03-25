@@ -29,7 +29,6 @@ class PlayerCards extends Component {
         const out_cards = []
         for (let index = 0; index < this.state.cards.length; index++) {
             var pos_arr = this.card_to_image_pos(this.state.cards[index]['number'], this.state.cards[index]['color']);
-            console.log(pos_arr)
             out_cards.push(<div className='card' 
                             style={{backgroundPositionX :pos_arr[0] + '%', backgroundPositionY :pos_arr[1] + '%'}} key={index}></div>);
         }
