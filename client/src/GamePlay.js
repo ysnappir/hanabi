@@ -9,10 +9,10 @@ class GamePlay extends Component {
     constructor (props) {
         super(props)
         this.state = {
-            players: []
+            players: {}
         }
         this.tokens_pile = React.createRef();
-        this.player = React.createRef();
+        this.playersRefs = [];
       }
 
       componentDidMount() {
@@ -22,6 +22,16 @@ class GamePlay extends Component {
         clearInterval(this.interval);
       }
       
+      get_player_cards(players, id) {
+          for (let index = 0; index < players.length; index++) {
+              var player = players[index];
+              if (player['id'] == id) {
+                  return player['cards']
+              }
+          }
+          return []
+      }
+
       update_game(game_json) {
         var myJson = JSON.parse(game_json);
 
@@ -30,10 +40,32 @@ class GamePlay extends Component {
         this.tokens_pile.current.set_available_clue_tokens(clue_tokens)
         this.tokens_pile.current.set_available_miss_tokens(miss_tokens)
 
-        var players = myJson['hands'];
-        
+        var json_players = myJson['hands'];
+        this.setState({players : json_players})
+        if (this.playersRefs.length > 0) {
+            //this.playersRefs.map((curr_ref, index) => console.log(curr_ref.props.user_id))
 
-        this.player.current.update_cards(TEST_CARDS);
+            this.playersRefs.map((curr_ref, index) => curr_ref.update_cards(
+                this.get_player_cards(json_players, curr_ref.props.user_id)
+            ))
+        }
+
+        // this.player.current.update_cards(TEST_CARDS);
+      }
+
+      render_players() {
+          var out_players = [];
+          if (this.state.players.length > 0) {
+          var out_players = this.state.players.map((player, index) => 
+            <Player user_id={player['id']} display_name={player['display_name']} ref={ref => { 
+                // Callback refs are preferable when 
+                // dealing with dynamic refs
+                this.playersRefs[index] = ref; 
+              }} key={player['id']} 
+            />)
+        }
+        //return <Player display_name='asdf' ref={this.player}/>
+        return out_players
       }
 
     render () {
@@ -43,7 +75,7 @@ class GamePlay extends Component {
             Tokens Status: <br/>
             <FullTokenPile ref={this.tokens_pile}/>
             <br/><br/>
-            <Player display_name='asdf' ref={this.player}/>
+            {this.render_players()}
         </div>
         )
     }
