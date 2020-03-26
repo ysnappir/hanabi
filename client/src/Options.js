@@ -85,7 +85,7 @@ class Options extends Component {
       render_regular () {
         return (
             <div className='main__container'>
-                User {this.props.user_id} -  What Do You Want To Do? <br/> <br/>
+                User {window.$id} -  What Do You Want To Do? <br/> <br/>
                 <button className='button'>
                     Start Game
                 </button> <br/> <br/>

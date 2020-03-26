@@ -41,8 +41,7 @@ class App extends Component {
     super(props)
     this.state = {
       load_options: false,
-      user_msg: '',
-      user_id: ''
+      user_msg: ''
     }  
     this.display_name = React.createRef();
     this.color_num = React.createRef();
@@ -79,7 +78,7 @@ class App extends Component {
 
   handleResponse(res) {
     console.log(res);
-    this.setState({user_id: res.data.id});
+    window.$id = res.data.id;
     this.setState({load_options: true});
   }
 
@@ -87,7 +86,7 @@ class App extends Component {
     if (this.state.load_options) {
       return (
           <div className='main__container'>
-            <Options user_id={this.state.user_id}/>
+            <Options/>
           </div>
       )
     }
