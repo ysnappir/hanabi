@@ -13,6 +13,7 @@ class GamePlay extends Component {
         }
         this.tokens_pile = React.createRef();
         this.playersRefs = [];
+        this.send_start_game = this.send_start_game.bind(this)
       }
 
       componentDidMount() {
@@ -33,6 +34,11 @@ class GamePlay extends Component {
       }
 
       update_game(game_json) {
+        axios.post('http://127.0.0.1:8080/game_state/' + window.$id + '/1', {}).
+        then(response => this.handle_get_state_response(response), 
+        reason => this.handle_get_state_error(reason));
+
+/*
         var myJson = JSON.parse(game_json);
 
         var clue_tokens = myJson['blue_tokens']
@@ -49,10 +55,33 @@ class GamePlay extends Component {
                 this.get_player_cards(json_players, curr_ref.props.user_id)
             ))
         }
-
+*/
         // this.player.current.update_cards(TEST_CARDS);
       }
 
+      handle_get_state_response(response) {
+        console.log(response)
+        console.log(response.data)
+        var myJson = response.data;
+
+        var clue_tokens = myJson['blue_tokens']
+        var miss_tokens = myJson['red_tokens']
+        this.tokens_pile.current.set_available_clue_tokens(clue_tokens)
+        this.tokens_pile.current.set_available_miss_tokens(miss_tokens)
+
+        var json_players = myJson['hands'];
+        this.setState({players : json_players})
+        if (this.playersRefs.length > 0) {
+            //this.playersRefs.map((curr_ref, index) => console.log(curr_ref.props.user_id))
+
+            this.playersRefs.map((curr_ref, index) => curr_ref.update_cards(
+                this.get_player_cards(json_players, curr_ref.props.user_id)
+            ))
+        }
+      }
+      handle_get_state_error(reason) {
+        console.log(reason)
+      }
       render_players() {
           var out_players = [];
           if (this.state.players.length > 0) {
@@ -68,6 +97,21 @@ class GamePlay extends Component {
         return out_players
       }
 
+      send_start_game() {
+        axios.post('http://127.0.0.1:8080/start_game/1', {})
+        .then(response => this.handle_start_game_response(response), 
+          reason => this.handle_start_game_error(reason));
+  
+      }
+
+      handle_start_game_response(response) {
+        console.log(response)
+      }
+
+      handle_start_game_error(reason) {
+        console.log(reason)
+      }
+
     render () {
         return (
         <div>
@@ -75,6 +119,7 @@ class GamePlay extends Component {
             Tokens Status: <br/>
             <FullTokenPile ref={this.tokens_pile}/>
             <br/><br/>
+            <button onClick={this.send_start_game}> Start Game </button>
             {this.render_players()}
         </div>
         )

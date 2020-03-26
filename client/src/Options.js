@@ -61,14 +61,6 @@ class JoinGame extends Component {
             )    
     }
 
-    render_game() {
-        return (
-            <div>
-                <GamePlay />
-            </div>
-        )
-    }
-
     render () {
         if (!this.state.join_game) {
             return this.render_regular();
@@ -84,7 +76,8 @@ class Options extends Component {
     constructor (props) {
         super(props)
         this.state = {
-            start_game: false
+            start_game: false,
+            game_pin: ''
           }  
           this.create_game = this.create_game.bind(this)
           this.join_game = this.join_game.bind(this)
@@ -113,7 +106,7 @@ class Options extends Component {
       render_start_game() {
           return (
         <div className='main__container'>
-            <GamePlay />
+            <GamePlay game_id={window.$game_id} />
         </div>
           )
       }
