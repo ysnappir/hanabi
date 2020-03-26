@@ -67,11 +67,24 @@ class Options extends Component {
         this.state = {
             start_game: false
           }  
-          this.start_game = this.start_game.bind(this)
+          this.create_game = this.create_game.bind(this)
+          //this.join_game = this.join_game.bind(this)
       }
 
-      start_game() {
+      create_game() {
+        axios.post('http://127.0.0.1:8080/create_game/' + window.$id, {}).
+        then(response => this.handle_create_game_response(response), 
+        reason => this.handle_create_game_error(reason));
+      }
+
+      handle_create_game_response(response) {
+          console.log(response)
+        window.$game_id = response.data.game_id;
           this.setState({start_game: true})
+      }
+
+      handle_create_game_error(reason) {
+          // TODO
       }
 
       render_start_game() {
@@ -86,14 +99,11 @@ class Options extends Component {
         return (
             <div className='main__container'>
                 User {window.$id} -  What Do You Want To Do? <br/> <br/>
-                <button className='button'>
-                    Start Game
-                </button> <br/> <br/>
-                <JoinGame start_game_func={this.start_game} />
+                <button className='button' onClick={this.create_game}> Create Game </button> <br/> <br/>
+                <JoinGame join_game_func={this.join_game} />
             </div>
             )
       }
-
 
     render () {
         if (this.state.start_game) {
