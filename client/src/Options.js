@@ -9,23 +9,42 @@ class JoinGame extends Component {
             join_game: false
           }  
           this.PIN_code = React.createRef();
-          this.join_game_click = this.join_game_click.bind(this)
+          this.main_button_click = this.main_button_click.bind(this)
+          this.join_click = this.join_click.bind(this)
       }
 
-    join_game_click() {
+      main_button_click() {
         this.setState({join_game: !this.state.join_game});
+    }
+
+    join_click() {
+        var pin = this.PIN_code.current.value;
+        console.log(pin)
+        axios.post('http://127.0.0.1:8080/join_game/' + window.$id + '/' + pin, {}).
+        then(response => this.handle_join_game_response(response), 
+        reason => this.handle_join_game_error(reason));
+
+    }
+
+    handle_join_game_response(response) {
+        console.log(response)
+        this.props.join_game_func();
+    }
+
+    handle_join_game_error(reason) {
+        // TODO
     }
 
     render_join_game() {
         return (
             <div>
-                <button className='button' onClick={this.join_game_click}>
+                <button className='button' onClick={this.main_button_click}>
                     Don't Join Game
                 </button> <br/>
                 PIN code:
                 <input type="text" ref={this.PIN_code} />
 
-                <button className='button' onClick={this.props.start_game_func}>
+                <button className='button' onClick={this.join_click}>
                     Join!
                 </button> <br/>
             </div>
@@ -35,7 +54,7 @@ class JoinGame extends Component {
     render_regular() {
         return (
             <div>
-                <button className='button' onClick={this.join_game_click}>
+                <button className='button' onClick={this.main_button_click}>
                     Join Game
                 </button>
             </div>
@@ -68,7 +87,7 @@ class Options extends Component {
             start_game: false
           }  
           this.create_game = this.create_game.bind(this)
-          //this.join_game = this.join_game.bind(this)
+          this.join_game = this.join_game.bind(this)
       }
 
       create_game() {
@@ -85,6 +104,10 @@ class Options extends Component {
 
       handle_create_game_error(reason) {
           // TODO
+      }
+
+      join_game() {
+        this.setState({start_game: true})
       }
 
       render_start_game() {
