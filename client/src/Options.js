@@ -1,8 +1,11 @@
 import React, { Component } from 'react'
 import axios from 'axios'
 import GamePlay from './GamePlay';
+import {UserIdContext} from './themes.js'
 
 class JoinGame extends Component {
+    static contextType = UserIdContext;
+
     constructor (props) {
         super(props)
         this.state = {
@@ -20,7 +23,7 @@ class JoinGame extends Component {
     join_click() {
         var pin = this.PIN_code.current.value;
         console.log(pin)
-        axios.post('http://127.0.0.1:8080/join_game/' + window.$id + '/' + pin, {}).
+        axios.post('http://127.0.0.1:8080/join_game/' + this.context + '/' + pin, {}).
         then(response => this.handle_join_game_response(response), 
         reason => this.handle_join_game_error(reason));
 
@@ -74,6 +77,8 @@ class JoinGame extends Component {
 }
 
 class Options extends Component {
+    static contextType = UserIdContext;
+
     constructor (props) {
         super(props)
         this.state = {
@@ -85,7 +90,7 @@ class Options extends Component {
       }
 
       create_game() {
-        axios.post('http://127.0.0.1:8080/create_game/' + window.$id, {}).
+        axios.post('http://127.0.0.1:8080/create_game/' + this.context, {}).
         then(response => this.handle_create_game_response(response), 
         reason => this.handle_create_game_error(reason));
       }
@@ -132,4 +137,5 @@ class Options extends Component {
         }
     }
 }
+
 export default Options

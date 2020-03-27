@@ -2,10 +2,13 @@ import React, { Component } from 'react'
 import axios from 'axios'
 import FullTokenPile from './Tokens.js'
 import Player, {TEST_CARDS} from './Player.js'
+import {UserIdContext} from './themes.js'
 
 const TEST_JSON = '{"deck_size": 42, "blue_tokens": 5, "red_tokens": 2, "table": {"rainbow": 3, "blue": null, "red": 5}, "hands": [{"id": "p_0", "display_name": "Snap", "cards": [{"number": 3, "color": "red"}, {"number": 3, "color": "red"}]}, {"id": "p_1", "display_name": "Ethan", "cards": [{"number": 5, "color": "blue"}, {"number": 3, "color": "red"}]}, {"id": "p_2", "display_name": "Amos", "cards": [{"number": 2, "color": "yellow"}, {"number": 1, "color": "white"}]}], "burnt_pile": [{"number": 2, "color": "yellow"}, {"number": 2, "color": "yellow"}, {"number": 2, "color": "yellow"}]}';
 
 class GamePlay extends Component {
+  static contextType = UserIdContext;
+
     constructor (props) {
         super(props)
         this.state = {
@@ -34,7 +37,7 @@ class GamePlay extends Component {
       }
 
       update_game(game_json) {
-        axios.post('http://127.0.0.1:8080/game_state/' + window.$id + '/1', {}).
+        axios.post('http://127.0.0.1:8080/game_state/' + this.context + '/' + this.props.game_id, {}).
         then(response => this.handle_get_state_response(response), 
         reason => this.handle_get_state_error(reason));
       }
