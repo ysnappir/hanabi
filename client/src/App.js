@@ -65,10 +65,10 @@ class App extends Component {
     }
     this.setState({user_msg: WAIT_STR});
 
-    axios.post('http://127.0.0.1:8080/register', 
+    axios.post('/register', 
       { display_name: this.display_name.current.value, 
         number_of_colors_in_clothes: this.color_num.current.value}
-      ).then(response => this.handleResponse(response), reason => this.handleError(reason));
+    ).then(response => this.handleResponse(response), reason => this.handleError(reason));
   }
   
   handleError(reason) {

@@ -35,7 +35,7 @@ class GamePlay extends Component {
       }
 
       update_game() {
-        axios.post('http://127.0.0.1:8080/game_state/' + this.context + '/' + this.props.game_id, {}).
+        axios.post('/game_state/' + this.context + '/' + this.props.game_id, {}).
         then(response => this.handle_get_state_response(response), 
         reason => this.handle_get_state_error(reason));
       }
@@ -79,7 +79,7 @@ class GamePlay extends Component {
       }
 
       send_start_game() {
-        axios.post('http://127.0.0.1:8080/start_game/' + this.props.game_id, {})
+        axios.post('/start_game/' + this.props.game_id, {})
         .then(response => this.handle_start_game_response(response), 
           reason => this.handle_start_game_error(reason));
   
