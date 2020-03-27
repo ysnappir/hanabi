@@ -5,7 +5,6 @@ import App from './App';
 import * as serviceWorker from './serviceWorker';
 
 window.$id = ''
-window.$game_id = ''
 
 ReactDOM.render(
   <React.StrictMode>

@@ -28,7 +28,8 @@ class JoinGame extends Component {
 
     handle_join_game_response(response) {
         console.log(response)
-        this.props.join_game_func();
+        var pin = this.PIN_code.current.value;
+        this.props.join_game_func(pin);
     }
 
     handle_join_game_error(reason) {
@@ -77,7 +78,7 @@ class Options extends Component {
         super(props)
         this.state = {
             start_game: false,
-            game_pin: ''
+            game_id: ''
           }  
           this.create_game = this.create_game.bind(this)
           this.join_game = this.join_game.bind(this)
@@ -91,7 +92,7 @@ class Options extends Component {
 
       handle_create_game_response(response) {
           console.log(response)
-        window.$game_id = response.data.game_id;
+          this.setState({game_id: response.data.game_id})
           this.setState({start_game: true})
       }
 
@@ -99,14 +100,15 @@ class Options extends Component {
           // TODO
       }
 
-      join_game() {
+      join_game(input_game_id) {
+        this.setState({game_id: input_game_id})
         this.setState({start_game: true})
       }
 
       render_start_game() {
           return (
         <div className='main__container'>
-            <GamePlay game_id={window.$game_id} />
+            <GamePlay game_id={this.state.game_id} />
         </div>
           )
       }

@@ -37,26 +37,6 @@ class GamePlay extends Component {
         axios.post('http://127.0.0.1:8080/game_state/' + window.$id + '/1', {}).
         then(response => this.handle_get_state_response(response), 
         reason => this.handle_get_state_error(reason));
-
-/*
-        var myJson = JSON.parse(game_json);
-
-        var clue_tokens = myJson['blue_tokens']
-        var miss_tokens = myJson['red_tokens']
-        this.tokens_pile.current.set_available_clue_tokens(clue_tokens)
-        this.tokens_pile.current.set_available_miss_tokens(miss_tokens)
-
-        var json_players = myJson['hands'];
-        this.setState({players : json_players})
-        if (this.playersRefs.length > 0) {
-            //this.playersRefs.map((curr_ref, index) => console.log(curr_ref.props.user_id))
-
-            this.playersRefs.map((curr_ref, index) => curr_ref.update_cards(
-                this.get_player_cards(json_players, curr_ref.props.user_id)
-            ))
-        }
-*/
-        // this.player.current.update_cards(TEST_CARDS);
       }
 
       handle_get_state_response(response) {
@@ -98,7 +78,7 @@ class GamePlay extends Component {
       }
 
       send_start_game() {
-        axios.post('http://127.0.0.1:8080/start_game/1', {})
+        axios.post('http://127.0.0.1:8080/start_game/' + this.props.game_id, {})
         .then(response => this.handle_start_game_response(response), 
           reason => this.handle_start_game_error(reason));
   
