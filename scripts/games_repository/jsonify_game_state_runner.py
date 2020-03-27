@@ -46,5 +46,6 @@ if __name__ == "__main__":
             HanabiCard(HanabiColor.YELLOW, HanabiNumber.TWO),
             HanabiCard(HanabiColor.YELLOW, HanabiNumber.TWO),
         ],
+        active_player="p_1"
     )
     print(json.dumps(jsonify_game_state(game_state)))
