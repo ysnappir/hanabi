@@ -1,31 +1,54 @@
 import React, { Component } from 'react'
 import axios from 'axios'
 import GamePlay from './GamePlay';
+import {UserIdContext} from './themes.js'
 
 class JoinGame extends Component {
+    static contextType = UserIdContext;
+
     constructor (props) {
         super(props)
         this.state = {
             join_game: false
           }  
           this.PIN_code = React.createRef();
-          this.join_game_click = this.join_game_click.bind(this)
+          this.main_button_click = this.main_button_click.bind(this)
+          this.join_click = this.join_click.bind(this)
       }
 
-    join_game_click() {
+      main_button_click() {
         this.setState({join_game: !this.state.join_game});
+    }
+
+    join_click() {
+        var pin = this.PIN_code.current.value;
+        console.log(pin)
+        axios.post('http://127.0.0.1:8080/join_game/' + this.context + '/' + pin, {}).
+        then(response => this.handle_join_game_response(response), 
+        reason => this.handle_join_game_error(reason));
+
+    }
+
+    handle_join_game_response(response) {
+        console.log(response)
+        var pin = this.PIN_code.current.value;
+        this.props.join_game_func(pin);
+    }
+
+    handle_join_game_error(reason) {
+        // TODO
     }
 
     render_join_game() {
         return (
             <div>
-                <button className='button' onClick={this.join_game_click}>
+                <button className='button' onClick={this.main_button_click}>
                     Don't Join Game
                 </button> <br/>
                 PIN code:
                 <input type="text" ref={this.PIN_code} />
 
-                <button className='button' onClick={this.props.start_game_func}>
+                <button className='button' onClick={this.join_click}>
                     Join!
                 </button> <br/>
             </div>
@@ -35,19 +58,11 @@ class JoinGame extends Component {
     render_regular() {
         return (
             <div>
-                <button className='button' onClick={this.join_game_click}>
+                <button className='button' onClick={this.main_button_click}>
                     Join Game
                 </button>
             </div>
             )    
-    }
-
-    render_game() {
-        return (
-            <div>
-                <GamePlay />
-            </div>
-        )
     }
 
     render () {
@@ -62,22 +77,43 @@ class JoinGame extends Component {
 }
 
 class Options extends Component {
+    static contextType = UserIdContext;
+
     constructor (props) {
         super(props)
         this.state = {
-            start_game: false
+            start_game: false,
+            game_id: ''
           }  
-          this.start_game = this.start_game.bind(this)
+          this.create_game = this.create_game.bind(this)
+          this.join_game = this.join_game.bind(this)
       }
 
-      start_game() {
+      create_game() {
+        axios.post('http://127.0.0.1:8080/create_game/' + this.context, {}).
+        then(response => this.handle_create_game_response(response), 
+        reason => this.handle_create_game_error(reason));
+      }
+
+      handle_create_game_response(response) {
+          console.log(response)
+          this.setState({game_id: response.data.game_id})
           this.setState({start_game: true})
+      }
+
+      handle_create_game_error(reason) {
+          // TODO
+      }
+
+      join_game(input_game_id) {
+        this.setState({game_id: input_game_id})
+        this.setState({start_game: true})
       }
 
       render_start_game() {
           return (
         <div className='main__container'>
-            <GamePlay />
+            <GamePlay game_id={this.state.game_id} />
         </div>
           )
       }
@@ -85,15 +121,12 @@ class Options extends Component {
       render_regular () {
         return (
             <div className='main__container'>
-                User {this.props.user_id} -  What Do You Want To Do? <br/> <br/>
-                <button className='button'>
-                    Start Game
-                </button> <br/> <br/>
-                <JoinGame start_game_func={this.start_game} />
+                User {window.$id} -  What Do You Want To Do? <br/> <br/>
+                <button className='button' onClick={this.create_game}> Create Game </button> <br/> <br/>
+                <JoinGame join_game_func={this.join_game} />
             </div>
             )
       }
-
 
     render () {
         if (this.state.start_game) {
@@ -104,4 +137,5 @@ class Options extends Component {
         }
     }
 }
+
 export default Options

@@ -31,7 +31,7 @@ import React, { Component } from 'react'
 import './App.css'
 import axios from 'axios'
 import Options from './Options';
-
+import {UserIdContext} from './themes.js'
 
 const BAD_INPUT_MSG = "Empty Display Name or Color Num not a number"
 const WAIT_STR = "Please Wait..."
@@ -79,16 +79,19 @@ class App extends Component {
 
   handleResponse(res) {
     console.log(res);
-    this.setState({user_id: res.data.id});
+    this.setState({user_id: res.data.id})
     this.setState({load_options: true});
   }
 
   render () {
     if (this.state.load_options) {
       return (
+        <UserIdContext.Provider value={this.state.user_id}>
           <div className='main__container'>
-            <Options user_id={this.state.user_id}/>
+            <Options/>
           </div>
+        </UserIdContext.Provider>
+
       )
     }
     else {

@@ -2,10 +2,11 @@ import React, { Component } from 'react'
 import axios from 'axios'
 import FullTokenPile from './Tokens.js'
 import Player, {TEST_CARDS} from './Player.js'
-
-const TEST_JSON = '{"deck_size": 42, "blue_tokens": 5, "red_tokens": 2, "table": {"rainbow": 3, "blue": null, "red": 5}, "hands": [{"id": "p_0", "display_name": "Snap", "cards": [{"number": 3, "color": "red"}, {"number": 3, "color": "red"}]}, {"id": "p_1", "display_name": "Ethan", "cards": [{"number": 5, "color": "blue"}, {"number": 3, "color": "red"}]}, {"id": "p_2", "display_name": "Amos", "cards": [{"number": 2, "color": "yellow"}, {"number": 1, "color": "white"}]}], "burnt_pile": [{"number": 2, "color": "yellow"}, {"number": 2, "color": "yellow"}, {"number": 2, "color": "yellow"}]}';
+import {UserIdContext} from './themes.js'
 
 class GamePlay extends Component {
+  static contextType = UserIdContext;
+
     constructor (props) {
         super(props)
         this.state = {
@@ -13,10 +14,11 @@ class GamePlay extends Component {
         }
         this.tokens_pile = React.createRef();
         this.playersRefs = [];
+        this.send_start_game = this.send_start_game.bind(this)
       }
 
       componentDidMount() {
-        this.interval = setInterval(() => this.update_game(TEST_JSON), 1000);
+        this.interval = setInterval(() => this.update_game(), 1000);
       }
       componentWillUnmount() {
         clearInterval(this.interval);
@@ -32,8 +34,16 @@ class GamePlay extends Component {
           return []
       }
 
-      update_game(game_json) {
-        var myJson = JSON.parse(game_json);
+      update_game() {
+        axios.post('http://127.0.0.1:8080/game_state/' + this.context + '/' + this.props.game_id, {}).
+        then(response => this.handle_get_state_response(response), 
+        reason => this.handle_get_state_error(reason));
+      }
+
+      handle_get_state_response(response) {
+        console.log(response)
+        console.log(response.data)
+        var myJson = response.data;
 
         var clue_tokens = myJson['blue_tokens']
         var miss_tokens = myJson['red_tokens']
@@ -49,10 +59,10 @@ class GamePlay extends Component {
                 this.get_player_cards(json_players, curr_ref.props.user_id)
             ))
         }
-
-        // this.player.current.update_cards(TEST_CARDS);
       }
-
+      handle_get_state_error(reason) {
+        console.log(reason)
+      }
       render_players() {
           var out_players = [];
           if (this.state.players.length > 0) {
@@ -68,6 +78,21 @@ class GamePlay extends Component {
         return out_players
       }
 
+      send_start_game() {
+        axios.post('http://127.0.0.1:8080/start_game/' + this.props.game_id, {})
+        .then(response => this.handle_start_game_response(response), 
+          reason => this.handle_start_game_error(reason));
+  
+      }
+
+      handle_start_game_response(response) {
+        console.log(response)
+      }
+
+      handle_start_game_error(reason) {
+        console.log(reason)
+      }
+
     render () {
         return (
         <div>
@@ -75,6 +100,7 @@ class GamePlay extends Component {
             Tokens Status: <br/>
             <FullTokenPile ref={this.tokens_pile}/>
             <br/><br/>
+            <button onClick={this.send_start_game}> Start Game </button>
             {this.render_players()}
         </div>
         )
