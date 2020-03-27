@@ -90,7 +90,7 @@ class HanabiState(IHanabiState):
         return self._player_ids
 
     def get_hand(self, player_id: PlayerIdType) -> IHandType:
-        return self._hands[player_id]
+        return self._hands.get(player_id)
 
     def get_blue_token_amount(self) -> int:
         return self._blue_tokens_amount
