@@ -44,7 +44,7 @@ class IHanabiState:
     def get_players_ids(self) -> List[PlayerIdType]:
         raise NotImplementedError("")
 
-    def get_hand(self, player_id: PlayerIdType) -> IHandType:
+    def get_hand(self, player_id: PlayerIdType) -> Optional[IHandType]:
         raise NotImplementedError("")
 
     def get_blue_token_amount(self) -> int:

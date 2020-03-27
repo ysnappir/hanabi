@@ -11,8 +11,12 @@ if __name__ == '__main__':
 
     reply = requests.post(f"http://127.0.0.1:8080/create_game/{yuval_id}")
     assert reply.status_code == 200
+
     game_id = reply.json().get("game_id")
     reply = requests.post(f"http://127.0.0.1:8080/join_game/{ethan_id}/{game_id}")
+    assert reply.status_code == 200
+
+    reply = requests.post(f"http://127.0.0.1:8080/game_state/{yuval_id}/{game_id}")
     assert reply.status_code == 200
 
     reply = requests.post(f"http://127.0.0.1:8080/start_game/{game_id}")

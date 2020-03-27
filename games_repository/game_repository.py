@@ -19,9 +19,10 @@ from games_repository.games_repository_api import (
     NetworkPlayerIdType,
     GameState,
 )
-from hanabi_game.constants import MAXIMAL_PLAYERS, MINIMAL_PLAYERS
+from hanabi_game.constants import MAXIMAL_PLAYERS, MINIMAL_PLAYERS, HANABI_DECK_SIZE, INITIAL_RED_TOKENS, \
+    INITIAL_BLUE_TOKENS
 from hanabi_game.defs import HanabiColor, PlayerIdType, HanabiNumber, HanabiMoveType
-from hanabi_game.hanabi_game import HanabiGame
+from hanabi_game.hanabi_game import HanabiGame, HanabiState
 from hanabi_game.hanabi_game_api import IHanabiGame, IHanabiState
 from hanabi_game.hanabi_moves import (
     IHanabiInfromMove,
@@ -79,13 +80,17 @@ class HanabiPlayerWrapper:
 
     def get_formatted_hand_state(self, hanabi_state: IHanabiState) -> HandState:
         hand = hanabi_state.get_hand(self._hanabi_player_id)
+        if hand:
+            cards = [
+                hand.get_card(self._card_mapper.get_fe_card_index(hanbi_card_index=i))
+                for i in range(hand.get_amount_of_cards())
+            ]
+        else:
+            cards = []
         return HandState(
             id=self._network_id,
             display_name=self._display_name,
-            cards=[
-                hand.get_card(self._card_mapper.get_fe_card_index(hanbi_card_index=i))
-                for i in range(hand.get_amount_of_cards())
-            ],
+            cards=cards,
         )
 
     def initialize_hand_mapping(self, number_of_cards: int) -> None:
@@ -126,10 +131,21 @@ class HanabiGameWrapper:
         ]
 
     def get_hanabi_state(self, player_id: NetworkPlayerIdType) -> Optional[GameState]:
+        hanabi_state: IHanabiState
         if self._status is GameStatus.CREATED:
-            return None
+            hanabi_state = HanabiState(
+                deck_size=HANABI_DECK_SIZE,
+                red_tokens_amount=INITIAL_RED_TOKENS,
+                blue_tokens_amount=INITIAL_BLUE_TOKENS,
+                hands_dict={},
+                pile_tops={},
+                burnt_pile=[],
+                acting_player=max(range(len(self._ordered_players)),
+                                  key=lambda i: self._players[self._ordered_players[i]].get_number_of_cloth_colors()),
+               )
+        else:
+            hanabi_state = self._game.get_state()
 
-        hanabi_state = self._game.get_state()
         return GameState(
             deck_size=hanabi_state.get_deck_size(),
             blue_token_amount=hanabi_state.get_blue_token_amount(),
@@ -141,6 +157,7 @@ class HanabiGameWrapper:
                 hanabi_state=hanabi_state, player_id=player_id
             ),
             burnt_pile=hanabi_state.get_burnt_pile(),
+            active_player=self._ordered_players[hanabi_state.get_active_player()]
         )
 
     def get_status(self) -> GameStatus:

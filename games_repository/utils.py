@@ -27,4 +27,5 @@ def jsonify_game_state(game_state: GameState) -> Any:
             {"number": card.get_number().value, "color": card.get_color().value}
             for card in game_state.burnt_pile
         ],
+        "active_player_id": game_state.active_player,
     }
