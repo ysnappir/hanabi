@@ -1,6 +1,6 @@
 from typing import Optional, List
 
-from hanabi_game.defs import HanabiColor, HanabiNumber, PlayerIdType
+from hanabi_game.defs import HanabiColor, HanabiNumber, PlayerIdType, GameVerdict
 from hanabi_game.hanabi_moves import IHanabiMove
 
 
@@ -82,4 +82,7 @@ class IHanabiGame:
         raise NotImplementedError("")
 
     def get_cards_per_player(self) -> int:
+        raise NotImplementedError("")
+
+    def get_verdict(self) -> GameVerdict:
         raise NotImplementedError("")
