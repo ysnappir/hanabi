@@ -7,13 +7,9 @@ import {UserIdContext} from './themes.js';
 function JoinGame(props) {
   const {onJoinGame} = props;
   const userId = useContext(UserIdContext);
-  const [joinGame, setJoinGame] = useState(false);
+  const [showPinField, setShowPinField] = useState(false);
   const pinCode = React.createRef();
 
-  const handleMainButtonClick = () => {
-    setJoinGame(!joinGame);
-  };
-    
   const handleJoinGameResponse = (response) => {
     console.log(response);
     var pin = pinCode.current.value;
@@ -37,34 +33,22 @@ function JoinGame(props) {
     }
   };
 
-  if (joinGame) {
-    return (
+  return (
+    <>
       <div>
-        <button className='button' onClick={handleMainButtonClick}>Don't Join Game</button>
-        <br/>
-        PIN code:
+        <button className='button' onClick={() => setShowPinField(!showPinField)}>
+          {showPinField ? 'Don\'t Join Game': 'Join Game'}
+        </button>
+      </div>
+
+      {showPinField && 
+      <div>
+          PIN code:
         <input type="text" ref={pinCode}/>
         <button className='button' onClick={handleJoinClick}>Join!</button> <br/>
-      </div>
-    );
-  } else {
-    return <button className='button' onClick={handleMainButtonClick}>Join Game</button>;
-  }
-
-  //   return (
-  //     <>
-  //       {(!joinGame) ? 
-  //         <button className='button' onClick={handleMainButtonClick}>Join Game</button>
-  //         :
-  //         <div>
-  //           <button className='button' onClick={handleMainButtonClick}>Don't Join Game</button>
-  //           <br/>
-  //                   PIN code:
-  //           <input type="text" ref={pinCode}/>
-  //           <button className='button' onClick={handleJoinClick}>Join!</button> <br/>
-  //         </div>}
-  //     </>
-  //   );
+      </div>}
+    </>
+  );
 
 }
 
