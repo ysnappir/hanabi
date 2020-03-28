@@ -37,20 +37,34 @@ function JoinGame(props) {
     }
   };
 
-  return (
-    <>
-      {(!joinGame) ? 
-        <button className='button' onClick={handleMainButtonClick}>Join Game</button>
-        :
-        <div>
-          <button className='button' onClick={handleMainButtonClick}>Don't Join Game</button>
-          <br/>
-                  PIN code:
-          <input type="text" ref={PIN_code}/>
-          <button className='button' onClick={handleJoinClick}>Join!</button> <br/>
-        </div>}
-    </>
-  );
+  if (joinGame) {
+    return (
+      <div>
+        <button className='button' onClick={handleMainButtonClick}>Don't Join Game</button>
+        <br/>
+        PIN code:
+        <input type="text" ref={PIN_code}/>
+        <button className='button' onClick={handleJoinClick}>Join!</button> <br/>
+      </div>
+    );
+  } else {
+    return <button className='button' onClick={handleMainButtonClick}>Join Game</button>;
+  }
+
+  //   return (
+  //     <>
+  //       {(!joinGame) ? 
+  //         <button className='button' onClick={handleMainButtonClick}>Join Game</button>
+  //         :
+  //         <div>
+  //           <button className='button' onClick={handleMainButtonClick}>Don't Join Game</button>
+  //           <br/>
+  //                   PIN code:
+  //           <input type="text" ref={PIN_code}/>
+  //           <button className='button' onClick={handleJoinClick}>Join!</button> <br/>
+  //         </div>}
+  //     </>
+  //   );
 
 }
 
