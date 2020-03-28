@@ -1,5 +1,3 @@
-/*eslint linebreak-style: ["error", "unix"]*/
-
 import React, {useState, useContext } from 'react';
 import PropTypes from 'prop-types';
 import axios from 'axios';
@@ -67,7 +65,7 @@ function CreateGame(props) {
 
   const handleCreateGameResponse = (response) => {
     console.log(response);
-    var pin = response.data.game_id;
+    let pin = response.data.game_id;
     onCreateGame();
     onJoinGame(pin);
   };
@@ -99,22 +97,21 @@ function Options() {
   
   // const userId = useContext(UserIdContext);
   // const gameId = useContext(GameIdContext);
-  const [pinCode, setPicCodeField] = useState(-1);
+  const [pinCode, setPicCode] = useState(-1);
  
-  const onJoinGame = (new_pin_code) => {
-    setPicCodeField(new_pin_code);
+  const onJoinGame = (NewPinCode) => {
+    setPicCode(NewPinCode);
   };
 
-  let return_value;
   if (pinCode > 0){
-    return_value = (
+    return (
       <div className='main__container'>
         <GamePlay game_id={pinCode} />
       </div>
     );
   }
   else{
-    return_value = (
+    return (
       <div className='main__container'>
               User {window.$id} -  What Do You Want To Do? <br/> <br/>
         <CreateGame onJoinGame={onJoinGame} onCreateGame={() => {}} />
@@ -122,8 +119,6 @@ function Options() {
       </div>
     );
   }
-
-  return return_value;
 }
 
 export default Options;

@@ -1,5 +1,3 @@
-/*eslint linebreak-style: ["error", "unix"]*/
-
 import React, { Component } from 'react';
 import axios from 'axios';
 import FullTokenPile from './Tokens.js';
