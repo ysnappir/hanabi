@@ -27,85 +27,77 @@ function App() {
 export default App;
 */
 
-import React, { Component } from 'react'
-import './App.css'
-import axios from 'axios'
+import React, { useState } from 'react';
+import './App.css';
+import axios from 'axios';
 import Options from './Options';
-import {UserIdContext} from './themes.js'
+import {UserIdContext} from './themes.js';
 
-const BAD_INPUT_MSG = "Empty Display Name or Color Num not a number"
-const WAIT_STR = "Please Wait..."
+const BAD_INPUT_MSG = 'Empty Display Name or Color Num not a number';
+const WAIT_STR = 'Please Wait...';
 
-class App extends Component {
-  constructor (props) {
-    super(props)
-    this.state = {
-      load_options: false,
-      user_msg: '',
-      user_id: ''
-    }  
-    this.display_name = React.createRef();
-    this.color_num = React.createRef();
-    this.handleClick = this.handleClick.bind(this)
-  }
-  
-  validateInput() {
-    var disp_name_val = this.display_name.current.value;
-    var color_num_val = this.color_num.current.value;
-    if (color_num_val.trim() === "" || isNaN(color_num_val) || disp_name_val.trim() === "") {
+function App() {
+  const [loginSuccess, setLoginSuccess] = useState(false);
+  const [userMsg, setUserMsg] = useState('');
+
+  let user_id = '';
+
+  const displayNameTextbox = React.createRef();
+  const colorNumTextbox = React.createRef();
+
+  const validateInput = () => {
+    var disp_name_val = displayNameTextbox.current.value;
+    var color_num_val = colorNumTextbox.current.value;
+    if (color_num_val.trim() === '' || isNaN(color_num_val) || disp_name_val.trim() === '') {
       return false;
     }
     return true;
-  }
+  };
 
-  handleClick () {
-    if (!this.validateInput()) {
-      this.setState({user_msg: BAD_INPUT_MSG});
+  const handleLoginClick = async () => {
+    if (!validateInput()) {
+      setUserMsg(BAD_INPUT_MSG);
       return;
     }
-    this.setState({user_msg: WAIT_STR});
+    setUserMsg(WAIT_STR);
 
-    axios.post('/register', 
-      { display_name: this.display_name.current.value, 
-        number_of_colors_in_clothes: this.color_num.current.value}
-    ).then(response => this.handleResponse(response), reason => this.handleError(reason));
-  }
+    try {
+      const response = await axios.post('/register', { display_name: displayNameTextbox.current.value, 
+        number_of_colors_in_clothes: colorNumTextbox.current.value});
+      handleLoginResponse(response);
+    } catch (error) {
+      handleLoginError(error);
+    }
+  };
+
+  const handleLoginError = (reason) => {
+    setUserMsg('Connection Error: ' + reason);
+  };
+
+  const handleLoginResponse = (response) => {
+    user_id = response.data.id;
+    setLoginSuccess(true);
+  };
   
-  handleError(reason) {
-    console.log(reason);
-    this.setState({user_msg: "Connection Error: " + reason});
-  }
-
-
-  handleResponse(res) {
-    console.log(res);
-    this.setState({user_id: res.data.id})
-    this.setState({load_options: true});
-  }
-
-  render () {
-    if (this.state.load_options) {
-      return (
-        <UserIdContext.Provider value={this.state.user_id}>
-          <div className='main__container'>
-            <Options/>
-          </div>
-        </UserIdContext.Provider>
-
-      )
-    }
-    else {
-      return (
+  if (loginSuccess) {
+    return (
+      <UserIdContext.Provider value={user_id}>
         <div className='main__container'>
-          Display Name: <input type="text" ref={this.display_name} /><br/>
-          How many colors are you wearing: <input type="text" ref={this.color_num} /><br/><br/>
-          <button className='button' onClick={this.handleClick}>
-            Lets Start!
-          </button>
-          <p>{this.state.user_msg}</p>
+          <Options/>
         </div>
-      )
-    }
+      </UserIdContext.Provider>
+    );
+  }
+  else {
+    return (
+      <div className='main__container'>
+        Display Name: <input type="text" ref={displayNameTextbox} /><br/>
+        How many colors are you wearing: <input type="text" ref={colorNumTextbox} /><br/><br/>
+        <button className='button' onClick={handleLoginClick}>Lets Start!</button>
+        <p>{userMsg}</p>
+      </div>
+    );
   }
 }
-export default App
+
+export default App;
