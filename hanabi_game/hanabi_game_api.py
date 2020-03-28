@@ -67,6 +67,9 @@ class IHanabiDeck:
     def get_size(self) -> int:
         raise NotImplementedError("")
 
+    def observe_cards(self) -> List[IHanabiCard]:
+        raise NotImplementedError("")
+
 
 class IHanabiGame:
     def perform_move(self, move: IHanabiMove) -> bool:

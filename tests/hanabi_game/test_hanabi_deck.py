@@ -16,3 +16,12 @@ def test_hanabi_deck_take_a_card():
 
     assert isinstance(deck.take_a_card(), IHanabiCard)
     assert deck.get_size() == ORIGINAL_HANABI_SIZE - 1
+
+
+def test_hanabi_dech_observe_cant_change_deck():
+    deck = HanabiDeck()
+
+    original_size = deck.get_size()
+    cards = deck.observe_cards()
+    cards.pop(0)
+    assert deck.get_size() == original_size, "Change in observed deck view changed inner state"

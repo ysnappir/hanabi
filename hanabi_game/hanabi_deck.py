@@ -19,3 +19,6 @@ class HanabiDeck(IHanabiDeck):
 
     def get_size(self) -> int:
         return len(self._cards)
+
+    def observe_cards(self) -> List[IHanabiCard]:
+        return self._cards[:]
