@@ -59,6 +59,42 @@ JoinGame.propTypes = {
 };
 
 
+function CreateGame(props) {
+
+  const {onCreateGame, onJoinGame} = props;
+  
+  const userId = useContext(UserIdContext);
+
+  const handleCreateGameResponse = (response) => {
+    console.log(response);
+    var pin = response.data.game_id;
+    onCreateGame();
+    onJoinGame(pin);
+  };
+
+  const handleCreateClick = async () => {   
+    try {
+      const response = await axios.post( `/create_game/${userId}`, {});
+      handleCreateGameResponse(response);
+    } catch (error) {
+      //TODO: handle create game error;
+      console.log('Create game has thrown and exception');
+    }
+  };
+
+  return (
+    <div>
+      <button className='button' onClick={() => handleCreateClick()} />
+    </div>
+  );
+
+}
+
+CreateGame.propTypes = {
+  onJoinGame: PropTypes.func.isRequired,
+  onCreateGame: PropTypes.func,
+};
+
 class Options extends Component {
     static contextType = UserIdContext;
 
