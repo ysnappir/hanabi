@@ -40,15 +40,15 @@ function App() {
   const [loginSuccess, setLoginSuccess] = useState(false);
   const [userMsg, setUserMsg] = useState('');
 
-  let user_id = '';
+  let userId = '';
 
   const displayNameTextbox = React.createRef();
   const colorNumTextbox = React.createRef();
 
   const validateInput = () => {
-    var disp_name_val = displayNameTextbox.current.value;
-    var color_num_val = colorNumTextbox.current.value;
-    if (color_num_val.trim() === '' || isNaN(color_num_val) || disp_name_val.trim() === '') {
+    const dispNameVal = displayNameTextbox.current.value;
+    const colorNumVal = colorNumTextbox.current.value;
+    if (colorNumVal.trim() === '' || isNaN(colorNumVal) || dispNameVal.trim() === '') {
       return false;
     }
     return true;
@@ -75,13 +75,13 @@ function App() {
   };
 
   const handleLoginResponse = (response) => {
-    user_id = response.data.id;
+    userId = response.data.id;
     setLoginSuccess(true);
   };
   
   if (loginSuccess) {
     return (
-      <UserIdContext.Provider value={user_id}>
+      <UserIdContext.Provider value={userId}>
         <div className='main__container'>
           <Options/>
         </div>
