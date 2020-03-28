@@ -8,7 +8,7 @@ function JoinGame(props) {
   const {onJoinGame} = props;
   const userId = useContext(UserIdContext);
   const [joinGame, setJoinGame] = useState(false);
-  const PIN_code = React.createRef();
+  const pinCode = React.createRef();
 
   const handleMainButtonClick = () => {
     setJoinGame(!joinGame);
@@ -16,7 +16,7 @@ function JoinGame(props) {
     
   const handleJoinGameResponse = (response) => {
     console.log(response);
-    var pin = PIN_code.current.value;
+    var pin = pinCode.current.value;
     onJoinGame(pin);
   };
 
@@ -26,11 +26,11 @@ function JoinGame(props) {
   };
 
   const handleJoinClick = async () => {
-    const pin = PIN_code.current.value;    
+    const pin = pinCode.current.value;    
     console.log(pin);
 
     try {
-      const response = await axios.post('/join_game/' + userId + '/' + pin, {});
+      const response = await axios.post( `/join_game/${userId}/${pin}`, {});
       handleJoinGameResponse(response);
     } catch (error) {
       handleJoinGameError(error);
@@ -43,7 +43,7 @@ function JoinGame(props) {
         <button className='button' onClick={handleMainButtonClick}>Don't Join Game</button>
         <br/>
         PIN code:
-        <input type="text" ref={PIN_code}/>
+        <input type="text" ref={pinCode}/>
         <button className='button' onClick={handleJoinClick}>Join!</button> <br/>
       </div>
     );
@@ -60,7 +60,7 @@ function JoinGame(props) {
   //           <button className='button' onClick={handleMainButtonClick}>Don't Join Game</button>
   //           <br/>
   //                   PIN code:
-  //           <input type="text" ref={PIN_code}/>
+  //           <input type="text" ref={pinCode}/>
   //           <button className='button' onClick={handleJoinClick}>Join!</button> <br/>
   //         </div>}
   //     </>
