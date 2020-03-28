@@ -141,9 +141,6 @@ def is_exist_card_only_in_burnt_pile(game_state: IHanabiState, deck_cards: List[
 
 class HanabiGame(IHanabiGame):
 
-    def is_lost_by_deck_ordering(game_state: IHanabiState, deck_cards: List[IHanabiCard]) -> bool:
-        raise NotImplementedError("")
-
     def __init__(
         self,
         n_players: int,
