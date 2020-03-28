@@ -99,7 +99,7 @@ function Options() {
   
   // const userId = useContext(UserIdContext);
   // const gameId = useContext(GameIdContext);
-  const [pinCode, setPicCodeField] = useState(-1);
+  const [pinCode, setPicCode] = useState(undefined);
  
   const onJoinGame = (new_pin_code) => {
     setPicCodeField(new_pin_code);
