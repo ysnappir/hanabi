@@ -1,3 +1,5 @@
+/*eslint linebreak-style: ["error", "unix"]*/
+
 import React, { Component, useState, useContext } from 'react';
 import PropTypes from 'prop-types';
 import axios from 'axios';
