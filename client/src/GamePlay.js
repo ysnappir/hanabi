@@ -76,7 +76,7 @@ function GamePlay(props) {
 
   const onStartGameClick = async () => {
     try {
-      const response = await axios.post('/start_game/' + this.props.game_id, {});
+      const response = await axios.post('/start_game/' + gameId, {});
       handleStartGameResponse(response);
     }
     catch(error) {
