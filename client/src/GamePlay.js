@@ -11,8 +11,6 @@ function GamePlay(props) {
   const [players, setPlayers] = useState(undefined);
   const tokensPile = React.createRef();
 
-  const playersRefs= useRef([]);
-
   const updateGameState = async () => {
     try {
       const response = await axios.post('/game_state/' + userId + '/' + gameId, {});
@@ -49,12 +47,6 @@ function GamePlay(props) {
 
     let json_players = myJson['hands'];
     setPlayers(json_players);
-    
-    if (playersRefs.current.length > 0) {
-      playersRefs.current.map((curr_ref, index) => curr_ref.update_cards(
-        getPlayerCards(curr_ref.props.user_id)
-      ));
-    }
   };
 
   const handleGetGameStateError = (reason) => {
@@ -65,13 +57,10 @@ function GamePlay(props) {
   const renderPlayers = () => {
     let out_players = [];
     if (players !== undefined && players.length > 0) {
-      //ref={el => (myRefs.current[i] = el)}
       out_players = players.map((player, index) => 
-        <Player user_id={player['id']} display_name={player['display_name']} ref={ref => { 
-          // Callback refs are preferable when 
-          // dealing with dynamic refs
-          playersRefs.current[index] = ref; 
-        }} key={player['id']} 
+        <Player userId={player['id']} displayName={player['display_name']} 
+          cards={getPlayerCards(player['id'])}
+          key={player['id']} 
         />);
     }
     return out_players;
