@@ -12,7 +12,7 @@ function JoinGame(props) {
 
   const handleJoinGameResponse = (response) => {
     console.log(response);
-    var pin = pinCode.current.value;
+    const pin = pinCode.current.value;
     onJoinGame(pin);
   };
 
@@ -97,10 +97,10 @@ function Options() {
   
   // const userId = useContext(UserIdContext);
   // const gameId = useContext(GameIdContext);
-  const [pinCode, setPicCode] = useState(-1);
+  const [pinCode, setPinCode] = useState(-1);
  
   const onJoinGame = (NewPinCode) => {
-    setPicCode(NewPinCode);
+    setPinCode(String(NewPinCode));
   };
 
   if (pinCode > 0){

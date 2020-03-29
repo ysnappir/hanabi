@@ -1,4 +1,4 @@
-import React, { useEffect, useContext, useState } from 'react';
+import React, { useEffect, useContext, useState, useRef } from 'react';
 import axios from 'axios';
 import PropTypes from 'prop-types';
 import FullTokenPile from './Tokens.js';
@@ -11,7 +11,7 @@ function GamePlay(props) {
   const [players, setPlayers] = useState(undefined);
   const tokensPile = React.createRef();
 
-  let playersRefs = [];
+  const playersRefs= useRef([]);
 
   const updateGameState = async () => {
     try {
@@ -28,10 +28,12 @@ function GamePlay(props) {
   );
   
   const getPlayerCards = (id) => {
-    for (let index = 0; index < players.length; index++) {
-      var player = players[index];
-      if (player['id'] == id) {
-        return player['cards'];
+    if (players !== undefined) {
+      for (let index = 0; index < players.length; index++) {
+        var player = players[index];
+        if (player['id'] == id) {
+          return player['cards'];
+        }
       }
     }
     return [];
@@ -47,9 +49,9 @@ function GamePlay(props) {
 
     let json_players = myJson['hands'];
     setPlayers(json_players);
-
-    if (playersRefs.length > 0) {
-      playersRefs.map((curr_ref, index) => curr_ref.update_cards(
+    
+    if (playersRefs.current.length > 0) {
+      playersRefs.current.map((curr_ref, index) => curr_ref.update_cards(
         getPlayerCards(curr_ref.props.user_id)
       ));
     }
@@ -62,12 +64,13 @@ function GamePlay(props) {
 
   const renderPlayers = () => {
     let out_players = [];
-    if (players && players.length > 0) {
+    if (players !== undefined && players.length > 0) {
+      //ref={el => (myRefs.current[i] = el)}
       out_players = players.map((player, index) => 
         <Player user_id={player['id']} display_name={player['display_name']} ref={ref => { 
           // Callback refs are preferable when 
           // dealing with dynamic refs
-          playersRefs[index] = ref; 
+          playersRefs.current[index] = ref; 
         }} key={player['id']} 
         />);
     }
@@ -104,7 +107,7 @@ function GamePlay(props) {
 }
 
 GamePlay.propTypes = {
-  gameId: PropTypes.number.isRequired,
+  gameId: PropTypes.string.isRequired,
 };
 
 /*
