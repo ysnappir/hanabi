@@ -6,8 +6,7 @@ const COLOR_TO_ROW = {'red': 0, 'yellow': 1, 'green': 2, 'blue': 3, 'white': 4, 
 
 
 function PlayerCards(props) {
-  let temp_cards = props;
-  const cards = temp_cards.cards; // Da Fuk Is Dis????
+  let {cards} = props;
 
   const cardToImagePos = (number, color) => {
     let posX = (+number - 1) * (-100);
