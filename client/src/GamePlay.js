@@ -1,15 +1,17 @@
-import React, { useEffect, useContext, useState, useRef } from 'react';
+import React, { useEffect, useContext, useState } from 'react';
 import axios from 'axios';
 import PropTypes from 'prop-types';
 import FullTokenPile from './Tokens.js';
 import Player from './Player.js';
 import {UserIdContext} from './themes.js';
+import {MAX_CLUE_TOKENS, MAX_MISS_TOKENS} from './Tokens.js';
 
 function GamePlay(props) {
   const userId = useContext(UserIdContext);
   const {gameId} = props;
   const [players, setPlayers] = useState(undefined);
-  const tokensPile = React.createRef();
+  const [availableClueTokens, setAvailableClueTokens] = useState(MAX_CLUE_TOKENS);
+  const [availableMissTokens, setAvailableMissTokens] = useState(MAX_MISS_TOKENS);
 
   const updateGameState = async () => {
     try {
@@ -40,13 +42,10 @@ function GamePlay(props) {
   const handleGetGameStateResponse = (response) => {
     let myJson = response.data;
 
-    let clueTokens = myJson['blue_tokens'];
-    let missTokens = myJson['red_tokens'];
-    tokensPile.current.set_available_clue_tokens(clueTokens);
-    tokensPile.current.set_available_miss_tokens(missTokens);
+    setAvailableClueTokens(myJson['blue_tokens']);
+    setAvailableMissTokens(myJson['red_tokens']);
 
-    let json_players = myJson['hands'];
-    setPlayers(json_players);
+    setPlayers(myJson['hands']);
   };
 
   const handleGetGameStateError = (reason) => {
@@ -88,7 +87,7 @@ function GamePlay(props) {
     <div>
       Full game play <br/> <br/>
       Tokens Status: <br/>
-      <FullTokenPile ref={tokensPile}/> <br/><br/>
+      <FullTokenPile clueTokens={+availableClueTokens} missTokens={+availableMissTokens}/> <br/><br/>
       <button onClick={onStartGameClick}>Start Game</button>
       {renderPlayers()}
     </div>
