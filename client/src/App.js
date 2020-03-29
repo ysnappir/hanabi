@@ -10,8 +10,7 @@ const WAIT_STR = 'Please Wait...';
 function App() {
   const [loginSuccess, setLoginSuccess] = useState(false);
   const [userMsg, setUserMsg] = useState('');
-
-  let userId = '';
+  const [userId, setUserId] = useState('');
 
   const displayNameTextbox = React.createRef();
   const colorNumTextbox = React.createRef();
@@ -46,10 +45,10 @@ function App() {
   };
 
   const handleLoginResponse = (response) => {
-    userId = response.data.id;
+    setUserId(response.data.id);
     setLoginSuccess(true);
   };
-  
+
   if (loginSuccess) {
     return (
       <UserIdContext.Provider value={userId}>

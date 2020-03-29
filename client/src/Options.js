@@ -106,14 +106,14 @@ function Options() {
   if (pinCode > 0){
     return (
       <div className='main__container'>
-        <GamePlay game_id={pinCode} />
+        <GamePlay gameId={pinCode} />
       </div>
     );
   }
   else{
     return (
       <div className='main__container'>
-              User {window.$id} -  What Do You Want To Do? <br/> <br/>
+        What Do You Want To Do? <br/> <br/>
         <CreateGame onJoinGame={onJoinGame} onCreateGame={() => {}} />
         <JoinGame onJoinGame={onJoinGame} />
       </div>
