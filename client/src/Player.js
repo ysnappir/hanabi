@@ -37,7 +37,7 @@ PlayerCards.propTypes = {
 
 
 function Player(props) {
-  const { displayName, userId, cards } = props;
+  const { displayName, cards } = props;
   
   return (
     <div>

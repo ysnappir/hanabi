@@ -56,7 +56,7 @@ function GamePlay(props) {
   const renderPlayers = () => {
     let out_players = [];
     if (players !== undefined && players.length > 0) {
-      out_players = players.map((player, index) => 
+      out_players = players.map((player) => 
         <Player userId={player['id']} displayName={player['display_name']} 
           cards={getPlayerCards(player['id'])} key={player['id']} />
       );
