@@ -2,7 +2,7 @@ import React, {useState, useContext } from 'react';
 import PropTypes from 'prop-types';
 import axios from 'axios';
 import GamePlay from './GamePlay';
-import {UserIdContext} from './themes.js';
+import {UserIdContext} from './Contex.js';
 
 function JoinGame(props) {
   const {onJoinGame} = props;

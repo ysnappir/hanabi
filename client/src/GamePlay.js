@@ -3,7 +3,7 @@ import axios from 'axios';
 import PropTypes from 'prop-types';
 import FullTokenPile from './Tokens.js';
 import Player from './Player.js';
-import {UserIdContext} from './themes.js';
+import {UserIdContext} from './Contex.js';
 import {MAX_CLUE_TOKENS, MAX_MISS_TOKENS} from './Tokens.js';
 
 function GamePlay(props) {
@@ -30,7 +30,7 @@ function GamePlay(props) {
   const getPlayerCards = (id) => {
     if (players !== undefined) {
       for (let index = 0; index < players.length; index++) {
-        var player = players[index];
+        let player = players[index];
         if (player['id'] == id) {
           return player['cards'];
         }
@@ -58,9 +58,8 @@ function GamePlay(props) {
     if (players !== undefined && players.length > 0) {
       out_players = players.map((player, index) => 
         <Player userId={player['id']} displayName={player['display_name']} 
-          cards={getPlayerCards(player['id'])}
-          key={player['id']} 
-        />);
+          cards={getPlayerCards(player['id'])} key={player['id']} />
+      );
     }
     return out_players;
   };
