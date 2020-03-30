@@ -1,141 +1,124 @@
-import React, { Component } from 'react'
-import axios from 'axios'
+import React, {useState, useContext } from 'react';
+import PropTypes from 'prop-types';
+import axios from 'axios';
 import GamePlay from './GamePlay';
-import {UserIdContext} from './themes.js'
+import {UserIdContext} from './Contex.js';
 
-class JoinGame extends Component {
-    static contextType = UserIdContext;
+function JoinGame(props) {
+  const {onJoinGame} = props;
+  const userId = useContext(UserIdContext);
+  const [showPinField, setShowPinField] = useState(false);
+  const pinCode = React.createRef();
 
-    constructor (props) {
-        super(props)
-        this.state = {
-            join_game: false
-          }  
-          this.PIN_code = React.createRef();
-          this.main_button_click = this.main_button_click.bind(this)
-          this.join_click = this.join_click.bind(this)
-      }
+  const handleJoinGameResponse = (response) => {
+    console.log(response);
+    const pin = pinCode.current.value;
+    onJoinGame(pin);
+  };
 
-      main_button_click() {
-        this.setState({join_game: !this.state.join_game});
+  const handleJoinGameError = (reason) =>  {
+    // TODO
+    console.log(reason);
+  };
+
+  const handleJoinClick = async () => {
+    const pin = pinCode.current.value;    
+    console.log(pin);
+
+    try {
+      const response = await axios.post( `/join_game/${userId}/${pin}`, {});
+      handleJoinGameResponse(response);
+    } catch (error) {
+      handleJoinGameError(error);
     }
+  };
 
-    join_click() {
-        var pin = this.PIN_code.current.value;
-        console.log(pin)
-        axios.post('http://127.0.0.1:8080/join_game/' + this.context + '/' + pin, {}).
-        then(response => this.handle_join_game_response(response), 
-        reason => this.handle_join_game_error(reason));
+  return (
+    <>
+      <div>
+        <button className='button' onClick={() => setShowPinField(!showPinField)}>
+          {showPinField ? 'Don\'t Join Game': 'Join Game'}
+        </button>
+      </div>
 
-    }
-
-    handle_join_game_response(response) {
-        console.log(response)
-        var pin = this.PIN_code.current.value;
-        this.props.join_game_func(pin);
-    }
-
-    handle_join_game_error(reason) {
-        // TODO
-    }
-
-    render_join_game() {
-        return (
-            <div>
-                <button className='button' onClick={this.main_button_click}>
-                    Don't Join Game
-                </button> <br/>
-                PIN code:
-                <input type="text" ref={this.PIN_code} />
-
-                <button className='button' onClick={this.join_click}>
-                    Join!
-                </button> <br/>
-            </div>
-        )
-    }
-    
-    render_regular() {
-        return (
-            <div>
-                <button className='button' onClick={this.main_button_click}>
-                    Join Game
-                </button>
-            </div>
-            )    
-    }
-
-    render () {
-        if (!this.state.join_game) {
-            return this.render_regular();
-        }
-        else {
-            return this.render_join_game();
-        }
-    }
+      {showPinField && 
+      <div>
+          PIN code:
+        <input type="text" ref={pinCode}/>
+        <button className='button' onClick={handleJoinClick}>Join!</button> <br/>
+      </div>}
+    </>
+  );
 
 }
 
-class Options extends Component {
-    static contextType = UserIdContext;
+JoinGame.propTypes = {
+  onJoinGame: PropTypes.func.isRequired,
+};
 
-    constructor (props) {
-        super(props)
-        this.state = {
-            start_game: false,
-            game_id: ''
-          }  
-          this.create_game = this.create_game.bind(this)
-          this.join_game = this.join_game.bind(this)
-      }
 
-      create_game() {
-        axios.post('http://127.0.0.1:8080/create_game/' + this.context, {}).
-        then(response => this.handle_create_game_response(response), 
-        reason => this.handle_create_game_error(reason));
-      }
+function CreateGame(props) {
 
-      handle_create_game_response(response) {
-          console.log(response)
-          this.setState({game_id: response.data.game_id})
-          this.setState({start_game: true})
-      }
+  const {onCreateGame, onJoinGame} = props;
+  
+  const userId = useContext(UserIdContext);
 
-      handle_create_game_error(reason) {
-          // TODO
-      }
+  const handleCreateGameResponse = (response) => {
+    console.log(response);
+    let pin = response.data.game_id;
+    onCreateGame();
+    onJoinGame(pin);
+  };
 
-      join_game(input_game_id) {
-        this.setState({game_id: input_game_id})
-        this.setState({start_game: true})
-      }
-
-      render_start_game() {
-          return (
-        <div className='main__container'>
-            <GamePlay game_id={this.state.game_id} />
-        </div>
-          )
-      }
-
-      render_regular () {
-        return (
-            <div className='main__container'>
-                User {window.$id} -  What Do You Want To Do? <br/> <br/>
-                <button className='button' onClick={this.create_game}> Create Game </button> <br/> <br/>
-                <JoinGame join_game_func={this.join_game} />
-            </div>
-            )
-      }
-
-    render () {
-        if (this.state.start_game) {
-            return this.render_start_game();
-        }
-        else {
-            return this.render_regular();
-        }
+  const handleCreateClick = async () => {   
+    try {
+      const response = await axios.post( `/create_game/${userId}`, {});
+      handleCreateGameResponse(response);
+    } catch (error) {
+      //TODO: handle create game error;
+      console.log('Create game has thrown and exception');
     }
+  };
+
+  return (
+    <div>
+      <button className='button' onClick={() => handleCreateClick()}>Create Game!</button>
+    </div>
+  );
+
 }
 
-export default Options
+CreateGame.propTypes = {
+  onJoinGame: PropTypes.func.isRequired,
+  onCreateGame: PropTypes.func,
+};
+
+function Options() {
+  
+  // const userId = useContext(UserIdContext);
+  // const gameId = useContext(GameIdContext);
+  const [pinCode, setPinCode] = useState(-1);
+ 
+  const onJoinGame = (NewPinCode) => {
+    setPinCode(String(NewPinCode));
+  };
+
+  if (pinCode > 0){
+    return (
+      <div className='main__container'>
+        <GamePlay gameId={pinCode} />
+      </div>
+    );
+  }
+  else{
+    return (
+      <div className='main__container'>
+        What Do You Want To Do? <br/> <br/>
+        <CreateGame onJoinGame={onJoinGame} onCreateGame={() => {}} />
+        <JoinGame onJoinGame={onJoinGame} />
+      </div>
+    );
+  }
+}
+
+export default Options;
