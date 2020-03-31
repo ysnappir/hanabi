@@ -3,6 +3,7 @@ import './App.css';
 import axios from 'axios';
 import Options from './Options';
 import {UserIdContext} from './Contex.js';
+import GamePlay from './GamePlay';
 
 const BAD_INPUT_MSG = 'Empty Display Name or Color Num not a number';
 const WAIT_STR = 'Please Wait...';
@@ -11,6 +12,7 @@ function App() {
   const [loginSuccess, setLoginSuccess] = useState(false);
   const [userMsg, setUserMsg] = useState('');
   const [userId, setUserId] = useState('');
+  const [pinCode, setPinCode] = useState(undefined);
 
   const displayNameTextbox = React.createRef();
   const colorNumTextbox = React.createRef();
@@ -49,25 +51,28 @@ function App() {
     setLoginSuccess(true);
   };
 
-  if (loginSuccess) {
+  const onDisplayGame = (pinCode) => {
+    setPinCode(pinCode);
+  };
+
+  if (loginSuccess || pinCode) {
     return (
       <UserIdContext.Provider value={userId}>
-        <div className='main__container'>
-          <Options/>
+        <div>
+          { pinCode ? <GamePlay gameId={pinCode} /> : <Options onDisplayGame={onDisplayGame}/> }
         </div>
       </UserIdContext.Provider>
     );
   }
-  else {
-    return (
-      <div className='main__container'>
+
+  return (
+    <div className='main__container'>
         Display Name: <input type="text" ref={displayNameTextbox} /><br/>
         How many colors are you wearing: <input type="text" ref={colorNumTextbox} /><br/><br/>
-        <button className='button' onClick={handleLoginClick}>Lets Start!</button>
-        <p>{userMsg}</p>
-      </div>
-    );
-  }
+      <button className='button' onClick={handleLoginClick}>Lets Start!</button>
+      <p>{userMsg}</p>
+    </div>
+  );
 }
 
 export default App;

@@ -1,7 +1,6 @@
 import React, {useState, useContext } from 'react';
 import PropTypes from 'prop-types';
 import axios from 'axios';
-import GamePlay from './GamePlay';
 import {UserIdContext} from './Contex.js';
 
 function JoinGame(props) {
@@ -76,7 +75,7 @@ function CreateGame(props) {
       handleCreateGameResponse(response);
     } catch (error) {
       //TODO: handle create game error;
-      console.log('Create game has thrown and exception');
+      console.log('Create game has thrown an exception');
     }
   };
 
@@ -93,32 +92,26 @@ CreateGame.propTypes = {
   onCreateGame: PropTypes.func,
 };
 
-function Options() {
-  
-  // const userId = useContext(UserIdContext);
-  // const gameId = useContext(GameIdContext);
-  const [pinCode, setPinCode] = useState(-1);
+function Options(props) {
+  const {onDisplayGame} = props;
  
   const onJoinGame = (NewPinCode) => {
-    setPinCode(String(NewPinCode));
+    onDisplayGame(String(NewPinCode));
   };
 
-  if (pinCode > 0){
-    return (
-      <div className='main__container'>
-        <GamePlay gameId={pinCode} />
-      </div>
-    );
-  }
-  else{
-    return (
-      <div className='main__container'>
+  return (
+    <div className='main__container'>
         What Do You Want To Do? <br/> <br/>
-        <CreateGame onJoinGame={onJoinGame} onCreateGame={() => {}} />
-        <JoinGame onJoinGame={onJoinGame} />
-      </div>
-    );
-  }
+      <CreateGame onJoinGame={onJoinGame} onCreateGame={() => {}} />
+      <JoinGame onJoinGame={onJoinGame} />
+    </div>
+  );
 }
+//}
+
+Options.propTypes = {
+  onDisplayGame: PropTypes.func.isRequired,
+};
+
 
 export default Options;
