@@ -50,3 +50,21 @@
   height: 40px;
   width: 200px;
 }
+
+.input-row {
+  margin: 25px 0px;
+}
+.has-error {
+  border: 1px solid #f44336;
+}
+
+.form-message {
+  font-size: 10px;
+  padding-top: 2px;
+}
+.form-message.valid {
+  color: #4caf50;
+}
+.form-message.invalid {
+  color: #f44336;
+}
