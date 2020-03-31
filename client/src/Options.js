@@ -75,7 +75,7 @@ function CreateGame(props) {
       handleCreateGameResponse(response);
     } catch (error) {
       //TODO: handle create game error;
-      console.log('Create game has thrown and exception');
+      console.log('Create game has thrown an exception');
     }
   };
 
