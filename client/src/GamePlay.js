@@ -95,10 +95,12 @@ function GamePlay(props) {
     setAvailableMissTokens(myJson['red_tokens']);
 
     setPlayers(myJson['hands']);
-    console.log(myJson['hands']);
-    if (myJson['hands'].length > 0 && myJson['hands'][0].cards.length > 0) {
-      console.log('Game Started!');
-      setIsGameStarted(true);
+    
+    if (!isGameStarted) {
+      if (myJson['hands'].length > 0 && myJson['hands'][0].cards.length > 0) {
+        console.log('Game Started!');
+        setIsGameStarted(true);
+      }
     }
   };
 
