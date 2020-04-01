@@ -6,9 +6,55 @@ import Player from './Player.js';
 import {UserIdContext} from './Contex.js';
 import {MAX_CLUE_TOKENS, MAX_MISS_TOKENS} from './Tokens.js';
 
+function WaitForGameStart(props) {
+  const {gameId, currPlayers, } = props;
+
+  const renderPlayersDisplayName = () => {
+    let outPlayers = [];
+    if (currPlayers !== undefined && currPlayers.length > 0) {
+      outPlayers = currPlayers.map((player, index) => <li key={index}>{player['display_name']}</li>);
+    }
+    return <ul>{outPlayers}</ul>;
+  };
+
+  const onStartGameClick = async () => {
+    try {
+      const response = await axios.post('/start_game/' + gameId, {});
+      handleStartGameResponse(response);
+    }
+    catch(error) {
+      handleStartGameError(error);
+    }
+  };
+
+  const handleStartGameResponse = (response) => {
+    console.log(response);
+  };
+
+  const handleStartGameError = (reason) => {
+    console.log(reason);
+  };
+
+  return (
+    <div>
+      <h1>Welcome to Game Number {gameId}</h1>
+      <h2>The game hasn't started yet. Current players are:</h2>
+      {renderPlayersDisplayName()}
+      <button onClick={onStartGameClick}>Start Game</button>
+    </div>
+  );
+}
+
+WaitForGameStart.propTypes = {
+  gameId: PropTypes.string.isRequired,
+  currPlayers: PropTypes.array.isRequired,
+};
+
+
 function GamePlay(props) {
   const userId = useContext(UserIdContext);
   const {gameId} = props;
+  const [isGameStarted, setIsGameStarted] = useState(false);
   const [players, setPlayers] = useState(undefined);
   const [availableClueTokens, setAvailableClueTokens] = useState(MAX_CLUE_TOKENS);
   const [availableMissTokens, setAvailableMissTokens] = useState(MAX_MISS_TOKENS);
@@ -46,6 +92,11 @@ function GamePlay(props) {
     setAvailableMissTokens(myJson['red_tokens']);
 
     setPlayers(myJson['hands']);
+    console.log(myJson['hands']);
+    if (myJson['hands'].length > 0 && myJson['hands'][0].cards.length > 0) {
+      console.log('Game Started!');
+      setIsGameStarted(true);
+    }
   };
 
   const handleGetGameStateError = (reason) => {
@@ -64,30 +115,18 @@ function GamePlay(props) {
     return out_players;
   };
 
-  const onStartGameClick = async () => {
-    try {
-      const response = await axios.post('/start_game/' + gameId, {});
-      handleStartGameResponse(response);
-    }
-    catch(error) {
-      handleStartGameError(error);
-    }
-  };
-
-  const handleStartGameResponse = (response) => {
-    console.log(response);
-  };
-
-  const handleStartGameError = (reason) => {
-    console.log(reason);
-  };
-
+  if (!isGameStarted) {
+    return (
+      <div>
+        <WaitForGameStart gameId={gameId} currPlayers={players}/>
+      </div>
+    );
+  }
   return (
     <div>
       Full game play <br/> <br/>
       Tokens Status: <br/>
       <FullTokenPile clueTokens={+availableClueTokens} missTokens={+availableMissTokens}/> <br/><br/>
-      <button onClick={onStartGameClick}>Start Game</button>
       {renderPlayers()}
     </div>
   );
