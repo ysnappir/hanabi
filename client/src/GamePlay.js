@@ -5,6 +5,8 @@ import FullTokenPile from './Tokens.js';
 import Player from './Player.js';
 import {UserIdContext} from './Contex.js';
 import {MAX_CLUE_TOKENS, MAX_MISS_TOKENS} from './Tokens.js';
+import cardBack from './img/BackRect125.png';
+
 
 function WaitForGameStart(props) {
   const {gameId, currPlayers } = props;
@@ -53,7 +55,7 @@ WaitForGameStart.propTypes = {
 
 
 function HanabiBoard(props) {
-  const {gameId, players, clueTokens, missTokens } = props;
+  const {gameId, players, clueTokens, missTokens, remainingDeckSize } = props;
 
   const getPlayerCards = (id) => {
     for (let index = 0; index < players.length; index++) {
@@ -82,6 +84,7 @@ function HanabiBoard(props) {
       <h1>Full game play - game number {gameId}</h1> <br/><br/>
       Tokens Status: <br/>
       <FullTokenPile clueTokens={+clueTokens} missTokens={+missTokens}/> <br/><br/>
+      Remaining Deck Size: {remainingDeckSize}
       {renderPlayers()}
     </div>
   );
@@ -92,8 +95,11 @@ HanabiBoard.propTypes = {
   players: PropTypes.array.isRequired,
   clueTokens: PropTypes.number.isRequired,
   missTokens: PropTypes.number.isRequired,
+  remainingDeckSize: PropTypes.number.isRequired,
 };
 
+
+//<div id="deck_pile_item_1" class="stockitem  stockitem_unselectable card deck_font" style="top: 0px; left: 0px; width: 81px; height: 125px; z-index: 2; background-image: url(&quot;https://x.boardgamearena.net/data/themereleases/current/games/hanabi/200213-1217/img/BackRect125.png&quot;); opacity: 1;">40</div>
 
 
 function GamePlay(props) {
@@ -103,6 +109,7 @@ function GamePlay(props) {
   const [players, setPlayers] = useState([]);
   const [availableClueTokens, setAvailableClueTokens] = useState(MAX_CLUE_TOKENS);
   const [availableMissTokens, setAvailableMissTokens] = useState(MAX_MISS_TOKENS);
+  const [remainingDeckSize, setRemainingDeckSize] = useState(-1);
 
   const updateGameState = async () => {
     try {
@@ -126,6 +133,8 @@ function GamePlay(props) {
 
     setPlayers(myJson['hands']);
 
+    setRemainingDeckSize(myJson['deck_size']);
+
     if (!isGameStarted) {
       if (myJson['hands'].length > 0 && myJson['hands'][0].cards.length > 0) {
         console.log('Game Started!');
@@ -142,7 +151,8 @@ function GamePlay(props) {
     <div>
       { !isGameStarted ? 
         <WaitForGameStart gameId={gameId} currPlayers={players}/> :
-        <HanabiBoard gameId={gameId} players={players} clueTokens={+availableClueTokens} missTokens={+availableMissTokens}/> }
+        <HanabiBoard gameId={gameId} players={players} clueTokens={+availableClueTokens} missTokens={+availableMissTokens}
+          remainingDeckSize={remainingDeckSize}/> }
     </div>
   );
 }
