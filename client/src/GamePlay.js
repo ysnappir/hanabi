@@ -38,7 +38,7 @@ function WaitForGameStart(props) {
   return (
     <div>
       <h1>Welcome to Game Number {gameId}</h1>
-      <h2>The game hasn't started yet. Current players are:</h2>
+      <h2>The game hasn&apos;t started yet. Current players are:</h2>
       {renderPlayersDisplayName()}
       <button onClick={onStartGameClick}>Start Game</button>
     </div>
@@ -49,6 +49,9 @@ WaitForGameStart.propTypes = {
   gameId: PropTypes.string.isRequired,
   currPlayers: PropTypes.array.isRequired,
 };
+
+
+
 
 
 function GamePlay(props) {
