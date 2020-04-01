@@ -7,11 +7,11 @@ import {UserIdContext} from './Contex.js';
 import {MAX_CLUE_TOKENS, MAX_MISS_TOKENS} from './Tokens.js';
 
 function WaitForGameStart(props) {
-  const {gameId, currPlayers, } = props;
+  const {gameId, currPlayers } = props;
 
   const renderPlayersDisplayName = () => {
     let outPlayers = [];
-    if (currPlayers !== undefined && currPlayers.length > 0) {
+    if (currPlayers.length > 0) {
       outPlayers = currPlayers.map((player, index) => <li key={index}>{player['display_name']}</li>);
     }
     return <ul>{outPlayers}</ul>;
@@ -52,13 +52,55 @@ WaitForGameStart.propTypes = {
 
 
 
+function HanabiBoard(props) {
+  const {gameId, players, clueTokens, missTokens } = props;
+
+  const getPlayerCards = (id) => {
+    for (let index = 0; index < players.length; index++) {
+      let player = players[index];
+      if (player['id'] == id) {
+        return player['cards'];
+      }
+    }
+
+    return [];
+  };
+
+  const renderPlayers = () => {
+    let out_players = [];
+    if (players.length > 0) {
+      out_players = players.map((player) => 
+        <Player userId={player['id']} displayName={player['display_name']} 
+          cards={getPlayerCards(player['id'])} key={player['id']} />
+      );
+    }
+    return out_players;
+  };
+
+  return (
+    <div>
+      <h1>Full game play - game number {gameId}</h1> <br/><br/>
+      Tokens Status: <br/>
+      <FullTokenPile clueTokens={+clueTokens} missTokens={+missTokens}/> <br/><br/>
+      {renderPlayers()}
+    </div>
+  );
+}
+
+HanabiBoard.propTypes = {
+  gameId: PropTypes.string.isRequired,
+  players: PropTypes.array.isRequired,
+  clueTokens: PropTypes.number.isRequired,
+  missTokens: PropTypes.number.isRequired,
+};
+
 
 
 function GamePlay(props) {
   const userId = useContext(UserIdContext);
   const {gameId} = props;
   const [isGameStarted, setIsGameStarted] = useState(false);
-  const [players, setPlayers] = useState(undefined);
+  const [players, setPlayers] = useState([]);
   const [availableClueTokens, setAvailableClueTokens] = useState(MAX_CLUE_TOKENS);
   const [availableMissTokens, setAvailableMissTokens] = useState(MAX_MISS_TOKENS);
 
@@ -75,18 +117,6 @@ function GamePlay(props) {
     const interval = setInterval(() => { updateGameState(); }, 1000);
     return () => clearInterval(interval);}
   );
-  
-  const getPlayerCards = (id) => {
-    if (players !== undefined) {
-      for (let index = 0; index < players.length; index++) {
-        let player = players[index];
-        if (player['id'] == id) {
-          return player['cards'];
-        }
-      }
-    }
-    return [];
-  };
 
   const handleGetGameStateResponse = (response) => {
     let myJson = response.data;
@@ -95,7 +125,7 @@ function GamePlay(props) {
     setAvailableMissTokens(myJson['red_tokens']);
 
     setPlayers(myJson['hands']);
-    
+
     if (!isGameStarted) {
       if (myJson['hands'].length > 0 && myJson['hands'][0].cards.length > 0) {
         console.log('Game Started!');
@@ -108,31 +138,11 @@ function GamePlay(props) {
     console.log(reason);
   };
 
-
-  const renderPlayers = () => {
-    let out_players = [];
-    if (players !== undefined && players.length > 0) {
-      out_players = players.map((player) => 
-        <Player userId={player['id']} displayName={player['display_name']} 
-          cards={getPlayerCards(player['id'])} key={player['id']} />
-      );
-    }
-    return out_players;
-  };
-
-  if (!isGameStarted) {
-    return (
-      <div>
-        <WaitForGameStart gameId={gameId} currPlayers={players}/>
-      </div>
-    );
-  }
   return (
     <div>
-      Full game play <br/> <br/>
-      Tokens Status: <br/>
-      <FullTokenPile clueTokens={+availableClueTokens} missTokens={+availableMissTokens}/> <br/><br/>
-      {renderPlayers()}
+      { !isGameStarted ? 
+        <WaitForGameStart gameId={gameId} currPlayers={players}/> :
+        <HanabiBoard gameId={gameId} players={players} clueTokens={+availableClueTokens} missTokens={+availableMissTokens}/> }
     </div>
   );
 }
