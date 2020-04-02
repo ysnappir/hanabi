@@ -18,7 +18,7 @@ import datetime
 from flask import Flask, render_template, request
 from flask_cors import CORS
 
-from games_repository.defs import GameIdType
+from games_repository.defs import GameIdType, GameAction, MoveCardRequest
 from games_repository.game_repository import HanabiGamesRepository
 from games_repository.games_repository_api import IGamesRepository
 from games_repository.utils import jsonify_game_state
@@ -83,6 +83,74 @@ def start_game(game_id: str):
 def game_state(player_id: str, game_id: str):
     try:
         ret_val = jsonify_game_state(game_repository.get_game_state(game_id=GameIdType(game_id), player_id=player_id))
+        return ret_val, 200
+    except KeyError:
+        return "", 400
+
+
+@app.route("/make_turn/inform/<player_id>", methods=["post"])
+def inform_move(player_id: str):
+    try:
+        payload = request.get_json()
+        ret_val = game_repository.perform_action(GameAction(
+            acting_player=player_id,
+            action_type="inform",
+            informed_player=payload["informed_player_id"],
+            information_data=payload["information"],  # small letters color or a number
+            placed_card_index=None,
+            burn_card_index=None,
+        ))
+
+        return ret_val, 200
+    except KeyError:
+        return "", 400
+
+
+@app.route("/make_turn/burn/<player_id>", methods=["post"])
+def burn_move(player_id: str):
+    try:
+        payload = request.get_json()
+        ret_val = game_repository.perform_action(GameAction(
+            acting_player=player_id,
+            action_type="burn",
+            informed_player=None,
+            information_data=None,
+            placed_card_index=None,
+            burn_card_index=payload["card_index"],
+        ))
+
+        return ret_val, 200
+    except KeyError:
+        return "", 400
+
+
+@app.route("/make_turn/place/<player_id>", methods=["post"])
+def place_move(player_id: str):
+    try:
+        payload = request.get_json()
+        ret_val = game_repository.perform_action(GameAction(
+            acting_player=player_id,
+            action_type="place",
+            informed_player=None,
+            information_data=None,
+            placed_card_index=payload["card_index"],
+            burn_card_index=None,
+        ))
+
+        return ret_val, 200
+    except KeyError:
+        return "", 400
+
+
+@app.route("/move_card/<player_id>", methods=["post"])
+def move_card(player_id: str):
+    try:
+        payload = request.get_json()
+        ret_val = game_repository.perform_card_motion(card_motion_request=MoveCardRequest(
+            player_id=player_id,
+            initial_card_index=payload["move_from_index"],
+            final_card_index=payload["move_to_index"],
+        ))
         return ret_val, 200
     except KeyError:
         return "", 400

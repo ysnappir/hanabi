@@ -293,7 +293,7 @@ class HanabiGamesRepository(IGamesRepository):
     def get_game_state(
         self, game_id: GameIdType, player_id: NetworkPlayerIdType
     ) -> GameState:
-        assert game_id in self._games
+        assert game_id in self._games, f"Received not existing game {game_id}"
         return self._games[game_id].get_hanabi_state(player_id=player_id)
 
     def register_player(
@@ -303,7 +303,7 @@ class HanabiGamesRepository(IGamesRepository):
         clothes_color_number: int = 1,
     ) -> NetworkPlayerIdType:
         player_id = self._generate_player_id()
-        assert player_id not in self._players
+        assert player_id not in self._players, f"Unknown player ({player_id})"
 
         self._players[player_id] = HanabiPlayerWrapper(
             network_id=player_id,
