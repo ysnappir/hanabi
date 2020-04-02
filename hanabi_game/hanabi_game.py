@@ -139,6 +139,11 @@ def is_exist_card_only_in_burnt_pile(game_state: IHanabiState, deck_cards: List[
     return len(card_hashes_in_burnt.difference(card_not_in_burnt_hashes)) > 0
 
 
+def is_lost_by_deck_ordering(game_state: IHanabiState, deck_cards: List[IHanabiCard]) -> bool:
+    return False
+    # raise NotImplementedError("")
+
+
 class HanabiGame(IHanabiGame):
 
     def __init__(
@@ -284,8 +289,8 @@ class HanabiGame(IHanabiGame):
             self._game_verdict = GameVerdict.UNWINABLE
             return self._game_verdict
 
-        # if is_lost_by_deck_ordering(self.get_state(), self._deck.observe_cards()):
-        #     self._game_verdict = GameVerdict.UNWINABLE_BY_DECK
-        #     return self._game_verdict
+        if is_lost_by_deck_ordering(self.get_state(), self._deck.observe_cards()):
+            self._game_verdict = GameVerdict.UNWINABLE_BY_DECK
+            return self._game_verdict
 
         return self._game_verdict
