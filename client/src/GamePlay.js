@@ -5,7 +5,7 @@ import FullTokenPile from './Tokens.js';
 import Player from './Player.js';
 import {UserIdContext} from './Contex.js';
 import {MAX_CLUE_TOKENS, MAX_MISS_TOKENS} from './Tokens.js';
-import RemainingDeck from './CardPiles.js';
+import RemainingDeck, {HanabiTable} from './CardPiles.js';
 
 function WaitForGameStart(props) {
   const {gameId, currPlayers } = props;
@@ -54,7 +54,7 @@ WaitForGameStart.propTypes = {
 
 
 function HanabiBoard(props) {
-  const {gameId, players, clueTokens, missTokens, remainingDeckSize } = props;
+  const {gameId, players, clueTokens, missTokens, remainingDeckSize, hanabiTable } = props;
 
   const getPlayerCards = (id) => {
     for (let index = 0; index < players.length; index++) {
@@ -84,6 +84,7 @@ function HanabiBoard(props) {
       Tokens Status: <br/>
       <FullTokenPile clueTokens={+clueTokens} missTokens={+missTokens}/> <br/><br/>
       <RemainingDeck remainingCards={remainingDeckSize}/>
+      <HanabiTable table={hanabiTable}/>
       {renderPlayers()}
     </div>
   );
@@ -95,6 +96,7 @@ HanabiBoard.propTypes = {
   clueTokens: PropTypes.number.isRequired,
   missTokens: PropTypes.number.isRequired,
   remainingDeckSize: PropTypes.number.isRequired,
+  hanabiTable: PropTypes.array.isRequired,
 };
 
 
@@ -109,6 +111,7 @@ function GamePlay(props) {
   const [availableClueTokens, setAvailableClueTokens] = useState(MAX_CLUE_TOKENS);
   const [availableMissTokens, setAvailableMissTokens] = useState(MAX_MISS_TOKENS);
   const [remainingDeckSize, setRemainingDeckSize] = useState(-1);
+  const [hanabiTable, setHanabiTable] = useState([]);
 
   const updateGameState = async () => {
     try {
@@ -125,6 +128,7 @@ function GamePlay(props) {
   );
 
   const handleGetGameStateResponse = (response) => {
+    console.log(response);
     let myJson = response.data;
 
     setAvailableClueTokens(myJson['blue_tokens']);
@@ -133,7 +137,7 @@ function GamePlay(props) {
     setPlayers(myJson['hands']);
 
     setRemainingDeckSize(myJson['deck_size']);
-
+    setHanabiTable(myJson['table']);
     if (!isGameStarted) {
       if (myJson['hands'].length > 0 && myJson['hands'][0].cards.length > 0) {
         console.log('Game Started!');
@@ -151,7 +155,7 @@ function GamePlay(props) {
       { !isGameStarted ? 
         <WaitForGameStart gameId={gameId} currPlayers={players}/> :
         <HanabiBoard gameId={gameId} players={players} clueTokens={+availableClueTokens} missTokens={+availableMissTokens}
-          remainingDeckSize={remainingDeckSize}/> }
+          remainingDeckSize={remainingDeckSize} hanabiTable={hanabiTable}/> }
     </div>
   );
 }
