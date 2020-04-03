@@ -5,8 +5,7 @@ import FullTokenPile from './Tokens.js';
 import Player from './Player.js';
 import {UserIdContext} from './Contex.js';
 import {MAX_CLUE_TOKENS, MAX_MISS_TOKENS} from './Tokens.js';
-import cardBack from './img/BackRect125.png';
-
+import RemainingDeck from './CardPiles.js';
 
 function WaitForGameStart(props) {
   const {gameId, currPlayers } = props;
@@ -84,7 +83,7 @@ function HanabiBoard(props) {
       <h1>Full game play - game number {gameId}</h1> <br/><br/>
       Tokens Status: <br/>
       <FullTokenPile clueTokens={+clueTokens} missTokens={+missTokens}/> <br/><br/>
-      Remaining Deck Size: {remainingDeckSize}
+      <RemainingDeck remainingCards={remainingDeckSize}/>
       {renderPlayers()}
     </div>
   );
