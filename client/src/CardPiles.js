@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import {COLOR_TO_FILE_INDENTIFIER, cardToImageFile} from './Cards.js';
 
 function RemainingDeck(props) {
   const {remainingCards} = props;
@@ -23,19 +24,23 @@ export function HanabiTable(props) {
 
   const generateBoard = () => {
     let outBoards = [];
-    console.log(table);
-    console.log(table.length);
-    console.log(table['green']);
-    
-    for (let index = 0; index < table.length; index++) {
-      console.log('loop');
-      //outBoards.push(<h3 style={{}}></h3>);
-      //let cardPath = cardToImageFile(cards[index]['number'], cards[index]['color']);
-      //outBoards.push(<img src={cardPath} key={index}/>);
-    }
-    
-    return <div>{outBoards}</div>;
+    let colors = Object.keys(table); 
 
+    for (let index = 0; index < colors.length; index++) {
+      let currColor = colors[index];
+      let currColorOnBoard = table[currColor];
+      let style = {color: currColor};
+      if (currColor == 'white') {
+        style['backgroundColor'] = 'black';
+        style['alignItems'] = 'start';
+      }
+      outBoards.push(<tr>
+        <td> <h3 style={style}>{currColor}</h3> </td>
+        <td> </td>
+      </tr>);
+    }
+
+    return <table>{outBoards}</table>;
   };
 
   return (
