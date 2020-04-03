@@ -52,12 +52,12 @@ function PlayerCards(props) {
   };
 
   const renderCards = () => {
-    let out_cards = [];
+    let outCards = [];
     for (let index = 0; index < cards.length; index++) {
       let cardPath = cardToImageFile(cards[index]['number'], cards[index]['color']);
-      out_cards.push(<img src={cardPath} key={index}/>);
+      outCards.push(<img src={cardPath} key={index}/>);
     }
-    return <div>{out_cards}</div>;
+    return <div>{outCards}</div>;
   };
 
   return (
