@@ -1,7 +1,7 @@
-from typing import List, Optional, Dict, Callable
+from typing import List, Optional, Dict, Callable, Hashable
 
 from hanabi_game.constants import INITIAL_BLUE_TOKENS, INITIAL_RED_TOKENS
-from hanabi_game.defs import PlayerIdType, HanabiColor, HanabiNumber, HanabiMoveType
+from hanabi_game.defs import PlayerIdType, HanabiColor, HanabiNumber, HanabiMoveType, GameVerdict
 from hanabi_game.hanabi_deck import HanabiDeck
 from hanabi_game.hanabi_game_api import (
     IHanabiGame,
@@ -125,7 +125,27 @@ class HanabiHand(IHandType):
         self._cards = self._cards[:index] + [card] + self._cards[index:]
 
 
+def _card_to_hashable(card: IHanabiCard) -> Hashable:
+    return tuple((card.get_number().value, card.get_color().value))
+
+
+def is_exist_card_only_in_burnt_pile(game_state: IHanabiState, deck_cards: List[IHanabiCard]) -> bool:
+    card_hashes_in_burnt: set = set(map(_card_to_hashable, game_state.get_burnt_pile()))
+    cards_not_in_burnt: List[IHanabiCard] = deck_cards + [
+        game_state.get_hand(j).get_card(i)
+        for j in range(game_state.get_number_of_players())
+        for i in range(game_state.get_hand(j).get_amount_of_cards())]
+    card_not_in_burnt_hashes = set(map(_card_to_hashable, cards_not_in_burnt))
+    return len(card_hashes_in_burnt.difference(card_not_in_burnt_hashes)) > 0
+
+
+def is_lost_by_deck_ordering(game_state: IHanabiState, deck_cards: List[IHanabiCard]) -> bool:
+    return False
+    # raise NotImplementedError("")
+
+
 class HanabiGame(IHanabiGame):
+
     def __init__(
         self,
         n_players: int,
@@ -164,6 +184,7 @@ class HanabiGame(IHanabiGame):
             HanabiMoveType.PLACE: self._perform_place,
             HanabiMoveType.INFORM: self._perform_inform,
         }
+        self._game_verdict: GameVerdict = GameVerdict.ONGOING
         self._moves_log = []
 
     def last_move(self) -> Optional[IHanabiMove]:
@@ -204,12 +225,13 @@ class HanabiGame(IHanabiGame):
             self._piles[placed_card.get_color()] = placed_card.get_number()
             if placed_card.get_number() is HanabiNumber.FIVE:
                 self._blue_tokens_amount += 1
+                if all(self._piles.get(color) is HanabiNumber.FIVE for color in HanabiColor):
+                    self._game_verdict = GameVerdict.WON
         else:
             self._burnt_pile.append(placed_card)
             self._red_tokens_amount -= 1
             if self._red_tokens_amount == 0:
-                # TODO 20/03/2020 ysnappir: Handle game over
-                pass
+                self._game_verdict = GameVerdict.LOST
 
     def _perform_inform(self, move: IHanabiInfromMove) -> None:
         self._blue_tokens_amount -= 1
@@ -255,3 +277,20 @@ class HanabiGame(IHanabiGame):
 
     def get_cards_per_player(self) -> int:
         return self._number_of_cards_per_player
+
+    def _is_game_winable(self) -> bool:
+        raise NotImplementedError("")
+
+    def get_verdict(self) -> GameVerdict:
+        if self._game_verdict in [GameVerdict.LOST, GameVerdict.WON]:
+            return self._game_verdict
+
+        if is_exist_card_only_in_burnt_pile(self.get_state(), self._deck.observe_cards()):
+            self._game_verdict = GameVerdict.UNWINABLE
+            return self._game_verdict
+
+        if is_lost_by_deck_ordering(self.get_state(), self._deck.observe_cards()):
+            self._game_verdict = GameVerdict.UNWINABLE_BY_DECK
+            return self._game_verdict
+
+        return self._game_verdict
