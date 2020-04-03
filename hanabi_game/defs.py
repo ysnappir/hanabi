@@ -30,3 +30,11 @@ class HanabiMoveType(Enum):
     PLACE = "place"
     BURN = "burn"
     INFORM = "inform"
+
+
+class GameVerdict(Enum):
+    ONGOING = "ongoing"
+    WON = "won"
+    LOST = "lost"
+    UNWINABLE = "unwinable"
+    UNWINABLE_BY_DECK = "unwinable_by_deck"
