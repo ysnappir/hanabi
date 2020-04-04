@@ -6,6 +6,7 @@ import Player from './Player.js';
 import {UserIdContext} from './Contex.js';
 import {MAX_CLUE_TOKENS, MAX_MISS_TOKENS} from './Tokens.js';
 import RemainingDeck, {HanabiTable} from './CardPiles.js';
+import {CARD_WIDTH} from './Cards.js'
 
 function WaitForGameStart(props) {
   const {gameId, currPlayers } = props;
@@ -54,7 +55,7 @@ WaitForGameStart.propTypes = {
 
 
 function HanabiBoard(props) {
-  const {gameId, players, clueTokens, missTokens, remainingDeckSize, hanabiTable } = props;
+  const {gameId, players, clueTokens, missTokens, remainingDeckSize, hanabiTable, activePlayer } = props;
 
   const getPlayerCards = (id) => {
     for (let index = 0; index < players.length; index++) {
@@ -70,9 +71,13 @@ function HanabiBoard(props) {
   const renderPlayers = () => {
     let out_players = [];
     if (players.length > 0) {
+      let divWidth = (getPlayerCards(players[0]['id']).length + 0.25) * CARD_WIDTH; // the width of a card. Not sure why I need the 0.25
       out_players = players.map((player) => 
-        <Player userId={player['id']} displayName={player['display_name']} 
-          cards={getPlayerCards(player['id'])} key={player['id']} />
+        <div key={'player_div+' + player['id']}
+          style={{width: divWidth + 'px', border: player['id'] == activePlayer ? '2px solid red' : 'none'}}>
+          <Player userId={player['id']} displayName={player['display_name']} 
+            cards={getPlayerCards(player['id'])} key={player['id']} />
+        </div>
       );
     }
     return out_players;
@@ -97,10 +102,8 @@ HanabiBoard.propTypes = {
   missTokens: PropTypes.number.isRequired,
   remainingDeckSize: PropTypes.number.isRequired,
   hanabiTable: PropTypes.object.isRequired,
+  activePlayer: PropTypes.number.isRequired,
 };
-
-
-//<div id="deck_pile_item_1" class="stockitem  stockitem_unselectable card deck_font" style="top: 0px; left: 0px; width: 81px; height: 125px; z-index: 2; background-image: url(&quot;https://x.boardgamearena.net/data/themereleases/current/games/hanabi/200213-1217/img/BackRect125.png&quot;); opacity: 1;">40</div>
 
 
 function GamePlay(props) {
@@ -112,6 +115,7 @@ function GamePlay(props) {
   const [availableMissTokens, setAvailableMissTokens] = useState(MAX_MISS_TOKENS);
   const [remainingDeckSize, setRemainingDeckSize] = useState(-1);
   const [hanabiTable, setHanabiTable] = useState([]);
+  const [activePlayer, setActivePlayer] = useState(-1);
 
   const updateGameState = async () => {
     try {
@@ -128,7 +132,6 @@ function GamePlay(props) {
   );
 
   const handleGetGameStateResponse = (response) => {
-    console.log(response);
     let myJson = response.data;
 
     setAvailableClueTokens(myJson['blue_tokens']);
@@ -138,6 +141,8 @@ function GamePlay(props) {
 
     setRemainingDeckSize(myJson['deck_size']);
     setHanabiTable(myJson['table']);
+    setActivePlayer(myJson['active_player_id']);
+  
     if (!isGameStarted) {
       if (myJson['hands'].length > 0 && myJson['hands'][0].cards.length > 0) {
         console.log('Game Started!');
@@ -155,7 +160,7 @@ function GamePlay(props) {
       { !isGameStarted ? 
         <WaitForGameStart gameId={gameId} currPlayers={players}/> :
         <HanabiBoard gameId={gameId} players={players} clueTokens={+availableClueTokens} missTokens={+availableMissTokens}
-          remainingDeckSize={remainingDeckSize} hanabiTable={hanabiTable}/> }
+          remainingDeckSize={remainingDeckSize} hanabiTable={hanabiTable} activePlayer={+activePlayer}/> }
     </div>
   );
 }
