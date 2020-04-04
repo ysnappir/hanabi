@@ -29,3 +29,11 @@ def jsonify_game_state(game_state: GameState) -> Any:
         ],
         "active_player_id": game_state.active_player,
     }
+
+
+def deck_to_game_factory(deck: IHanabiDeck) -> GameFactoryType:
+    def game_factory(*args, **kwargs):
+        return HanabiGame(*args, **kwargs, predifined_deck=deck)
+
+    # noinspection PyTypeChecker
+    return game_factory
