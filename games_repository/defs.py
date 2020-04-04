@@ -24,7 +24,7 @@ class GameAction(NamedTuple):
     acting_player: NetworkPlayerIdType
     action_type: str
     informed_player: Optional[NetworkPlayerIdType]
-    information_data: Optional[str]
+    information_data: Optional[Union[int, str]]
     placed_card_index: Optional[int]
     burn_card_index: Optional[int]
 

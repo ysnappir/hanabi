@@ -1,6 +1,9 @@
 from typing import Any
 
-from games_repository.defs import GameState
+from games_repository.defs import GameState, GameFactoryType
+from hanabi_game.defs import HanabiColor
+from hanabi_game.hanabi_game import HanabiGame
+from hanabi_game.hanabi_game_api import IHanabiDeck
 
 
 def jsonify_game_state(game_state: GameState) -> Any:
@@ -9,8 +12,8 @@ def jsonify_game_state(game_state: GameState) -> Any:
         "blue_tokens": game_state.blue_token_amount,
         "red_tokens": game_state.red_token_amount,
         "table": {
-            k.value: v.value if v is not None else None
-            for k, v in game_state.table_state.items()
+            k.value: game_state.table_state[k].value if game_state.table_state.get(k) is not None else 0
+            for k in HanabiColor
         },
         "hands": [
             {
