@@ -253,7 +253,7 @@ class HanabiGameWrapper:
 
         ret_val = self._game.perform_move(move=move)
         if ret_val and action_type in [HanabiMoveType.BURN, HanabiMoveType.PLACE]:
-            self._players[move.performer].dispose_card(move.card_hand_index)
+            self._players[action.acting_player].dispose_card(move.card_hand_index)
 
         return ret_val
 
