@@ -5,6 +5,8 @@ import FullTokenPile from './Tokens.js';
 import Player from './Player.js';
 import {UserIdContext} from './Contex.js';
 import {MAX_CLUE_TOKENS, MAX_MISS_TOKENS} from './Tokens.js';
+import RemainingDeck, {HanabiTable, BurntPile} from './CardPiles.js';
+import {CARD_WIDTH} from './Cards.js';
 
 function WaitForGameStart(props) {
   const {gameId, currPlayers } = props;
@@ -53,7 +55,7 @@ WaitForGameStart.propTypes = {
 
 
 function HanabiBoard(props) {
-  const {gameId, players, clueTokens, missTokens } = props;
+  const {gameId, players, clueTokens, missTokens, remainingDeckSize, hanabiTable, activePlayer, burntPileCards} = props;
 
   const getPlayerCards = (id) => {
     for (let index = 0; index < players.length; index++) {
@@ -69,9 +71,13 @@ function HanabiBoard(props) {
   const renderPlayers = () => {
     let out_players = [];
     if (players.length > 0) {
+      let divWidth = (getPlayerCards(players[0]['id']).length + 0.25) * CARD_WIDTH; // the width of a card. Not sure why I need the 0.25
       out_players = players.map((player) => 
-        <Player userId={player['id']} displayName={player['display_name']} 
-          cards={getPlayerCards(player['id'])} key={player['id']} />
+        <div key={'player_div+' + player['id']}
+          style={{width: divWidth + 'px', border: player['id'] == activePlayer ? '2px solid red' : 'none'}}>
+          <Player userId={player['id']} displayName={player['display_name']} 
+            cards={getPlayerCards(player['id'])} key={player['id']} />
+        </div>
       );
     }
     return out_players;
@@ -82,7 +88,11 @@ function HanabiBoard(props) {
       <h1>Full game play - game number {gameId}</h1> <br/><br/>
       Tokens Status: <br/>
       <FullTokenPile clueTokens={+clueTokens} missTokens={+missTokens}/> <br/><br/>
+      <RemainingDeck remainingCards={remainingDeckSize}/>
+      <HanabiTable table={hanabiTable}/>
       {renderPlayers()}
+      <BurntPile cardList={burntPileCards}/>
+      <h1>End of board</h1>
     </div>
   );
 }
@@ -92,8 +102,11 @@ HanabiBoard.propTypes = {
   players: PropTypes.array.isRequired,
   clueTokens: PropTypes.number.isRequired,
   missTokens: PropTypes.number.isRequired,
+  remainingDeckSize: PropTypes.number.isRequired,
+  hanabiTable: PropTypes.object.isRequired,
+  activePlayer: PropTypes.number.isRequired,
+  burntPileCards: PropTypes.array.isRequired,
 };
-
 
 
 function GamePlay(props) {
@@ -103,6 +116,10 @@ function GamePlay(props) {
   const [players, setPlayers] = useState([]);
   const [availableClueTokens, setAvailableClueTokens] = useState(MAX_CLUE_TOKENS);
   const [availableMissTokens, setAvailableMissTokens] = useState(MAX_MISS_TOKENS);
+  const [remainingDeckSize, setRemainingDeckSize] = useState(-1);
+  const [hanabiTable, setHanabiTable] = useState([]);
+  const [activePlayer, setActivePlayer] = useState(-1);
+  const [burntPileCards, setBurntPileCards] = useState([]);
 
   const updateGameState = async () => {
     try {
@@ -126,6 +143,11 @@ function GamePlay(props) {
 
     setPlayers(myJson['hands']);
 
+    setRemainingDeckSize(myJson['deck_size']);
+    setHanabiTable(myJson['table']);
+    setActivePlayer(myJson['active_player_id']);
+    setBurntPileCards(myJson['burnt_pile']);
+    
     if (!isGameStarted) {
       if (myJson['hands'].length > 0 && myJson['hands'][0].cards.length > 0) {
         console.log('Game Started!');
@@ -142,7 +164,8 @@ function GamePlay(props) {
     <div>
       { !isGameStarted ? 
         <WaitForGameStart gameId={gameId} currPlayers={players}/> :
-        <HanabiBoard gameId={gameId} players={players} clueTokens={+availableClueTokens} missTokens={+availableMissTokens}/> }
+        <HanabiBoard gameId={gameId} players={players} clueTokens={+availableClueTokens} missTokens={+availableMissTokens}
+          remainingDeckSize={remainingDeckSize} hanabiTable={hanabiTable} burntPileCards={burntPileCards} activePlayer={+activePlayer}/> }
     </div>
   );
 }

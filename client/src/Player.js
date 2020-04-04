@@ -1,27 +1,23 @@
 import React from 'react';
-import './Player.css';
 import PropTypes from 'prop-types';
-
-const COLOR_TO_ROW = {'red': 0, 'yellow': 1, 'green': 2, 'blue': 3, 'white': 4, 'rainbow': 5};
+import {cardToImageFile} from './Cards.js';
 
 
 function PlayerCards(props) {
   let {cards} = props;
-
-  const cardToImagePos = (number, color) => {
-    let posX = (+number - 1) * (-100);
-    let posY = COLOR_TO_ROW[color] * (-100);
-    return [posX, posY];
-  };
-
+  
   const renderCards = () => {
-    let out_cards = [];
+    let outCards = [];
     for (let index = 0; index < cards.length; index++) {
-      let pos_arr = cardToImagePos(cards[index]['number'], cards[index]['color']);
-      out_cards.push(<div className='card' 
-        style={{backgroundPositionX :pos_arr[0] + '%', backgroundPositionY :pos_arr[1] + '%'}} key={index}></div>);
+      if(cards[index] != null){
+        let cardPath = cardToImageFile(cards[index]['number'], cards[index]['color']);
+        outCards.push(<img src={cardPath} key={index}/>);
+      }
+      else{
+        outCards.push(<img src={require ('./img/BackRect125.png')}/>);
+      }
     }
-    return out_cards;
+    return <div>{outCards}</div>;
   };
 
   return (
