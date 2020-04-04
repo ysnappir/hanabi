@@ -96,7 +96,7 @@ HanabiBoard.propTypes = {
   clueTokens: PropTypes.number.isRequired,
   missTokens: PropTypes.number.isRequired,
   remainingDeckSize: PropTypes.number.isRequired,
-  hanabiTable: PropTypes.array.isRequired,
+  hanabiTable: PropTypes.object.isRequired,
 };
 
 
