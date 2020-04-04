@@ -12,7 +12,7 @@ from games_repository.defs import (
     HandState,
     GameAction,
     MoveCardRequest,
-)
+    GameFactoryType)
 from games_repository.games_repository_api import (
     IGamesRepository,
     GameIdType,
@@ -114,8 +114,9 @@ class HanabiPlayerWrapper:
 
 
 class HanabiGameWrapper:
-    def __init__(self, game_id: GameIdType):
+    def __init__(self, game_id: GameIdType, game_factory: Optional[GameFactoryType] = None):
         self._game_id = game_id
+        self._game_factory = game_factory or HanabiGame
         self._status: GameStatus = GameStatus.CREATED
         self._game: Optional[IHanabiGame] = None
         self._players: Dict[NetworkPlayerIdType, HanabiPlayerWrapper] = {}
@@ -188,7 +189,7 @@ class HanabiGameWrapper:
                 self._ordered_players[i]
             ].get_number_of_cloth_colors(),
         )
-        self._game = HanabiGame(
+        self._game = self._game_factory(
             n_players=self.get_number_of_players(),
             starting_player=index_of_player_with_most_colors,
         )
@@ -278,9 +279,9 @@ class HanabiGamesRepository(IGamesRepository):
     def get_available_id(self) -> GameIdType:
         return max(self._games.keys(), default=0) + 1
 
-    def create_game(self) -> GameIdType:
+    def create_game(self, game_factory: Optional[GameFactoryType] = None) -> GameIdType:
         game_id = self._generate_game_id()
-        self._games[game_id] = HanabiGameWrapper(game_id=game_id)
+        self._games[game_id] = HanabiGameWrapper(game_id=game_id, game_factory=game_factory)
         return game_id
 
     def get_active_games(self) -> Set[GameIdType]:

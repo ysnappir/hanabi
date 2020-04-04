@@ -21,7 +21,9 @@ from flask_cors import CORS
 from games_repository.defs import GameIdType, GameAction, MoveCardRequest
 from games_repository.game_repository import HanabiGamesRepository
 from games_repository.games_repository_api import IGamesRepository
-from games_repository.utils import jsonify_game_state
+from games_repository.utils import jsonify_game_state, deck_to_game_factory
+from hanabi_game.hanabi_deck import HanabiDeck
+from hanabi_game.utils import get_all_cards_list
 
 app = Flask(__name__)
 cors = CORS(app, resources={r"/*": {"origins": "*"}})
@@ -54,7 +56,13 @@ def register():
 @app.route("/create_game/<player_id>", methods=["post"])
 def create_game(player_id: str):
     try:
-        game_id = game_repository.create_game()
+        is_test_game = request.get_json().get("test_game", False) is True
+        if is_test_game:
+
+            game_id = game_repository.create_game(
+                game_factory=deck_to_game_factory(deck=HanabiDeck(cards=get_all_cards_list())))
+        else:
+            game_id = game_repository.create_game()
         assert game_repository.assign_player_to_game(player_id=player_id, game_id=game_id)
         return {"game_id": game_id}, 200
     except KeyError:
