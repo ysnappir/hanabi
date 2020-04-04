@@ -13,15 +13,16 @@
 # limitations under the License.
 
 # [START gae_python37_render_template]
-import datetime
 
-from flask import Flask, render_template, request
+from flask import Flask, request  # render_template,
 from flask_cors import CORS
 
-from games_repository.defs import GameIdType
+from games_repository.defs import GameIdType, GameAction, MoveCardRequest
 from games_repository.game_repository import HanabiGamesRepository
 from games_repository.games_repository_api import IGamesRepository
-from games_repository.utils import jsonify_game_state
+from games_repository.utils import jsonify_game_state, deck_to_game_factory
+from hanabi_game.hanabi_deck import HanabiDeck
+from hanabi_game.utils import get_all_cards_list
 
 app = Flask(__name__)
 cors = CORS(app, resources={r"/*": {"origins": "*"}})
@@ -32,12 +33,12 @@ game_repository: IGamesRepository = HanabiGamesRepository()
 def root():
     # For the sake of example, use static information to inflate the template.
     # This will be replaced with real information in later steps.
-    dummy_times = [datetime.datetime(2018, 1, 1, 10, 0, 0),
-                   datetime.datetime(2018, 1, 2, 10, 30, 0),
-                   datetime.datetime(2018, 1, 3, 11, 0, 0),
-                   ]
+    # dummy_times = [datetime.datetime(2018, 1, 1, 10, 0, 0),
+    #                datetime.datetime(2018, 1, 2, 10, 30, 0),
+    #                datetime.datetime(2018, 1, 3, 11, 0, 0),
+    #                ]
 
-    return render_template('index.html', times=dummy_times)
+    return "Bucke's hanabi server is up", 200  # render_template('index.html', times=dummy_times)
 
 
 @app.route("/register", methods=["post"])
@@ -54,7 +55,13 @@ def register():
 @app.route("/create_game/<player_id>", methods=["post"])
 def create_game(player_id: str):
     try:
-        game_id = game_repository.create_game()
+        is_test_game = request.get_json().get("test_game", False) is True
+        if is_test_game:
+
+            game_id = game_repository.create_game(
+                game_factory=deck_to_game_factory(deck=HanabiDeck(cards=get_all_cards_list())))
+        else:
+            game_id = game_repository.create_game()
         assert game_repository.assign_player_to_game(player_id=player_id, game_id=game_id)
         return {"game_id": game_id}, 200
     except KeyError:
@@ -79,13 +86,91 @@ def start_game(game_id: str):
         return "", 400
 
 
-@app.route("/game_state/<player_id>/<game_id>", methods=["post"])
+@app.route("/game_state/<player_id>/<game_id>", methods=["get"])
 def game_state(player_id: str, game_id: str):
     try:
         ret_val = jsonify_game_state(game_repository.get_game_state(game_id=GameIdType(game_id), player_id=player_id))
         return ret_val, 200
     except KeyError:
         return "", 400
+
+
+@app.route("/make_turn/inform/<player_id>", methods=["post"])
+def inform_move(player_id: str):
+    try:
+        print("making inform")
+        payload = request.get_json()
+        action = GameAction(
+            acting_player=player_id,
+            action_type="inform",
+            informed_player=payload["informed_player_id"],
+            information_data=payload["information"],  # small letters color or a number
+            placed_card_index=None,
+            burn_card_index=None,
+        )
+        print(action)
+        ret_val = game_repository.perform_action(action=action)
+        print(f"return value is {ret_val}")
+        return {}, 200
+    except KeyError:
+        return "", 400
+    except AssertionError as e:
+        print(e)
+        return str(e), 400
+
+
+@app.route("/make_turn/burn/<player_id>", methods=["post"])
+def burn_move(player_id: str):
+    try:
+        payload = request.get_json()
+        ret_val = game_repository.perform_action(GameAction(
+            acting_player=player_id,
+            action_type="burn",
+            informed_player=None,
+            information_data=None,
+            placed_card_index=None,
+            burn_card_index=payload["card_index"],
+        ))
+        if ret_val:
+            return {}, 200
+        return "Not your turn!", 400
+    except KeyError:
+        return "", 400
+
+
+@app.route("/make_turn/place/<player_id>", methods=["post"])
+def place_move(player_id: str):
+    try:
+        payload = request.get_json()
+        print(f"Handling placing with payload: {payload}")
+        ret_val = game_repository.perform_action(GameAction(
+            acting_player=player_id,
+            action_type="place",
+            informed_player=None,
+            information_data=None,
+            placed_card_index=payload["card_index"],
+            burn_card_index=None,
+        ))
+        print(f"Return value: {ret_val}")
+        return {}, 200
+    except KeyError:
+        return "", 400
+
+
+@app.route("/move_card/<player_id>", methods=["post"])
+def move_card(player_id: str):
+    try:
+        payload = request.get_json()
+        assert game_repository.perform_card_motion(card_motion_request=MoveCardRequest(
+            player_id=player_id,
+            initial_card_index=payload["move_from_index"],
+            final_card_index=payload["move_to_index"],
+        ))
+        return {}, 200
+    except KeyError:
+        return "", 400
+    except AssertionError:
+        return "Couldn't move the card", 400
 
 
 if __name__ == '__main__':

@@ -1,5 +1,7 @@
 from games_repository.card_mapper import CardMapper
 from games_repository.card_mapper_api import ICardMapper
+from games_repository.defs import GameAction, MoveCardRequest
+from games_repository.game_repository import HanabiGamesRepository
 
 
 def test_correct_mapping_after_moving():
@@ -73,3 +75,36 @@ def test_correct_mapping_after_moving_and_disposing():
     assert mapper.get_hanabi_card_index(2) == 1
     assert mapper.get_hanabi_card_index(3) == 0
     assert mapper.get_hanabi_card_index(4) == 2
+
+
+def test_moving_hot_seat_to_pinned():
+    game_repository = HanabiGamesRepository()
+    yuval_id = game_repository.register_player(display_name="Yuval", clothes_color_number=9)
+    ethan_id = game_repository.register_player(display_name="Ethan", clothes_color_number=2)
+
+    game_id = game_repository.create_game()
+    game_repository.assign_player_to_game(player_id=yuval_id, game_id=game_id)
+    game_repository.assign_player_to_game(player_id=ethan_id, game_id=game_id)
+
+    game_repository.start_game(game_id=game_id)
+
+    assert game_repository.perform_action(action=GameAction(
+        acting_player=yuval_id,
+        action_type="inform",
+        informed_player=ethan_id,
+        information_data=5,
+        placed_card_index=None,
+        burn_card_index=None,
+    ))
+
+    game_state = game_repository.get_game_state(game_id=game_id, player_id=yuval_id)
+    assert game_state.active_player == ethan_id and game_state.blue_token_amount == 7
+
+    game_repository.perform_card_motion(card_motion_request=MoveCardRequest(
+        player_id=ethan_id,
+        initial_card_index=4,
+        final_card_index=0
+    ))
+
+    game_state = game_repository.get_game_state(game_id=game_id, player_id=yuval_id)
+    assert game_state.hands_state[1].cards[0].get_number().value == 5

@@ -1,13 +1,14 @@
 from enum import Enum
-from typing import NamedTuple, Optional, Dict, List
+from typing import NamedTuple, Optional, Dict, List, Union, Callable
 
 from games_repository.card_mapper_api import FECardIndex
 from hanabi_game.defs import HanabiColor, HanabiNumber
-from hanabi_game.hanabi_game_api import IHanabiCard
+from hanabi_game.hanabi_game_api import IHanabiCard, IHanabiGame
 
 GameIdType = int
 NetworkPlayerIdType = str
 TableState = Dict[HanabiColor, Optional[HanabiNumber]]
+GameFactoryType = Callable[[int, int], IHanabiGame]  # number of players and starting player
 
 
 class HandState(NamedTuple):
@@ -23,7 +24,7 @@ class GameAction(NamedTuple):
     acting_player: NetworkPlayerIdType
     action_type: str
     informed_player: Optional[NetworkPlayerIdType]
-    information_data: Optional[str]
+    information_data: Optional[Union[int, str]]
     placed_card_index: Optional[int]
     burn_card_index: Optional[int]
 

@@ -6,12 +6,12 @@ from games_repository.defs import (
     NetworkPlayerIdType,
     GameState,
     MoveCardRequest,
-)
+    GameFactoryType)
 
 
 class IGamesRepository:
 
-    def create_game(self) -> GameIdType:
+    def create_game(self, game_factory: Optional[GameFactoryType] = None) -> GameIdType:
         raise NotImplementedError("")
 
     def start_game(self, game_id: GameIdType) -> bool:
