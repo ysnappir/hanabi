@@ -10,8 +10,13 @@ function PlayerCards(props) {
   const renderCards = () => {
     let outCards = [];
     for (let index = 0; index < cards.length; index++) {
-      let cardPath = cardToImageFile(cards[index]['number'], cards[index]['color']);
-      outCards.push(<img src={cardPath} key={index}/>);
+      if(cards[index] != null){
+        let cardPath = cardToImageFile(cards[index]['number'], cards[index]['color']);
+        outCards.push(<img src={cardPath} key={index}/>);
+      }
+      else{
+        outCards.push(<img src={require ('./img/BackRect125.png')}/>);
+      }
     }
     return <div>{outCards}</div>;
   };

@@ -5,7 +5,7 @@ import FullTokenPile from './Tokens.js';
 import Player from './Player.js';
 import {UserIdContext} from './Contex.js';
 import {MAX_CLUE_TOKENS, MAX_MISS_TOKENS} from './Tokens.js';
-import RemainingDeck, {HanabiTable} from './CardPiles.js';
+import RemainingDeck, {HanabiTable, BurntPile} from './CardPiles.js';
 import {CARD_WIDTH} from './Cards.js';
 
 function WaitForGameStart(props) {
@@ -55,7 +55,7 @@ WaitForGameStart.propTypes = {
 
 
 function HanabiBoard(props) {
-  const {gameId, players, clueTokens, missTokens, remainingDeckSize, hanabiTable, activePlayer } = props;
+  const {gameId, players, clueTokens, missTokens, remainingDeckSize, hanabiTable, activePlayer, burntPileCards} = props;
 
   const getPlayerCards = (id) => {
     for (let index = 0; index < players.length; index++) {
@@ -91,6 +91,8 @@ function HanabiBoard(props) {
       <RemainingDeck remainingCards={remainingDeckSize}/>
       <HanabiTable table={hanabiTable}/>
       {renderPlayers()}
+      <BurntPile cardList={burntPileCards}/>
+      <h1>End of board</h1>
     </div>
   );
 }
@@ -103,6 +105,7 @@ HanabiBoard.propTypes = {
   remainingDeckSize: PropTypes.number.isRequired,
   hanabiTable: PropTypes.object.isRequired,
   activePlayer: PropTypes.number.isRequired,
+  burntPileCards: PropTypes.array.isRequired,
 };
 
 
@@ -116,6 +119,7 @@ function GamePlay(props) {
   const [remainingDeckSize, setRemainingDeckSize] = useState(-1);
   const [hanabiTable, setHanabiTable] = useState([]);
   const [activePlayer, setActivePlayer] = useState(-1);
+  const [burntPileCards, setBurntPileCards] = useState([]);
 
   const updateGameState = async () => {
     try {
@@ -142,7 +146,8 @@ function GamePlay(props) {
     setRemainingDeckSize(myJson['deck_size']);
     setHanabiTable(myJson['table']);
     setActivePlayer(myJson['active_player_id']);
-  
+    setBurntPileCards(myJson['burnt_pile']);
+    
     if (!isGameStarted) {
       if (myJson['hands'].length > 0 && myJson['hands'][0].cards.length > 0) {
         console.log('Game Started!');
@@ -160,7 +165,7 @@ function GamePlay(props) {
       { !isGameStarted ? 
         <WaitForGameStart gameId={gameId} currPlayers={players}/> :
         <HanabiBoard gameId={gameId} players={players} clueTokens={+availableClueTokens} missTokens={+availableMissTokens}
-          remainingDeckSize={remainingDeckSize} hanabiTable={hanabiTable} activePlayer={+activePlayer}/> }
+          remainingDeckSize={remainingDeckSize} hanabiTable={hanabiTable} burntPileCards={burntPileCards} activePlayer={+activePlayer}/> }
     </div>
   );
 }
