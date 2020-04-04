@@ -5,7 +5,7 @@ import FullTokenPile from './Tokens.js';
 import Player from './Player.js';
 import {UserIdContext} from './Contex.js';
 import {MAX_CLUE_TOKENS, MAX_MISS_TOKENS} from './Tokens.js';
-import RemainingDeck, {HanabiTable} from './CardPiles.js';
+import RemainingDeck, {HanabiTable, BurntPile} from './CardPiles.js';
 
 function WaitForGameStart(props) {
   const {gameId, currPlayers } = props;
@@ -54,7 +54,7 @@ WaitForGameStart.propTypes = {
 
 
 function HanabiBoard(props) {
-  const {gameId, players, clueTokens, missTokens, remainingDeckSize, hanabiTable } = props;
+  const {gameId, players, clueTokens, missTokens, remainingDeckSize, hanabiTable, burntPileCards} = props;
 
   const getPlayerCards = (id) => {
     for (let index = 0; index < players.length; index++) {
@@ -86,6 +86,8 @@ function HanabiBoard(props) {
       <RemainingDeck remainingCards={remainingDeckSize}/>
       <HanabiTable table={hanabiTable}/>
       {renderPlayers()}
+      <BurntPile cardList={burntPileCards}/>
+      <h1>End of board</h1>
     </div>
   );
 }
@@ -97,6 +99,7 @@ HanabiBoard.propTypes = {
   missTokens: PropTypes.number.isRequired,
   remainingDeckSize: PropTypes.number.isRequired,
   hanabiTable: PropTypes.object.isRequired,
+  burntPileCards: PropTypes.array.isRequired,
 };
 
 
@@ -112,6 +115,7 @@ function GamePlay(props) {
   const [availableMissTokens, setAvailableMissTokens] = useState(MAX_MISS_TOKENS);
   const [remainingDeckSize, setRemainingDeckSize] = useState(-1);
   const [hanabiTable, setHanabiTable] = useState([]);
+  const [burntPileCards, setBurntPileCards] = useState([]);
 
   const updateGameState = async () => {
     try {
@@ -138,6 +142,7 @@ function GamePlay(props) {
 
     setRemainingDeckSize(myJson['deck_size']);
     setHanabiTable(myJson['table']);
+    setBurntPileCards(myJson['burnt_pile']);
     if (!isGameStarted) {
       if (myJson['hands'].length > 0 && myJson['hands'][0].cards.length > 0) {
         console.log('Game Started!');
@@ -155,7 +160,7 @@ function GamePlay(props) {
       { !isGameStarted ? 
         <WaitForGameStart gameId={gameId} currPlayers={players}/> :
         <HanabiBoard gameId={gameId} players={players} clueTokens={+availableClueTokens} missTokens={+availableMissTokens}
-          remainingDeckSize={remainingDeckSize} hanabiTable={hanabiTable}/> }
+          remainingDeckSize={remainingDeckSize} hanabiTable={hanabiTable} burntPileCards={burntPileCards}/> }
     </div>
   );
 }
