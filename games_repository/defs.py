@@ -14,7 +14,7 @@ GameFactoryType = Callable[[int, int], IHanabiGame]  # number of players and sta
 class HandState(NamedTuple):
     id: NetworkPlayerIdType
     display_name: str
-    cards: List[IHanabiCard]
+    cards: List[Optional[IHanabiCard]]
 
 
 HandsState = List[HandState]
