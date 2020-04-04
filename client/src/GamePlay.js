@@ -6,7 +6,7 @@ import Player from './Player.js';
 import {UserIdContext} from './Contex.js';
 import {MAX_CLUE_TOKENS, MAX_MISS_TOKENS} from './Tokens.js';
 import RemainingDeck, {HanabiTable} from './CardPiles.js';
-import {CARD_WIDTH} from './Cards.js'
+import {CARD_WIDTH} from './Cards.js';
 
 function WaitForGameStart(props) {
   const {gameId, currPlayers } = props;
