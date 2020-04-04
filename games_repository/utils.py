@@ -1,7 +1,8 @@
 from typing import Any
 
 from games_repository.defs import GameState, GameFactoryType
-from hanabi_game.defs import HanabiColor
+from hanabi_game.defs import HanabiColor, HanabiNumber
+from hanabi_game.hanabi_card import HanabiCard
 from hanabi_game.hanabi_game import HanabiGame
 from hanabi_game.hanabi_game_api import IHanabiDeck
 
@@ -20,7 +21,7 @@ def jsonify_game_state(game_state: GameState) -> Any:
                 "id": player.id,
                 "display_name": player.display_name,
                 "cards": [
-                    {"number": card.get_number().value, "color": card.get_color().value}
+                    {"number": card.get_number().value, "color": card.get_color().value} if card else None
                     for card in player.cards
                 ],
             }

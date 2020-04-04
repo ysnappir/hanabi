@@ -78,11 +78,11 @@ class HanabiPlayerWrapper:
     def get_number_of_cloth_colors(self) -> int:
         return self._number_of_color_in_clothes
 
-    def get_formatted_hand_state(self, hanabi_state: IHanabiState) -> HandState:
+    def get_formatted_hand_state(self, hanabi_state: IHanabiState, hide_cards: bool = False) -> HandState:
         hand = hanabi_state.get_hand(self._hanabi_player_id)
         if hand:
             cards = [
-                hand.get_card(self._card_mapper.get_hanabi_card_index(fe_card_index=i))
+                hand.get_card(self._card_mapper.get_hanabi_card_index(fe_card_index=i)) if not hide_cards else None
                 for i in range(hand.get_amount_of_cards())
             ]
         else:
@@ -127,8 +127,8 @@ class HanabiGameWrapper:
     ) -> HandsState:
         i = self._ordered_players.index(player_id)
         return [
-            self._players[player_id].get_formatted_hand_state(hanabi_state=hanabi_state)
-            for player_id in self._ordered_players[i:] + self._ordered_players[:i]
+            self._players[player_id].get_formatted_hand_state(hanabi_state=hanabi_state, hide_cards=(j == 0))
+            for j, player_id in enumerate(self._ordered_players[i:] + self._ordered_players[:i])
         ]
 
     def get_hanabi_state(self, player_id: NetworkPlayerIdType) -> Optional[GameState]:
