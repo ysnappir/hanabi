@@ -68,26 +68,30 @@ HanabiTable.propTypes = {
 export function BurntPile(props) {
   const {cardList} = props;
 
-  const numbers = [1, 2, 3, 4, 5];
-  return (
-    <div>
-      <h2>Burnt pile. length: {cardList.length}</h2>
-      {
-        numbers
-          .map((value) => <div key={value}>
-            {cardList.filter(item => item['number'] == value)
-              .sort((x, y) => {
-                if(x['color'] > y['color'])
-                  return 1;
-                else
-                  return -1;
-              })
-              .map((value) => <img src={cardToImageFile(value['number'], value['color'])} key={'burntCard_' + value['number'] + value['color']}/>)
-            }
-          </div>)
-      }
-    </div>
-  );
+  const renderCardsByNumberSortedByColor = () => {
+    let numbers = [1, 2, 3, 4, 5];
+    return (
+      <div>
+        <h2>Burnt pile. length: {cardList.length}</h2>
+        {
+          numbers
+            .map((value) => <div key={value}>
+              {cardList.filter(item => item['number'] == value)
+                .sort((x, y) => {
+                  if(x['color'] > y['color'])
+                    return 1;
+                  else
+                    return -1;
+                })
+                .map((value) => <img src={cardToImageFile(value['number'], value['color'])} key={'burntCard_' + value['number'] + value['color']}/>)
+              }
+            </div>)
+        }
+      </div>
+    );  
+  };
+  
+  return renderCardsByNumberSortedByColor();
 }
 
 BurntPile.propTypes = {
