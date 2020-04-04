@@ -8,11 +8,10 @@ if __name__ == "__main__":
 
     game_id = repository.get_available_id()
 
-    repository.create_game(game_id=game_id)
+    repository.create_game()
 
     for i, player_id in enumerate(players_ids):
         repository.register_player(
-            player_id=player_id,
             display_name=player_id,
             game_id=game_id,
             clothes_color_number=i,
