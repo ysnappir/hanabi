@@ -15,7 +15,7 @@
 # [START gae_python37_render_template]
 import datetime
 
-from flask import Flask, render_template, request
+from flask import Flask, request  # render_template,
 from flask_cors import CORS
 
 from games_repository.defs import GameIdType, GameAction, MoveCardRequest
@@ -34,12 +34,12 @@ game_repository: IGamesRepository = HanabiGamesRepository()
 def root():
     # For the sake of example, use static information to inflate the template.
     # This will be replaced with real information in later steps.
-    dummy_times = [datetime.datetime(2018, 1, 1, 10, 0, 0),
-                   datetime.datetime(2018, 1, 2, 10, 30, 0),
-                   datetime.datetime(2018, 1, 3, 11, 0, 0),
-                   ]
+    # dummy_times = [datetime.datetime(2018, 1, 1, 10, 0, 0),
+    #                datetime.datetime(2018, 1, 2, 10, 30, 0),
+    #                datetime.datetime(2018, 1, 3, 11, 0, 0),
+    #                ]
 
-    return render_template('index.html', times=dummy_times)
+    return "Bucke's hanabi server is up", 200  # render_template('index.html', times=dummy_times)
 
 
 @app.route("/register", methods=["post"])
