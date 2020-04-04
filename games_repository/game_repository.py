@@ -82,7 +82,7 @@ class HanabiPlayerWrapper:
         hand = hanabi_state.get_hand(self._hanabi_player_id)
         if hand:
             cards = [
-                hand.get_card(self._card_mapper.get_fe_card_index(hanbi_card_index=i))
+                hand.get_card(self._card_mapper.get_hanabi_card_index(fe_card_index=i))
                 for i in range(hand.get_amount_of_cards())
             ]
         else:
