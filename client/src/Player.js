@@ -1,5 +1,4 @@
 import React from 'react';
-import './Player.css';
 import PropTypes from 'prop-types';
 import {cardToImageFile} from './Cards.js';
 
