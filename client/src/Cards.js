@@ -42,3 +42,6 @@ export const cardToImageFile = (number, color) => {
   let cardProp = COLOR_TO_FILE_INDENTIFIER[color] + number;
   return cardsImages[cardProp];
 };
+
+export const CARD_WIDTH = 81;
+export const CARD_HEIGHT = 125;

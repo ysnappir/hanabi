@@ -1,12 +1,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import {cardToImageFile} from './Cards.js';
+import {cardToImageFile, CARD_WIDTH} from './Cards.js';
 
 function RemainingDeck(props) {
   const {remainingCards} = props;
 
   return (
-    <div style={{width: '81px'}}>
+    <div style={{width: CARD_WIDTH + 'px'}}>
       Remaining Deck: <br/>
       <img src={require ('./img/BackRect125.png')} style={{width: '100%'}}/>
       <div style={{position: 'relative', top: '-30px', marginTop: '-60px', textAlign: 'center', fontFamily: 'Frijole', fontSize: '40px', 
