@@ -57,6 +57,10 @@ WaitForGameStart.propTypes = {
 function HanabiBoard(props) {
   const {gameId, players, clueTokens, missTokens, remainingDeckSize, hanabiTable, activePlayer, burntPileCards} = props;
 
+  const onSelfCardClick = () => {
+    console.log('clicked on card!');
+  };
+
   const getPlayerCards = (id) => {
     for (let index = 0; index < players.length; index++) {
       let player = players[index];
@@ -76,7 +80,7 @@ function HanabiBoard(props) {
         <div key={'player_div+' + player['id']}
           style={{width: divWidth + 'px', border: player['id'] == activePlayer ? '2px solid red' : 'none'}}>
           <Player userId={player['id']} displayName={player['display_name']} 
-            cards={getPlayerCards(player['id'])} key={player['id']} />
+            cards={getPlayerCards(player['id'])} key={player['id']} onSelfCardClick={onSelfCardClick} />
         </div>
       );
     }

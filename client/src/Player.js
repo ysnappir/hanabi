@@ -4,7 +4,7 @@ import {cardToImageFile} from './Cards.js';
 
 
 function PlayerCards(props) {
-  let {cards} = props;
+  let {cards, onSelfCardClick} = props;
   
   const renderCards = () => {
     let outCards = [];
@@ -14,7 +14,7 @@ function PlayerCards(props) {
         outCards.push(<img src={cardPath} key={index}/>);
       }
       else{
-        outCards.push(<img src={require ('./img/BackRect125.png')}/>);
+        outCards.push(<img src={require ('./img/BackRect125.png')} onClick={onSelfCardClick}/>);
       }
     }
     return <div>{outCards}</div>;
@@ -29,16 +29,17 @@ function PlayerCards(props) {
 
 PlayerCards.propTypes = {
   cards: PropTypes.array.isRequired,
+  onSelfCardClick: PropTypes.func.isRequired,
 };
 
 
 function Player(props) {
-  const { displayName, cards } = props;
+  const { displayName, cards , onSelfCardClick} = props;
   
   return (
     <div>
       Welcome {displayName}! <br/>
-      <PlayerCards cards={cards}/>
+      <PlayerCards cards={cards} onSelfCardClick={onSelfCardClick}/>
     </div>
   );
 
@@ -48,6 +49,7 @@ Player.propTypes = {
   displayName: PropTypes.string.isRequired,
   userId: PropTypes.string.isRequired,
   cards: PropTypes.array.isRequired,
+  onSelfCardClick: PropTypes.func.isRequired,
 };
 
 export default Player;
