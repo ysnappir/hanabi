@@ -7,6 +7,7 @@ import {UserIdContext} from './Contex.js';
 import {MAX_CLUE_TOKENS, MAX_MISS_TOKENS} from './Tokens.js';
 import RemainingDeck, {HanabiTable, BurntPile} from './CardPiles.js';
 import {CARD_WIDTH} from './Cards.js';
+import Popup from 'reactjs-popup';
 
 function WaitForGameStart(props) {
   const {gameId, currPlayers } = props;
@@ -57,8 +58,11 @@ WaitForGameStart.propTypes = {
 function HanabiBoard(props) {
   const {gameId, players, clueTokens, missTokens, remainingDeckSize, hanabiTable, activePlayer, burntPileCards} = props;
 
+  const [selfCardPressed, setSelfCardPressed] = useState(false);
+
   const onSelfCardClick = (cardIndex) => {
     console.log('clicked on card! ' + cardIndex);
+    setSelfCardPressed(true);
   };
 
   const getPlayerCards = (id) => {
@@ -97,6 +101,11 @@ function HanabiBoard(props) {
       {renderPlayers()}
       <BurntPile cardList={burntPileCards}/>
       <h1>End of board</h1>
+      <Popup trigger={<div></div>} open={selfCardPressed} position='center center'>
+        <div>Popup content here !!</div>
+        <button onClick={()=> {setSelfCardPressed(false);}}>Click!</button>
+      </Popup>
+
     </div>
   );
 }
