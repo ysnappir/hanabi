@@ -14,7 +14,7 @@ function PlayerCards(props) {
         outCards.push(<img src={cardPath} key={index}/>);
       }
       else{
-        outCards.push(<img src={require ('./img/BackRect125.png')} onClick={onSelfCardClick}/>);
+        outCards.push(<img src={require ('./img/BackRect125.png')} onClick={() => onSelfCardClick(index)} key={index}/>);
       }
     }
     return <div>{outCards}</div>;

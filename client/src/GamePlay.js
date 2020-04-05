@@ -57,8 +57,8 @@ WaitForGameStart.propTypes = {
 function HanabiBoard(props) {
   const {gameId, players, clueTokens, missTokens, remainingDeckSize, hanabiTable, activePlayer, burntPileCards} = props;
 
-  const onSelfCardClick = () => {
-    console.log('clicked on card!');
+  const onSelfCardClick = (cardIndex) => {
+    console.log('clicked on card! ' + cardIndex);
   };
 
   const getPlayerCards = (id) => {
