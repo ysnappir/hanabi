@@ -7,7 +7,9 @@ import {UserIdContext} from './Contex.js';
 import {MAX_CLUE_TOKENS, MAX_MISS_TOKENS} from './Tokens.js';
 import RemainingDeck, {HanabiTable, BurntPile} from './CardPiles.js';
 import {CARD_WIDTH} from './Cards.js';
+import ActionsPopup from './Actions.js';
 import Popup from 'reactjs-popup';
+
 
 function WaitForGameStart(props) {
   const {gameId, currPlayers } = props;
@@ -59,9 +61,11 @@ function HanabiBoard(props) {
   const {gameId, players, clueTokens, missTokens, remainingDeckSize, hanabiTable, activePlayer, burntPileCards} = props;
 
   const [selfCardPressed, setSelfCardPressed] = useState(false);
+  const [selfCardPressedIndex, setSelfCardPressedIndex] = useState(-1);
 
   const onSelfCardClick = (cardIndex) => {
     console.log('clicked on card! ' + cardIndex);
+    setSelfCardPressedIndex(cardIndex);
     setSelfCardPressed(true);
   };
 
@@ -101,11 +105,7 @@ function HanabiBoard(props) {
       {renderPlayers()}
       <BurntPile cardList={burntPileCards}/>
       <h1>End of board</h1>
-      <Popup trigger={<div></div>} open={selfCardPressed} onClose={() => setSelfCardPressed(false)} modal closeOnDocumentClick>
-        <div>Popup content here !!</div>
-        <button onClick={()=> {setSelfCardPressed(false);}}>Do nothing!</button>
-      </Popup>
-
+      <ActionsPopup cardIndex={selfCardPressedIndex} setShowPopup={setSelfCardPressed} showPopup={selfCardPressed}/>
     </div>
   );
 }
