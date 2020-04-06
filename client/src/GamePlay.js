@@ -101,9 +101,9 @@ function HanabiBoard(props) {
       {renderPlayers()}
       <BurntPile cardList={burntPileCards}/>
       <h1>End of board</h1>
-      <Popup trigger={<div></div>} open={selfCardPressed} position='center center'>
+      <Popup trigger={<div></div>} open={selfCardPressed} onClose={() => setSelfCardPressed(false)} modal closeOnDocumentClick>
         <div>Popup content here !!</div>
-        <button onClick={()=> {setSelfCardPressed(false);}}>Click!</button>
+        <button onClick={()=> {setSelfCardPressed(false);}}>Do nothing!</button>
       </Popup>
 
     </div>
