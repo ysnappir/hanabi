@@ -8,7 +8,6 @@ import {MAX_CLUE_TOKENS, MAX_MISS_TOKENS} from './Tokens.js';
 import RemainingDeck, {HanabiTable, BurntPile} from './CardPiles.js';
 import {CARD_WIDTH} from './Cards.js';
 import ActionsPopup from './Actions.js';
-import Popup from 'reactjs-popup';
 
 
 function WaitForGameStart(props) {
