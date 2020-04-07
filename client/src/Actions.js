@@ -1,3 +1,5 @@
+/*eslint linebreak-style: ["error", "unix"]*/
+
 import React, {useContext} from 'react';
 import PropTypes from 'prop-types';
 import Popup from 'reactjs-popup';
@@ -17,6 +19,7 @@ function ActionsPopup(props) {
           <h3> What would you want to do? </h3>
           <Action buttonDisplay='Burn It!' userId={+userId} actionFunc={burnActionFunc} funcData={cardIndex}/> 
           <Action buttonDisplay='Place It!' userId={+userId} actionFunc={placeActionFunc} funcData={cardIndex}/> 
+          <Action buttonDisplay='Flip It!' userId={+userId} actionFunc={flipActionFunc} funcData={cardIndex}/> 
         </div>
         :
         <h3> Not your turn, Dumbass! </h3>
@@ -46,6 +49,15 @@ async function burnActionFunc(userId, cardIndex) {
 async function placeActionFunc(userId, cardIndex) {
   try {
     const response = await axios.post('/make_turn/place/' + userId, {'card_index': cardIndex});
+  }
+  catch(error) {
+    console.log('Error placing card ' + error);
+  }
+}
+
+async function flipActionFunc(userId, cardIndex) {
+  try {
+    const response = await axios.post('/move_card/' + userId, {'move_from_index': cardIndex, 'move_to_index': cardIndex});
   }
   catch(error) {
     console.log('Error placing card ' + error);

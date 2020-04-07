@@ -2,7 +2,7 @@ import React, { useEffect, useContext, useState } from 'react';
 import axios from 'axios';
 import PropTypes from 'prop-types';
 import FullTokenPile from './Tokens.js';
-import Player from './Player.js';
+import Player, {OwnHand} from './Player.js';
 import {UserIdContext} from './Contex.js';
 import {MAX_CLUE_TOKENS, MAX_MISS_TOKENS} from './Tokens.js';
 import RemainingDeck, {HanabiTable, BurntPile} from './CardPiles.js';
@@ -83,11 +83,15 @@ function HanabiBoard(props) {
     let out_players = [];
     if (players.length > 0) {
       let divWidth = (getPlayerCards(players[0]['id']).length + 0.25) * CARD_WIDTH; // the width of a card. Not sure why I need the 0.25
-      out_players = players.map((player) => 
+      out_players = players.map((player, index) => 
         <div key={'player_div+' + player['id']}
           style={{width: divWidth + 'px', border: player['id'] == activePlayer ? '2px solid red' : 'none'}}>
-          <Player userId={player['id']} displayName={player['display_name']} 
-            cards={getPlayerCards(player['id'])} key={player['id']} onSelfCardClick={onSelfCardClick} />
+          {index == 0 ?
+            <OwnHand cards={getPlayerCards(player['id'])} key={player['id']} onSelfCardClick={onSelfCardClick}/>
+            :
+            <Player userId={player['id']} displayName={player['display_name']} 
+              cards={getPlayerCards(player['id'])} key={player['id']} />
+          }
         </div>
       );
     }
@@ -101,6 +105,7 @@ function HanabiBoard(props) {
       <FullTokenPile clueTokens={+clueTokens} missTokens={+missTokens}/> <br/><br/>
       <RemainingDeck remainingCards={remainingDeckSize}/>
       <HanabiTable table={hanabiTable}/>
+      Players:
       {renderPlayers()}
       <BurntPile cardList={burntPileCards}/>
       <h1>End of board</h1>
