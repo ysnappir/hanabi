@@ -14,6 +14,15 @@ def test_correct_mapping_after_moving():
     assert mapper.get_hanabi_card_index(4) == 4
 
 
+def test_flipping():
+    mapper: ICardMapper = CardMapper(5)
+
+    mapper.move_a_card(0, 0)
+    mapper.handle_dispose(4)
+    assert mapper.get_hanabi_card_index(0) == 0
+    assert mapper.get_hanabi_card_index(1) == 4
+
+
 def test_correct_mapping_after_disposing():
     mapper: ICardMapper = CardMapper(5)
 
