@@ -14,7 +14,7 @@ export const ItemTypes = {
 
 
 function OwnCard(props) {
-  let {index, onDrag, ondblclick} = props;
+  let {index, onDrag, onSelfCardClick} = props;
 
   const [{ isDragging }, drag] = useDrag({
     item: {type: ItemTypes.DraggableOwnCard},
@@ -29,7 +29,7 @@ function OwnCard(props) {
 
   const renderDragging = () => {
     return (  
-      <img src={require ('./img/BackRect125.png')} ref={drag} onDoubleClick={ondblclick}
+      <img src={require ('./img/BackRect125.png')} ref={drag} onClick={() => onSelfCardClick(index)}
         style={{
           opacity: isDragging ? 0.1 : 1,
           cursor: 'move',
@@ -43,13 +43,13 @@ function OwnCard(props) {
 OwnCard.propTypes = {
   index: PropTypes.number.isRequired,
   onDrag: PropTypes.func.isRequired,
-  ondblclick: PropTypes.func,
+  onSelfCardClick: PropTypes.func.isRequired,
 };
 
 function OwnSlot(props) {
 
   const userId = useContext(UserIdContext);
-  let {index, onDrag, draggedIndex} = props;
+  let {index, onDrag, draggedIndex, onSelfCardClick} = props;
 
   const [{ isOver }, drop] = useDrop({
     accept: ItemTypes.DraggableOwnCard,
@@ -74,7 +74,7 @@ function OwnSlot(props) {
         opacity: isOver ? 0.5 : 1,
         cursor: 'move',
       }}>
-        <OwnCard index={index} onDrag={onDrag} ondblclick={() => moveCard(index, index)}/>
+        <OwnCard index={index} onDrag={onDrag} onSelfCardClick={onSelfCardClick}/>
       </span>
     );
   };
@@ -86,18 +86,19 @@ OwnSlot.propTypes = {
   index: PropTypes.number.isRequired,
   onDrag: PropTypes.func.isRequired,
   draggedIndex: PropTypes.number.isRequired,
+  onSelfCardClick: PropTypes.func.isRequired,
 };
 
 export function OwnHand(props) {
 
-  let {cards} = props;
+  let {cards, onSelfCardClick} = props;
   const [draggedIndex, setdraggedIndex] = useState(-1);
   //const [droppedIndex, setdroppedIndex] = useState(-1);
 
   const renderDragAndDropableHand = () => {
     let outCards = [];
     for (let index = 0; index < cards.length; index++) {
-      outCards.push(<OwnSlot index={index} key={'slot' + index} onDrag={setdraggedIndex} draggedIndex={draggedIndex}/>);
+      outCards.push(<OwnSlot index={index} key={'slot' + index} onDrag={setdraggedIndex} draggedIndex={draggedIndex} onSelfCardClick={onSelfCardClick}/>);
     }
     return <div>{outCards}</div>;
   };
@@ -110,6 +111,7 @@ export function OwnHand(props) {
 
 OwnHand.propTypes = {
   cards: PropTypes.array.isRequired,
+  onSelfCardClick: PropTypes.func.isRequired,
 };
 
 function PlayerCards(props) {
@@ -118,13 +120,8 @@ function PlayerCards(props) {
   const renderCards = () => {
     let outCards = [];
     for (let index = 0; index < cards.length; index++) {
-      if(cards[index] != null){
-        let cardPath = cardToImageFile(cards[index]['number'], cards[index]['color']);
-        outCards.push(<img src={cardPath} key={index}/>);
-      }
-      else{
-        outCards.push(<img src={require ('./img/BackRect125.png')} key={index}/>);
-      }
+      let cardPath = cardToImageFile(cards[index]['number'], cards[index]['color']);
+      outCards.push(<img src={cardPath} key={index}/>);
     }
     return <div>{outCards}</div>;
   };
@@ -142,7 +139,7 @@ PlayerCards.propTypes = {
 
 
 function Player(props) {
-  const { displayName, cards } = props;
+  const { displayName, cards} = props;
   
   return (
     <div>
