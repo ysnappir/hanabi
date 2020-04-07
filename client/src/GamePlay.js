@@ -104,7 +104,8 @@ function HanabiBoard(props) {
       {renderPlayers()}
       <BurntPile cardList={burntPileCards}/>
       <h1>End of board</h1>
-      <ActionsPopup cardIndex={selfCardPressedIndex} setShowPopup={setSelfCardPressed} showPopup={selfCardPressed}/>
+      <ActionsPopup cardIndex={selfCardPressedIndex} setShowPopup={setSelfCardPressed} showPopup={selfCardPressed}
+        activePlayer={activePlayer}/>
     </div>
   );
 }
