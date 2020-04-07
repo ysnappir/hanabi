@@ -1,6 +1,6 @@
 /*eslint linebreak-style: ["error", "unix"]*/
 
-import React from 'react';
+import React, {useState} from 'react';
 import PropTypes from 'prop-types';
 import {cardToImageFile} from './Cards.js';
 import { useDrag, useDrop } from 'react-dnd';
@@ -12,7 +12,7 @@ export const ItemTypes = {
 
 
 function OwnCard(props) {
-  let {index} = props;
+  let {index, onDrag} = props;
 
   const [{ isDragging }, drag] = useDrag({
     item: {type: ItemTypes.DraggableOwnCard},
@@ -24,6 +24,10 @@ function OwnCard(props) {
   const logIndex = () => {
     console.log('card index is ' + index);
   };
+
+  if (isDragging){
+    onDrag(index);
+  }
 
   const renderDragging = () => {
     return (  
@@ -40,22 +44,28 @@ function OwnCard(props) {
 
 OwnCard.propTypes = {
   index: PropTypes.number.isRequired,
+  onDrag: PropTypes.func.isRequired,
 };
 
 function OwnSlot(props) {
-  let {index} = props;
+  let {index, onDrag, draggedIndex} = props;
 
   const [{ isOver }, drop] = useDrop({
     accept: ItemTypes.DraggableOwnCard,
-    drop: () => logIndex(),
+    drop: () => {
+      if(draggedIndex != index)
+        console.log('Moving ' + draggedIndex + ' to '  + index);
+    },
     collect: monitor => ({
       isOver: !!monitor.isOver(),
     }),
   });
 
-  const logIndex = () => {
-    console.log('slot index is ' + index);
+  /*
+  const logIndex = (card_index) => {
+    console.log('slot index is ' + index + ' card index in ' + card_index);
   };
+  */
 
   const render = () => {
     return (  
@@ -63,7 +73,7 @@ function OwnSlot(props) {
         opacity: isOver ? 0.5 : 1,
         cursor: 'move',
       }}>
-        <OwnCard index={index}/>
+        <OwnCard index={index} onDrag={onDrag}/>
       </span>
     );
   };
@@ -73,20 +83,32 @@ function OwnSlot(props) {
 
 OwnSlot.propTypes = {
   index: PropTypes.number.isRequired,
+  onDrag: PropTypes.func.isRequired,
+  draggedIndex: PropTypes.number.isRequired,
 };
 
 export function OwnHand(props) {
 
   let {cards} = props;
+  const [draggedIndex, setdraggedIndex] = useState(-1);
+  //const [droppedIndex, setdroppedIndex] = useState(-1);
 
   const renderDragAndDropableHand = () => {
     let outCards = [];
     for (let index = 0; index < cards.length; index++) {
-      outCards.push(<OwnSlot index={index} key={'slot' + index}/>);
+      outCards.push(<OwnSlot index={index} key={'slot' + index} onDrag={setdraggedIndex} draggedIndex={draggedIndex}/>);
     }
     return <div>{outCards}</div>;
   };
-
+  /*
+  if (draggedIndex > -1 && droppedIndex > -1){
+    if (draggedIndex != droppedIndex){
+      console.log('Moving ' + draggedIndex + ' to ' + droppedIndex);
+    }
+    setdraggedIndex(-1);
+    setdroppedIndex(-1);
+  }
+  */
   return (
     <div>
       {renderDragAndDropableHand()}
