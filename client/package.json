@@ -11,6 +11,8 @@
     "fibers": "^4.0.2",
     "node-sass": "^4.13.1",
     "react": "^16.13.1",
+    "react-dnd": "^10.0.2",
+    "react-dnd-html5-backend": "^10.0.2",
     "react-dom": "^16.13.1",
     "react-scripts": "3.4.1",
     "sass": "^1.26.3",
