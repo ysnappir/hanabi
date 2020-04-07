@@ -27,10 +27,10 @@ ActionsPopup.propTypes = {
 
 async function burnActionFunc(userId, cardIndex) {
   try {
-    const response = await axios.post('/make_turn/burn/' + {userId}, {'card_index': {cardIndex}});
+    const response = await axios.post('/make_turn/burn/' + userId, {'card_index': cardIndex});
   }
   catch(error) {
-    console.log('Error burning card');
+    console.log('Error burning card ' + error);
   }
   
 }
@@ -38,10 +38,9 @@ async function burnActionFunc(userId, cardIndex) {
 function Action(props) {
   const {buttonDisplay, actionFunc, funcData, userId} = props;
 
-  
   return (
     <div>
-      <button onClick={actionFunc(userId, funcData)}>{buttonDisplay}</button>
+      <button onClick={() => actionFunc(userId, funcData)}>{buttonDisplay}</button>
     </div>
   );
 }
