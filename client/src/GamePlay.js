@@ -59,6 +59,8 @@ WaitForGameStart.propTypes = {
 function HanabiBoard(props) {
   const {gameId, players, clueTokens, missTokens, remainingDeckSize, hanabiTable, activePlayer, burntPileCards} = props;
 
+  const userId = useContext(UserIdContext);
+
   const [selfCardPressed, setSelfCardPressed] = useState(false);
   const [selfCardPressedIndex, setSelfCardPressedIndex] = useState(-1);
 
@@ -67,6 +69,11 @@ function HanabiBoard(props) {
     setSelfCardPressedIndex(cardIndex);
     setSelfCardPressed(true);
   };
+
+  const onPlayerClick = (playerId) => {
+    console.log('clicked on Player id ' + playerId);
+  };
+
 
   const getPlayerCards = (id) => {
     for (let index = 0; index < players.length; index++) {
@@ -85,9 +92,10 @@ function HanabiBoard(props) {
       let divWidth = (getPlayerCards(players[0]['id']).length + 0.25) * CARD_WIDTH; // the width of a card. Not sure why I need the 0.25
       out_players = players.map((player) => 
         <div key={'player_div+' + player['id']}
-          style={{width: divWidth + 'px', border: player['id'] == activePlayer ? '2px solid red' : 'none'}}>
+          style={{width: divWidth + 'px', border: player['id'] == activePlayer ? '2px solid red' : 'none'}} 
+          onClick={userId == player['id'] ? () => {} : () => onPlayerClick(player['id'])} >
           <Player userId={player['id']} displayName={player['display_name']} 
-            cards={getPlayerCards(player['id'])} key={player['id']} onSelfCardClick={onSelfCardClick} />
+            cards={getPlayerCards(player['id'])} key={player['id']}  onSelfCardClick={onSelfCardClick}/>
         </div>
       );
     }
