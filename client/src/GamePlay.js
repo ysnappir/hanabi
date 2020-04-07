@@ -74,11 +74,15 @@ function HanabiBoard(props) {
     let out_players = [];
     if (players.length > 0) {
       let divWidth = (getPlayerCards(players[0]['id']).length + 0.25) * CARD_WIDTH; // the width of a card. Not sure why I need the 0.25
-      out_players = players.map((player) => 
+      out_players = players.map((player, index) => 
         <div key={'player_div+' + player['id']}
           style={{width: divWidth + 'px', border: player['id'] == activePlayer ? '2px solid red' : 'none'}}>
-          <Player userId={player['id']} displayName={player['display_name']} 
-            cards={getPlayerCards(player['id'])} key={player['id']} />
+          {index == 0 ?
+            <OwnHand cards={getPlayerCards(player['id'])} key={player['id']}/>
+            :
+            <Player userId={player['id']} displayName={player['display_name']} 
+              cards={getPlayerCards(player['id'])} key={player['id']} />
+          }
         </div>
       );
     }
@@ -92,8 +96,6 @@ function HanabiBoard(props) {
       <FullTokenPile clueTokens={+clueTokens} missTokens={+missTokens}/> <br/><br/>
       <RemainingDeck remainingCards={remainingDeckSize}/>
       <HanabiTable table={hanabiTable}/>
-      Own hand:
-      <OwnHand cards={players[0]['cards']} key='ownHand'/>
       Players:
       {renderPlayers()}
       <BurntPile cardList={burntPileCards}/>

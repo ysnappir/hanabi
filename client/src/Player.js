@@ -1,8 +1,10 @@
 /*eslint linebreak-style: ["error", "unix"]*/
 
-import React, {useState} from 'react';
+import React, {useState, useContext} from 'react';
 import PropTypes from 'prop-types';
 import {cardToImageFile} from './Cards.js';
+import {UserIdContext} from './Contex.js';
+import axios from 'axios';
 import { useDrag, useDrop } from 'react-dnd';
 
 
@@ -12,7 +14,7 @@ export const ItemTypes = {
 
 
 function OwnCard(props) {
-  let {index, onDrag} = props;
+  let {index, onDrag, ondblclick} = props;
 
   const [{ isDragging }, drag] = useDrag({
     item: {type: ItemTypes.DraggableOwnCard},
@@ -20,10 +22,6 @@ function OwnCard(props) {
       isDragging: !!monitor.isDragging(),
     }),
   });
-  
-  const logIndex = () => {
-    console.log('card index is ' + index);
-  };
 
   if (isDragging){
     onDrag(index);
@@ -31,7 +29,7 @@ function OwnCard(props) {
 
   const renderDragging = () => {
     return (  
-      <img src={require ('./img/BackRect125.png')} onClick={logIndex} ref={drag}
+      <img src={require ('./img/BackRect125.png')} ref={drag} onDoubleClick={ondblclick}
         style={{
           opacity: isDragging ? 0.1 : 1,
           cursor: 'move',
@@ -45,27 +43,30 @@ function OwnCard(props) {
 OwnCard.propTypes = {
   index: PropTypes.number.isRequired,
   onDrag: PropTypes.func.isRequired,
+  ondblclick: PropTypes.func,
 };
 
 function OwnSlot(props) {
+
+  const userId = useContext(UserIdContext);
   let {index, onDrag, draggedIndex} = props;
 
   const [{ isOver }, drop] = useDrop({
     accept: ItemTypes.DraggableOwnCard,
     drop: () => {
-      if(draggedIndex != index)
-        console.log('Moving ' + draggedIndex + ' to '  + index);
+      moveCard(draggedIndex, index);
     },
     collect: monitor => ({
       isOver: !!monitor.isOver(),
     }),
   });
 
-  /*
-  const logIndex = (card_index) => {
-    console.log('slot index is ' + index + ' card index in ' + card_index);
+  const moveCard = (indexFrom, indexTo) => {
+    console.log('Moving ' + indexFrom + ' to '  + indexTo);
+    axios.post( `/move_card/${userId}`, 
+      {'move_from_index': indexFrom, 'move_to_index': indexTo}
+    );
   };
-  */
 
   const render = () => {
     return (  
@@ -73,7 +74,7 @@ function OwnSlot(props) {
         opacity: isOver ? 0.5 : 1,
         cursor: 'move',
       }}>
-        <OwnCard index={index} onDrag={onDrag}/>
+        <OwnCard index={index} onDrag={onDrag} ondblclick={() => moveCard(index, index)}/>
       </span>
     );
   };
@@ -100,15 +101,6 @@ export function OwnHand(props) {
     }
     return <div>{outCards}</div>;
   };
-  /*
-  if (draggedIndex > -1 && droppedIndex > -1){
-    if (draggedIndex != droppedIndex){
-      console.log('Moving ' + draggedIndex + ' to ' + droppedIndex);
-    }
-    setdraggedIndex(-1);
-    setdroppedIndex(-1);
-  }
-  */
   return (
     <div>
       {renderDragAndDropableHand()}
@@ -154,7 +146,7 @@ function Player(props) {
   
   return (
     <div>
-      Welcome {displayName}! <br/>
+      {displayName} hand: <br/>
       <PlayerCards cards={cards}/>
     </div>
   );
