@@ -21,6 +21,30 @@ function OwnCard(props) {
     }),
   });
   
+  const logIndex = () => {
+    console.log('card index is ' + index);
+  };
+
+  const renderDragging = () => {
+    return (  
+      <img src={require ('./img/BackRect125.png')} onClick={logIndex} ref={drag}
+        style={{
+          opacity: isDragging ? 0.1 : 1,
+          cursor: 'move',
+        }}/>
+    );
+  };
+
+  return renderDragging();
+}
+
+OwnCard.propTypes = {
+  index: PropTypes.number.isRequired,
+};
+
+function OwnSlot(props) {
+  let {index} = props;
+
   const [{ isOver }, drop] = useDrop({
     accept: ItemTypes.DraggableOwnCard,
     drop: () => logIndex(),
@@ -30,46 +54,24 @@ function OwnCard(props) {
   });
 
   const logIndex = () => {
-    console.log('index is ' + index);
+    console.log('slot index is ' + index);
   };
 
-  const renderDragging = () => {
-    console.log('rendering drag ' + index);
+  const render = () => {
     return (  
-      <div
-        ref={drag}
-        style={{
-          opacity: isDragging ? 0.1 : 1,
-          cursor: 'move',
-        }}
-      >
-        <img src={require ('./img/BackRect125.png')} onClick={logIndex}/>
-      </div>
+      <span ref={drop} style={{
+        opacity: isOver ? 0.5 : 1,
+        cursor: 'move',
+      }}>
+        <OwnCard index={index}/>
+      </span>
     );
   };
 
-  const renderOver = () => {
-    console.log('rendering over ' + index);
-    return (  
-      <div
-        ref={drop}
-        style={{
-          opacity: isOver ? 0.1 : 1,
-          cursor: 'move',
-        }}
-      >
-        <img src={require ('./img/BackRect125.png')} onClick={logIndex}/>
-      </div>
-    );
-  };
-
-  if (isOver)
-    return renderOver();
-  else
-    return renderDragging();
+  return render();
 }
 
-OwnCard.propTypes = {
+OwnSlot.propTypes = {
   index: PropTypes.number.isRequired,
 };
 
@@ -80,7 +82,7 @@ export function OwnHand(props) {
   const renderDragAndDropableHand = () => {
     let outCards = [];
     for (let index = 0; index < cards.length; index++) {
-      outCards.push(<OwnCard index={index} key={'own' + index}/>);
+      outCards.push(<OwnSlot index={index} key={'slot' + index}/>);
     }
     return <div>{outCards}</div>;
   };
