@@ -9,15 +9,12 @@ function ActionsPopup(props) {
   const userId = useContext(UserIdContext);
 
   let isActivePlayer = (activePlayer == userId);
+
   return (
     <Popup trigger={<div></div>} onClose={() => setShowPopup(false)} open={showPopup} modal>
       <h1> Pressed card number {cardIndex} </h1>
       {isActivePlayer ?
-        <div>
-          <h3> What would you want to do? </h3>
-          <Action buttonDisplay='Burn It!' userId={+userId} actionFunc={burnActionFunc} funcData={cardIndex}/> 
-          <Action buttonDisplay='Place It!' userId={+userId} actionFunc={placeActionFunc} funcData={cardIndex}/> 
-        </div>
+        <SelfCardActions cardIndex={cardIndex}/>
         :
         <h3> Not your turn, Dumbass! </h3>
       }
@@ -31,8 +28,27 @@ ActionsPopup.propTypes = {
   showPopup: PropTypes.bool.isRequired,
   cardIndex: PropTypes.number.isRequired,
   activePlayer: PropTypes.number.isRequired,
+  playerId: PropTypes.number.isRequired,
 };
 
+
+function SelfCardActions(props) {
+  const userId = useContext(UserIdContext);
+  const {cardIndex} = props;
+
+  return (
+    <div>
+      <h3> What would you want to do? </h3>
+      <Action buttonDisplay='Burn It!' userId={+userId} actionFunc={burnActionFunc} funcData={cardIndex}/> 
+      <Action buttonDisplay='Place It!' userId={+userId} actionFunc={placeActionFunc} funcData={cardIndex}/> 
+    </div>
+  );
+}
+
+SelfCardActions.propTypes = {
+  cardIndex: PropTypes.number.isRequired,
+};
+  
 
 async function burnActionFunc(userId, cardIndex) {
   try {

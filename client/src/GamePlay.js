@@ -61,17 +61,21 @@ function HanabiBoard(props) {
 
   const userId = useContext(UserIdContext);
 
-  const [selfCardPressed, setSelfCardPressed] = useState(false);
+  const [showActionsPopup, setShowActionsPopup] = useState(false);
+
   const [selfCardPressedIndex, setSelfCardPressedIndex] = useState(-1);
+  const [playerPressedId, setPlayerPressedId] = useState(-1);
 
   const onSelfCardClick = (cardIndex) => {
     console.log('clicked on card! ' + cardIndex);
     setSelfCardPressedIndex(cardIndex);
-    setSelfCardPressed(true);
+    setShowActionsPopup(true);
   };
 
   const onPlayerClick = (playerId) => {
     console.log('clicked on Player id ' + playerId);
+    setPlayerPressedId(playerId);
+    setShowActionsPopup(true);
   };
 
 
@@ -112,8 +116,8 @@ function HanabiBoard(props) {
       {renderPlayers()}
       <BurntPile cardList={burntPileCards}/>
       <h1>End of board</h1>
-      <ActionsPopup cardIndex={selfCardPressedIndex} setShowPopup={setSelfCardPressed} showPopup={selfCardPressed}
-        activePlayer={activePlayer}/>
+      <ActionsPopup cardIndex={+selfCardPressedIndex} playerId={+playerPressedId}
+        setShowPopup={setShowActionsPopup} showPopup={showActionsPopup} activePlayer={activePlayer}/>
     </div>
   );
 }
