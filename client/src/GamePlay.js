@@ -1,13 +1,15 @@
+/*eslint linebreak-style: ["error", "unix"]*/
+
 import React, { useEffect, useContext, useState } from 'react';
 import axios from 'axios';
 import PropTypes from 'prop-types';
 import FullTokenPile from './Tokens.js';
-import Player from './Player.js';
+import Player, {OwnHand} from './Player.js';
 import {UserIdContext} from './Contex.js';
 import {MAX_CLUE_TOKENS, MAX_MISS_TOKENS} from './Tokens.js';
 import RemainingDeck, {HanabiTable, BurntPile} from './CardPiles.js';
 import {CARD_WIDTH} from './Cards.js';
-import ActionsPopup from './Actions.js';
+import ActionsPopup from './Actions';
 
 
 function WaitForGameStart(props) {
@@ -57,33 +59,22 @@ WaitForGameStart.propTypes = {
 
 
 function HanabiBoard(props) {
+
   const {gameId, players, clueTokens, missTokens, remainingDeckSize, hanabiTable, activePlayer, burntPileCards} = props;
 
   const userId = useContext(UserIdContext);
 
   const [showActionsPopup, setShowActionsPopup] = useState(false);
-
+  const [draggedIndex, setdraggedIndex] = useState(-1);
   const [selfCardPressedIndex, setSelfCardPressedIndex] = useState(-1);
   const [playerPressedId, setPlayerPressedId] = useState(-1);
+  const [indexPressedId, setIndexPressedId] = useState(-1);
 
   const onActionPopupClose = () => {
     setShowActionsPopup(false);
     setSelfCardPressedIndex(-1);
     setPlayerPressedId(-1);
   };
-
-  const onSelfCardClick = (cardIndex) => {
-    console.log('clicked on card! ' + cardIndex);
-    setSelfCardPressedIndex(cardIndex);
-    setShowActionsPopup(true);
-  };
-
-  const onPlayerClick = (playerId) => {
-    console.log('clicked on Player id ' + playerId);
-    setPlayerPressedId(playerId);
-    setShowActionsPopup(true);
-  };
-
 
   const getPlayerCards = (id) => {
     for (let index = 0; index < players.length; index++) {
@@ -96,16 +87,32 @@ function HanabiBoard(props) {
     return [];
   };
 
+  const informCard = (playerId) => {
+    const inner = (cardIndex) => {
+      console.log('clicked card' + cardIndex + ' of player ' + playerId);
+      if (userId == activePlayer){
+        setPlayerPressedId(playerId);
+        setIndexPressedId(cardIndex);
+        setShowActionsPopup(true);
+      }
+    };
+
+    return inner;
+  };
+
   const renderPlayers = () => {
     let out_players = [];
     if (players.length > 0) {
       let divWidth = (getPlayerCards(players[0]['id']).length + 0.25) * CARD_WIDTH; // the width of a card. Not sure why I need the 0.25
-      out_players = players.map((player) => 
+      out_players = players.map((player, index) => 
         <div key={'player_div+' + player['id']}
-          style={{width: divWidth + 'px', border: player['id'] == activePlayer ? '2px solid red' : 'none'}} 
-          onClick={userId == player['id'] ? () => {} : () => onPlayerClick(player['id'])} >
-          <Player userId={player['id']} displayName={player['display_name']} 
-            cards={getPlayerCards(player['id'])} key={player['id']}  onSelfCardClick={onSelfCardClick}/>
+          style={{width: divWidth + 'px', border: player['id'] == activePlayer ? '2px solid red' : 'none'}}>
+          {index == 0 ?
+            <OwnHand cards={getPlayerCards(player['id'])} key={player['id']} setdraggedIndex={setdraggedIndex} draggedIndex={draggedIndex}/>
+            :
+            <Player userId={player['id']} displayName={player['display_name']} 
+              cards={getPlayerCards(player['id'])} key={player['id']} onClick={informCard(player['id'])}/>
+          }
         </div>
       );
     }
@@ -118,9 +125,10 @@ function HanabiBoard(props) {
       Tokens Status: <br/>
       <FullTokenPile clueTokens={+clueTokens} missTokens={+missTokens}/> <br/><br/>
       <RemainingDeck remainingCards={remainingDeckSize}/>
-      <HanabiTable table={hanabiTable}/>
+      <HanabiTable table={hanabiTable} droppedCardIndex={draggedIndex} isMyTurn={userId == activePlayer}/>
+      Players:
       {renderPlayers()}
-      <BurntPile cardList={burntPileCards}/>
+      <BurntPile cardList={burntPileCards} droppedCardIndex={draggedIndex} isMyTurn={userId == activePlayer}/>
       <h1>End of board</h1>
       <ActionsPopup cardIndex={+selfCardPressedIndex} playerId={+playerPressedId}
         onCloseFunc={onActionPopupClose} showPopup={showActionsPopup} activePlayer={activePlayer}/>

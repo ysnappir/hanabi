@@ -42,10 +42,10 @@ class CardMapper(ICardMapper):
         if fe_card_final_index > self._pinned_cards:
             return False
 
-        if fe_card_initial_index > self._pinned_cards:
+        if fe_card_initial_index >= self._pinned_cards:
             self._pinned_cards += 1
 
-        assert fe_card_initial_index > fe_card_final_index
+        assert fe_card_initial_index >= fe_card_final_index
 
         game_card_index = self._mapping[fe_card_initial_index]
         step = 1 if fe_card_initial_index < fe_card_final_index else -1
