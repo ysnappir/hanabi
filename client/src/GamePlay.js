@@ -1,5 +1,3 @@
-/*eslint linebreak-style: ["error", "unix"]*/
-
 import React, { useEffect, useContext, useState } from 'react';
 import axios from 'axios';
 import PropTypes from 'prop-types';
@@ -67,13 +65,12 @@ function HanabiBoard(props) {
   const [showActionsPopup, setShowActionsPopup] = useState(false);
   const [draggedIndex, setdraggedIndex] = useState(-1);
   const [selfCardPressedIndex, setSelfCardPressedIndex] = useState(-1);
-  const [playerPressedId, setPlayerPressedId] = useState(-1);
+  const [playerPressedId, setPlayerPressedId] = useState('');
   const [indexPressedId, setIndexPressedId] = useState(-1);
 
   const onActionPopupClose = () => {
     setShowActionsPopup(false);
-    setSelfCardPressedIndex(-1);
-    setPlayerPressedId(-1);
+    setPlayerPressedId('');
   };
 
   const getPlayerCards = (id) => {
@@ -96,8 +93,11 @@ function HanabiBoard(props) {
         setShowActionsPopup(true);
       }
     };
-
     return inner;
+  };
+
+  informCard.propTypes = {
+    playerId: PropTypes.string.isRequired,
   };
 
   const renderPlayers = () => {
@@ -130,7 +130,7 @@ function HanabiBoard(props) {
       {renderPlayers()}
       <BurntPile cardList={burntPileCards} droppedCardIndex={draggedIndex} isMyTurn={userId == activePlayer}/>
       <h1>End of board</h1>
-      <ActionsPopup cardIndex={+selfCardPressedIndex} playerId={+playerPressedId}
+      <ActionsPopup cardIndex={+selfCardPressedIndex} playerId={playerPressedId}
         onCloseFunc={onActionPopupClose} showPopup={showActionsPopup} activePlayer={activePlayer}/>
     </div>
   );

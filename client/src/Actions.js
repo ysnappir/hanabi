@@ -1,5 +1,3 @@
-/*eslint linebreak-style: ["error", "unix"]*/
-
 import React, {useContext} from 'react';
 import PropTypes from 'prop-types';
 import Popup from 'reactjs-popup';
@@ -26,8 +24,7 @@ ActionsPopup.propTypes = {
   onCloseFunc: PropTypes.func.isRequired,
   showPopup: PropTypes.bool.isRequired,
   cardIndex: PropTypes.number.isRequired,
-  activePlayer: PropTypes.number.isRequired,
-  playerId: PropTypes.number.isRequired,
+  playerId: PropTypes.string.isRequired,
 };
 
 function DifferentPlayerActions(props) {
@@ -38,6 +35,7 @@ function DifferentPlayerActions(props) {
 
   const sendInform = (value) => {
     console.log('Informing ' + playerId + ' about ' + value + '!');
+    // console.log(typeof playerId);
     axios.post( `/make_turn/inform/${userId}`, {'informed_player_id': playerId, 'information': value});
     onClose();
   };
@@ -50,7 +48,7 @@ function DifferentPlayerActions(props) {
 }
 
 DifferentPlayerActions.propTypes = {
-  playerId: PropTypes.number.isRequired,
+  playerId: PropTypes.string.isRequired,
   onClose: PropTypes.func.isRequired,
 };
 
