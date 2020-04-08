@@ -1,6 +1,6 @@
 /*eslint linebreak-style: ["error", "unix"]*/
 
-import React, {useState, useContext} from 'react';
+import React, {useContext} from 'react';
 import PropTypes from 'prop-types';
 import {cardToImageFile} from './Cards.js';
 import {UserIdContext} from './Contex.js';
@@ -9,7 +9,7 @@ import { useDrag, useDrop } from 'react-dnd';
 
 
 export const DraggableType = {
-  DraggableOwnCard: './Player/OwnCard',
+  DraggableOwnCard: 'OwnCard',
 };
 
 
@@ -90,8 +90,8 @@ OwnSlot.propTypes = {
 
 export function OwnHand(props) {
 
-  let {cards} = props;
-  const [draggedIndex, setdraggedIndex] = useState(-1);
+  let {cards, setdraggedIndex, draggedIndex} = props;
+  // const [draggedIndex, setdraggedIndex] = useState(-1);
 
   const renderDragAndDropableHand = () => {
     let outCards = [];
@@ -100,6 +100,7 @@ export function OwnHand(props) {
     }
     return <div>{outCards}</div>;
   };
+
   return (
     <div>
       {renderDragAndDropableHand()}
@@ -109,6 +110,8 @@ export function OwnHand(props) {
 
 OwnHand.propTypes = {
   cards: PropTypes.array.isRequired,
+  setdraggedIndex: PropTypes.func.isRequired,
+  draggedIndex: PropTypes.number.isRequired,
 };
 
 function PlayerCards(props) {

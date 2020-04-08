@@ -1,10 +1,9 @@
-/*eslint linebreak-style: ["error", "unix"]*/
-
-import React from 'react';
+import React, {useContext} from 'react';
 import PropTypes from 'prop-types';
 import {cardToImageFile, CARD_WIDTH} from './Cards.js';
-import DraggableType from './Player.js';
 import { useDrop } from 'react-dnd';
+import axios from 'axios';
+import {UserIdContext} from './Contex.js';
 
 function RemainingDeck(props) {
   const {remainingCards} = props;
@@ -23,23 +22,30 @@ RemainingDeck.propTypes = {
   remainingCards: PropTypes.number.isRequired,
 };
 
-export const MyType = {
-  XX: 'xx',
-};
-
 export function HanabiTable(props) {
-  const {table} = props;
+  const {table, droppedCardIndex, isMyTurn} = props;
+  const userId = useContext(UserIdContext);
 
   const [{ isOver }, drop] = useDrop({
-    accept: [MyType.XX],  // , DraggableType.DraggableOwnCard],
+    accept: 'OwnCard',  // DraggableType['DraggableOwnCard'], // 
     drop: () => {
-      console.log('placing card');
+      placeActionFunc(userId, droppedCardIndex);
     },
+    canDrop: () => isMyTurn,
     collect: monitor => ({
       isOver: !!monitor.isOver(),
     }),
   });
 
+  async function placeActionFunc(userId, cardIndex) {
+    try {
+      await axios.post('/make_turn/place/' + userId, {'card_index': cardIndex});  // const response = 
+    }
+    catch(error) {
+      console.log('Error placing card ' + error);
+    }
+  }
+  
   const renderCards = (color, maxCardNumber) => {
     let outCards = [];
     for (let index = 1; index <= maxCardNumber; index++) {
@@ -68,20 +74,12 @@ export function HanabiTable(props) {
       </tr>);
     }
 
-    if (isOver){
-      return (
-        <div ref={drop} style={{background: 'blue',}}>
-          <table key='table'>{outBoards}</table>
-        </div>
-      );
-    }
-
     return (
-      <div ref={drop} style={{background: 'white',}}>
+      <div ref={drop} style={{background: (isOver && isMyTurn)? 'lightblue' : 'white',}}>  
         <table key='table'>{outBoards}</table>
       </div>
     );
-  };
+  }; // 
 
   return (
     <div>
@@ -93,15 +91,39 @@ export function HanabiTable(props) {
 
 HanabiTable.propTypes = {
   table: PropTypes.object.isRequired,
+  droppedCardIndex: PropTypes.number.isRequired,
+  isMyTurn: PropTypes.bool.isRequired,
 };
 
 export function BurntPile(props) {
-  const {cardList} = props;
+  const {cardList, droppedCardIndex, isMyTurn} = props;
+  const userId = useContext(UserIdContext);
 
+  const [{ isOver }, drop] = useDrop({
+    accept: 'OwnCard',
+    drop: () => {
+      burnActionFunc(userId, droppedCardIndex);
+    },
+    canDrop: () => isMyTurn,
+    collect: monitor => ({
+      isOver: !!monitor.isOver(),
+    }),
+  });
+
+  async function burnActionFunc(userId, cardIndex) {
+    try {
+      console.log('burning card ' + cardIndex);
+      await axios.post('/make_turn/burn/' + userId, {'card_index': cardIndex});
+    }
+    catch(error) {
+      console.log('Error burning card ' + error);
+    }
+  }
+  
   const renderCardsByNumberSortedByColor = () => {
     let numbers = [1, 2, 3, 4, 5];
     return (
-      <div>
+      <div ref={drop} style={{background: (isOver && isMyTurn)? '#F98A91' : 'white',}}>  
         <h2>Burnt pile. length: {cardList.length}</h2>
         {
           numbers
@@ -126,6 +148,8 @@ export function BurntPile(props) {
 
 BurntPile.propTypes = {
   cardList: PropTypes.array.isRequired,
+  droppedCardIndex: PropTypes.number.isRequired,
+  isMyTurn: PropTypes.bool.isRequired,
 };
 
 export default RemainingDeck;
