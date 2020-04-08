@@ -7,7 +7,6 @@ import {UserIdContext} from './Contex.js';
 import {MAX_CLUE_TOKENS, MAX_MISS_TOKENS} from './Tokens.js';
 import RemainingDeck, {HanabiTable, BurntPile} from './CardPiles.js';
 import {CARD_WIDTH} from './Cards.js';
-import ActionsPopup from './Actions.js';
 
 
 function WaitForGameStart(props) {
@@ -57,16 +56,11 @@ WaitForGameStart.propTypes = {
 
 
 function HanabiBoard(props) {
+  
+  const userId = useContext(UserIdContext);
+
   const {gameId, players, clueTokens, missTokens, remainingDeckSize, hanabiTable, activePlayer, burntPileCards} = props;
-
-  const [selfCardPressed, setSelfCardPressed] = useState(false);
-  const [selfCardPressedIndex, setSelfCardPressedIndex] = useState(-1);
-
-  const onSelfCardClick = (cardIndex) => {
-    console.log('clicked on card! ' + cardIndex);
-    setSelfCardPressedIndex(cardIndex);
-    setSelfCardPressed(true);
-  };
+  const [draggedIndex, setdraggedIndex] = useState(-1);
 
   const getPlayerCards = (id) => {
     for (let index = 0; index < players.length; index++) {
@@ -87,7 +81,7 @@ function HanabiBoard(props) {
         <div key={'player_div+' + player['id']}
           style={{width: divWidth + 'px', border: player['id'] == activePlayer ? '2px solid red' : 'none'}}>
           {index == 0 ?
-            <OwnHand cards={getPlayerCards(player['id'])} key={player['id']} onSelfCardClick={onSelfCardClick}/>
+            <OwnHand cards={getPlayerCards(player['id'])} key={player['id']} setdraggedIndex={setdraggedIndex} draggedIndex={draggedIndex}/>
             :
             <Player userId={player['id']} displayName={player['display_name']} 
               cards={getPlayerCards(player['id'])} key={player['id']} />
@@ -104,13 +98,11 @@ function HanabiBoard(props) {
       Tokens Status: <br/>
       <FullTokenPile clueTokens={+clueTokens} missTokens={+missTokens}/> <br/><br/>
       <RemainingDeck remainingCards={remainingDeckSize}/>
-      <HanabiTable table={hanabiTable}/>
+      <HanabiTable table={hanabiTable} droppedCardIndex={draggedIndex} isMyTurn={userId == activePlayer}/>
       Players:
       {renderPlayers()}
-      <BurntPile cardList={burntPileCards}/>
+      <BurntPile cardList={burntPileCards} droppedCardIndex={draggedIndex} isMyTurn={userId == activePlayer}/>
       <h1>End of board</h1>
-      <ActionsPopup cardIndex={selfCardPressedIndex} setShowPopup={setSelfCardPressed} showPopup={selfCardPressed}
-        activePlayer={activePlayer}/>
     </div>
   );
 }
