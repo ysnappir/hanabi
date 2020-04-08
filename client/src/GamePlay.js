@@ -7,6 +7,7 @@ import {UserIdContext} from './Contex.js';
 import {MAX_CLUE_TOKENS, MAX_MISS_TOKENS} from './Tokens.js';
 import RemainingDeck, {HanabiTable, BurntPile} from './CardPiles.js';
 import {CARD_WIDTH} from './Cards.js';
+import ActionsPopup from './Actions';
 
 
 function WaitForGameStart(props) {
@@ -56,11 +57,21 @@ WaitForGameStart.propTypes = {
 
 
 function HanabiBoard(props) {
-  
-  const userId = useContext(UserIdContext);
 
   const {gameId, players, clueTokens, missTokens, remainingDeckSize, hanabiTable, activePlayer, burntPileCards} = props;
+
+  const userId = useContext(UserIdContext);
+
+  const [showActionsPopup, setShowActionsPopup] = useState(false);
   const [draggedIndex, setdraggedIndex] = useState(-1);
+  const [selfCardPressedIndex, setSelfCardPressedIndex] = useState(-1);
+  const [playerPressedId, setPlayerPressedId] = useState('');
+  const [indexPressedId, setIndexPressedId] = useState(-1);
+
+  const onActionPopupClose = () => {
+    setShowActionsPopup(false);
+    setPlayerPressedId('');
+  };
 
   const getPlayerCards = (id) => {
     for (let index = 0; index < players.length; index++) {
@@ -71,6 +82,22 @@ function HanabiBoard(props) {
     }
 
     return [];
+  };
+
+  const informCard = (playerId) => {
+    const inner = (cardIndex) => {
+      console.log('clicked card' + cardIndex + ' of player ' + playerId);
+      if (userId == activePlayer){
+        setPlayerPressedId(playerId);
+        setIndexPressedId(cardIndex);
+        setShowActionsPopup(true);
+      }
+    };
+    return inner;
+  };
+
+  informCard.propTypes = {
+    playerId: PropTypes.string.isRequired,
   };
 
   const renderPlayers = () => {
@@ -84,7 +111,7 @@ function HanabiBoard(props) {
             <OwnHand cards={getPlayerCards(player['id'])} key={player['id']} setdraggedIndex={setdraggedIndex} draggedIndex={draggedIndex}/>
             :
             <Player userId={player['id']} displayName={player['display_name']} 
-              cards={getPlayerCards(player['id'])} key={player['id']} />
+              cards={getPlayerCards(player['id'])} key={player['id']} onClick={informCard(player['id'])}/>
           }
         </div>
       );
@@ -103,6 +130,8 @@ function HanabiBoard(props) {
       {renderPlayers()}
       <BurntPile cardList={burntPileCards} droppedCardIndex={draggedIndex} isMyTurn={userId == activePlayer}/>
       <h1>End of board</h1>
+      <ActionsPopup cardIndex={+selfCardPressedIndex} playerId={playerPressedId}
+        onCloseFunc={onActionPopupClose} showPopup={showActionsPopup} activePlayer={activePlayer}/>
     </div>
   );
 }

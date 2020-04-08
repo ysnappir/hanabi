@@ -1,5 +1,3 @@
-/*eslint linebreak-style: ["error", "unix"]*/
-
 import React, {useContext} from 'react';
 import PropTypes from 'prop-types';
 import Popup from 'reactjs-popup';
@@ -7,62 +5,52 @@ import axios from 'axios';
 import {UserIdContext} from './Contex.js';
 
 function ActionsPopup(props) {
-  const {showPopup, setShowPopup, cardIndex, activePlayer} = props;
-  const userId = useContext(UserIdContext);
+  const {showPopup, onCloseFunc, cardIndex, playerId} = props;
 
-  let isActivePlayer = (activePlayer == userId);
+  let headerMsg = '';
+  
+  headerMsg = 'Pressed Player: ' + playerId;
+  
   return (
-    <Popup trigger={<div></div>} onClose={() => setShowPopup(false)} open={showPopup} modal>
-      <h1> Pressed card number {cardIndex} </h1>
-      {isActivePlayer ?
-        <div>
-          <h3> What would you want to do? </h3>
-          <Action buttonDisplay='Burn It!' userId={+userId} actionFunc={burnActionFunc} funcData={cardIndex}/> 
-          <Action buttonDisplay='Place It!' userId={+userId} actionFunc={placeActionFunc} funcData={cardIndex}/> 
-          <Action buttonDisplay='Flip It!' userId={+userId} actionFunc={flipActionFunc} funcData={cardIndex}/> 
-        </div>
-        :
-        <h3> Not your turn, Dumbass! </h3>
-      }
-      <button onClick={()=> {setShowPopup(false);}}>Do nothing!</button>
+    <Popup trigger={<div></div>} onClose={onCloseFunc} open={showPopup}>
+      <h1> {headerMsg} </h1>
+      <DifferentPlayerActions playerId={playerId} onClose={onCloseFunc}/>
+      <button onClick={onCloseFunc}>Do nothing!</button>
     </Popup>
   );
 }
 
 ActionsPopup.propTypes = {
-  setShowPopup: PropTypes.func.isRequired,
+  onCloseFunc: PropTypes.func.isRequired,
   showPopup: PropTypes.bool.isRequired,
   cardIndex: PropTypes.number.isRequired,
-  activePlayer: PropTypes.number.isRequired,
+  playerId: PropTypes.string.isRequired,
 };
 
+function DifferentPlayerActions(props) {
+  const userId = useContext(UserIdContext);
+  const {playerId, onClose} = props;
 
-async function burnActionFunc(userId, cardIndex) {
-  try {
-    const response = await axios.post('/make_turn/burn/' + userId, {'card_index': cardIndex});
-  }
-  catch(error) {
-    console.log('Error burning card ' + error);
-  }
+  let informationOptions = [1, 2, 3, 4, 5, 'red', 'green', 'blue', 'yellow', 'white'];
+
+  const sendInform = (value) => {
+    console.log('Informing ' + playerId + ' about ' + value + '!');
+    // console.log(typeof playerId);
+    axios.post( `/make_turn/inform/${userId}`, {'informed_player_id': playerId, 'information': value});
+    onClose();
+  };
+
+  return (
+    <div>
+      {informationOptions.map((value) => <button key={value} onClick={() => sendInform(value)}>{value}</button>)}
+    </div>
+  );
 }
 
-async function placeActionFunc(userId, cardIndex) {
-  try {
-    const response = await axios.post('/make_turn/place/' + userId, {'card_index': cardIndex});
-  }
-  catch(error) {
-    console.log('Error placing card ' + error);
-  }
-}
-
-async function flipActionFunc(userId, cardIndex) {
-  try {
-    const response = await axios.post('/move_card/' + userId, {'move_from_index': cardIndex, 'move_to_index': cardIndex});
-  }
-  catch(error) {
-    console.log('Error placing card ' + error);
-  }
-}
+DifferentPlayerActions.propTypes = {
+  playerId: PropTypes.string.isRequired,
+  onClose: PropTypes.func.isRequired,
+};
 
 function Action(props) {
   const {buttonDisplay, actionFunc, funcData, userId} = props;

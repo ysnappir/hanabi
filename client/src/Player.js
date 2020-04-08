@@ -91,7 +91,6 @@ OwnSlot.propTypes = {
 export function OwnHand(props) {
 
   let {cards, setdraggedIndex, draggedIndex} = props;
-  // const [draggedIndex, setdraggedIndex] = useState(-1);
 
   const renderDragAndDropableHand = () => {
     let outCards = [];
@@ -115,13 +114,13 @@ OwnHand.propTypes = {
 };
 
 function PlayerCards(props) {
-  let {cards} = props;
+  let {cards, onClick} = props;
   
   const renderCards = () => {
     let outCards = [];
     for (let index = 0; index < cards.length; index++) {
       let cardPath = cardToImageFile(cards[index]['number'], cards[index]['color']);
-      outCards.push(<img src={cardPath} key={index}/>);
+      outCards.push(<img src={cardPath} key={index} onClick={() => onClick(index)}/>);
     }
     return <div>{outCards}</div>;
   };
@@ -135,16 +134,17 @@ function PlayerCards(props) {
 
 PlayerCards.propTypes = {
   cards: PropTypes.array.isRequired,
+  onClick: PropTypes.func.isRequired,
 };
 
 
 function Player(props) {
-  const { displayName, cards} = props;
+  const { displayName, cards, onClick} = props;
   
   return (
     <div>
       {displayName} hand: <br/>
-      <PlayerCards cards={cards}/>
+      <PlayerCards cards={cards} onClick={onClick}/>
     </div>
   );
 
@@ -152,8 +152,8 @@ function Player(props) {
 
 Player.propTypes = {
   displayName: PropTypes.string.isRequired,
-  userId: PropTypes.string.isRequired,
   cards: PropTypes.array.isRequired,
+  onClick: PropTypes.func.isRequired,
 };
 
 export default Player;
