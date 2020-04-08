@@ -1,3 +1,5 @@
+/*eslint linebreak-style: ["error", "unix"]*/
+
 import React, { useEffect, useContext, useState } from 'react';
 import axios from 'axios';
 import PropTypes from 'prop-types';
@@ -7,7 +9,6 @@ import {UserIdContext} from './Contex.js';
 import {MAX_CLUE_TOKENS, MAX_MISS_TOKENS} from './Tokens.js';
 import RemainingDeck, {HanabiTable, BurntPile} from './CardPiles.js';
 import {CARD_WIDTH} from './Cards.js';
-import ActionsPopup from './Actions.js';
 
 
 function WaitForGameStart(props) {
@@ -59,14 +60,16 @@ WaitForGameStart.propTypes = {
 function HanabiBoard(props) {
   const {gameId, players, clueTokens, missTokens, remainingDeckSize, hanabiTable, activePlayer, burntPileCards} = props;
 
-  const [selfCardPressed, setSelfCardPressed] = useState(false);
-  const [selfCardPressedIndex, setSelfCardPressedIndex] = useState(-1);
+  //const [selfCardPressed, setSelfCardPressed] = useState(false);
+  //const [selfCardPressedIndex, setSelfCardPressedIndex] = useState(-1);
 
+  /*
   const onSelfCardClick = (cardIndex) => {
     console.log('clicked on card! ' + cardIndex);
     setSelfCardPressedIndex(cardIndex);
     setSelfCardPressed(true);
   };
+  */
 
   const getPlayerCards = (id) => {
     for (let index = 0; index < players.length; index++) {
@@ -87,7 +90,7 @@ function HanabiBoard(props) {
         <div key={'player_div+' + player['id']}
           style={{width: divWidth + 'px', border: player['id'] == activePlayer ? '2px solid red' : 'none'}}>
           {index == 0 ?
-            <OwnHand cards={getPlayerCards(player['id'])} key={player['id']} onSelfCardClick={onSelfCardClick}/>
+            <OwnHand cards={getPlayerCards(player['id'])} key={player['id']}/>
             :
             <Player userId={player['id']} displayName={player['display_name']} 
               cards={getPlayerCards(player['id'])} key={player['id']} />
@@ -109,8 +112,6 @@ function HanabiBoard(props) {
       {renderPlayers()}
       <BurntPile cardList={burntPileCards}/>
       <h1>End of board</h1>
-      <ActionsPopup cardIndex={selfCardPressedIndex} setShowPopup={setSelfCardPressed} showPopup={selfCardPressed}
-        activePlayer={activePlayer}/>
     </div>
   );
 }

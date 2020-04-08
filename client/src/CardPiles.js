@@ -1,6 +1,10 @@
+/*eslint linebreak-style: ["error", "unix"]*/
+
 import React from 'react';
 import PropTypes from 'prop-types';
 import {cardToImageFile, CARD_WIDTH} from './Cards.js';
+import DraggableType from './Player.js';
+import { useDrop } from 'react-dnd';
 
 function RemainingDeck(props) {
   const {remainingCards} = props;
@@ -19,8 +23,22 @@ RemainingDeck.propTypes = {
   remainingCards: PropTypes.number.isRequired,
 };
 
+export const MyType = {
+  XX: 'xx',
+};
+
 export function HanabiTable(props) {
   const {table} = props;
+
+  const [{ isOver }, drop] = useDrop({
+    accept: [MyType.XX],  // , DraggableType.DraggableOwnCard],
+    drop: () => {
+      console.log('placing card');
+    },
+    collect: monitor => ({
+      isOver: !!monitor.isOver(),
+    }),
+  });
 
   const renderCards = (color, maxCardNumber) => {
     let outCards = [];
@@ -50,7 +68,19 @@ export function HanabiTable(props) {
       </tr>);
     }
 
-    return <table key='table'>{outBoards}</table>;
+    if (isOver){
+      return (
+        <div ref={drop} style={{background: 'blue',}}>
+          <table key='table'>{outBoards}</table>
+        </div>
+      );
+    }
+
+    return (
+      <div ref={drop} style={{background: 'white',}}>
+        <table key='table'>{outBoards}</table>
+      </div>
+    );
   };
 
   return (
