@@ -1,4 +1,3 @@
-/*eslint linebreak-style: ["error", "unix"]*/
 
 import React from 'react';
 import ReactDOM from 'react-dom';

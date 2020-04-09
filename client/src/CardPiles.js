@@ -64,7 +64,7 @@ export function HanabiTable(props) {
       //table[currColor] = 2; // Just for testing
       let currColorOnBoard = table[currColor];
       let style = {color: currColor};
-      if (currColor == 'white') {
+      if (currColor === 'white') {
         style['backgroundColor'] = 'black';
         style['alignItems'] = 'start';
       }
@@ -128,7 +128,7 @@ export function BurntPile(props) {
         {
           numbers
             .map((value) => <div key={value}>
-              {cardList.filter(item => item['number'] == value)
+              {cardList.filter(item => item['number'] === value)
                 .sort((x, y) => {
                   if(x['color'] > y['color'])
                     return 1;
