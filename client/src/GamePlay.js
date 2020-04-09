@@ -64,7 +64,6 @@ function HanabiBoard(props) {
 
   const [showActionsPopup, setShowActionsPopup] = useState(false);
   const [draggedIndex, setdraggedIndex] = useState(-1);
-  // const [selfCardPressedIndex, setSelfCardPressedIndex] = useState(-1);
   const [playerPressedId, setPlayerPressedId] = useState('');
   const [indexPressedId, setIndexPressedId] = useState(-1);
 
