@@ -1,6 +1,6 @@
 import json
 
-from games_repository.defs import GameState, HandState
+from games_repository.defs import GameState, HandState, CardInfo
 from games_repository.utils import jsonify_game_state
 from hanabi_game.defs import HanabiColor, HanabiNumber
 from hanabi_game.hanabi_card import HanabiCard
@@ -20,24 +20,24 @@ if __name__ == "__main__":
                 id="p_0",
                 display_name="Snap",
                 cards=[
-                    HanabiCard(HanabiColor.RED, HanabiNumber.THREE),
-                    HanabiCard(HanabiColor.RED, HanabiNumber.THREE),
+                    CardInfo(HanabiColor.RED, HanabiNumber.THREE, True),
+                    CardInfo(HanabiColor.RED, HanabiNumber.THREE, False),
                 ],
             ),
             HandState(
                 id="p_1",
                 display_name="Ethan",
                 cards=[
-                    HanabiCard(HanabiColor.BLUE, HanabiNumber.FIVE),
-                    HanabiCard(HanabiColor.RED, HanabiNumber.THREE),
+                    CardInfo(HanabiColor.BLUE, HanabiNumber.FIVE, False),
+                    CardInfo(HanabiColor.RED, HanabiNumber.THREE, False),
                 ],
             ),
             HandState(
                 id="p_2",
                 display_name="Amos",
                 cards=[
-                    HanabiCard(HanabiColor.YELLOW, HanabiNumber.TWO),
-                    HanabiCard(HanabiColor.WHITE, HanabiNumber.ONE),
+                    CardInfo(HanabiColor.YELLOW, HanabiNumber.TWO, True),
+                    CardInfo(HanabiColor.WHITE, HanabiNumber.ONE, False),
                 ],
             ),
         ],
