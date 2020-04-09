@@ -13,14 +13,6 @@ import InformPlayerOptions from './Actions';
 function WaitForGameStart(props) {
   const {gameId, currPlayers } = props;
 
-  const renderPlayersDisplayName = () => {
-    let outPlayers = [];
-    if (currPlayers.length > 0) {
-      outPlayers = currPlayers.map((player, index) => <li key={index}>{player['display_name']}</li>);
-    }
-    return <ul>{outPlayers}</ul>;
-  };
-
   const onStartGameClick = async () => {
     try {
       const response = await axios.post('/start_game/' + gameId, {});
@@ -43,7 +35,11 @@ function WaitForGameStart(props) {
     <div>
       <h1>Welcome to Game Number {gameId}</h1>
       <h2>The game hasn&apos;t started yet. Current players are:</h2>
-      {renderPlayersDisplayName()}
+      { currPlayers.length > 0 && 
+        <ul>
+          {currPlayers.map((player, index) => <li key={index}>{player['display_name']}</li>)}
+        </ul>
+      }
       <button onClick={onStartGameClick}>Start Game</button>
     </div>
   );
@@ -55,6 +51,11 @@ WaitForGameStart.propTypes = {
 };
 
 
+const getPlayerCards = (players, id) => {
+  const relevantPlayers = players.filter(player => player['id'] === id);
+  return relevantPlayers.length ? relevantPlayers[0]['cards'] : [];
+};
+
 
 function HanabiBoard(props) {
 
@@ -63,25 +64,14 @@ function HanabiBoard(props) {
   const userId = useContext(UserIdContext);
 
   const [showActionsPopup, setShowActionsPopup] = useState(false);
-  const [draggedIndex, setdraggedIndex] = useState(-1);
-  const [playerPressedId, setPlayerPressedId] = useState('');
-  const [indexPressedId, setIndexPressedId] = useState(-1);
-
+  const [draggedIndex, setDraggedIndex] = useState(undefined);
+  const [playerPressedId, setPlayerPressedId] = useState(undefined);
+  const [indexPressedId, setIndexPressedId] = useState(undefined);
+  
   const onActionPopupClose = () => {
     setShowActionsPopup(false);
-    setPlayerPressedId('');
-    setIndexPressedId(-1);
-  };
-
-  const getPlayerCards = (id) => {
-    for (let index = 0; index < players.length; index++) {
-      let player = players[index];
-      if (player['id'] == id) {
-        return player['cards'];
-      }
-    }
-
-    return [];
+    setPlayerPressedId(undefined);
+    setIndexPressedId(undefined);
   };
 
   const getInfromReporter = (userId, informedUserId) => {
@@ -106,17 +96,18 @@ function HanabiBoard(props) {
   };
 
   const getPlayerDisplayName = () => {
-    if (playerPressedId == ''){
+    if (!playerPressedId){
       return '';
     }
-    return players.filter((value) => value['id'] == playerPressedId)[0]['display_name'];
+
+    return players.filter((value) => value['id'] === playerPressedId)[0]['display_name'];
   };
 
   const getCardPressedInfo = () => {
-    if (indexPressedId == -1){
+    if (!indexPressedId){
       return [];
     }
-    const card = getPlayerCards(playerPressedId)[indexPressedId];
+    const card = getPlayerCards(players, playerPressedId)[indexPressedId];
     return [card['color'], card['number']];
   };
 
@@ -124,27 +115,8 @@ function HanabiBoard(props) {
     playerId: PropTypes.string.isRequired,
   };
 
-  const renderPlayers = () => {
-    let out_players = [];
-    if (players.length > 0) {
-      let divWidth = (getPlayerCards(players[0]['id']).length + 0.25) * CARD_WIDTH; // the width of a card. Not sure why I need the 0.25
-      out_players = players.map((player, index) => 
-        <div key={'player_div+' + player['id']}
-          style={{width: divWidth + 'px', border: player['id'] == activePlayer ? '2px solid red' : 'none'}}>
-          {index == 0 ?
-            <OwnHand cards={getPlayerCards(player['id'])} key={player['id']} setdraggedIndex={setdraggedIndex} draggedIndex={draggedIndex}/>
-            :
-            <Player userId={player['id']} displayName={player['display_name']} 
-              cards={getPlayerCards(player['id'])} key={player['id']} onClick={informCard(player['id'])}/>
-          }
-        </div>
-      );
-    }
-    return out_players;
-  };
-
   return (
-    <div>
+    <div style={{padding: '30px'}}>
       <h1>Full game play - game number {gameId}</h1> <br/><br/>
       Tokens Status: <br/>
       <FullTokenPile clueTokens={+clueTokens} missTokens={+missTokens}/> <br/><br/>
@@ -154,7 +126,13 @@ function HanabiBoard(props) {
       <InformPlayerOptions onClose={onActionPopupClose} showPopup={showActionsPopup} 
         reportSelection={getInfromReporter(userId, playerPressedId)} playerDisplayName={getPlayerDisplayName()} 
         highlightArray={getCardPressedInfo()}/>
-      {renderPlayers()}
+      <PlayersHands
+        players={players}
+        activePlayer={activePlayer}
+        draggedIndex={draggedIndex}
+        onDraggedIndex={setDraggedIndex}
+        onInformCard={informCard}
+      />
       <BurntPile cardList={burntPileCards} droppedCardIndex={draggedIndex} isMyTurn={userId == activePlayer}/>
       <h1>End of board</h1>
     </div>
@@ -172,6 +150,41 @@ HanabiBoard.propTypes = {
   burntPileCards: PropTypes.array.isRequired,
 };
 
+
+function PlayersHands(props) {
+  const {players, activePlayer, draggedIndex, onDraggedIndex, onInformCard} = props;
+
+  const divWidth = (getPlayerCards(players, players[0]['id']).length + 0.25) * (CARD_WIDTH + 10); // the width of a card. Not sure why I need the 0.25
+
+  return (
+    <>
+      {players.map((player, index) => 
+        <div 
+          key={'player_div+' + player['id']}
+          style={{width: divWidth + 'px', border: player['id'] == activePlayer ? '2px solid red' : 'none'}}
+        >
+          {index === 0 ?
+            <OwnHand cards={getPlayerCards(players, player['id'])} setDraggedIndex={onDraggedIndex} draggedIndex={draggedIndex}/>
+            :
+            <Player
+              userId={player['id']}
+              displayName={player['display_name']} 
+              cards={getPlayerCards(players, player['id'])}
+              onClick={onInformCard(player['id'])}/>
+          }
+        </div>
+      )}
+    </>
+  );
+}
+
+PlayersHands.propTypes = {
+  players: PropTypes.array.isRequired,
+  activePlayer: PropTypes.number.isRequired,
+  draggedIndex: PropTypes.number.isRequired,
+  onDraggedIndex: PropTypes.func.isRequired,
+  onInformCard: PropTypes.func.isRequired,
+};
 
 function GamePlay(props) {
   const userId = useContext(UserIdContext);
@@ -225,12 +238,21 @@ function GamePlay(props) {
   };
 
   return (
-    <div>
+    <>
       { !isGameStarted ? 
-        <WaitForGameStart gameId={gameId} currPlayers={players}/> :
-        <HanabiBoard gameId={gameId} players={players} clueTokens={+availableClueTokens} missTokens={+availableMissTokens}
-          remainingDeckSize={remainingDeckSize} hanabiTable={hanabiTable} burntPileCards={burntPileCards} activePlayer={+activePlayer}/> }
-    </div>
+        <WaitForGameStart gameId={gameId} currPlayers={players}/> 
+        :
+        <HanabiBoard
+          gameId={gameId}
+          players={players}
+          clueTokens={+availableClueTokens}
+          missTokens={+availableMissTokens}
+          remainingDeckSize={remainingDeckSize}
+          hanabiTable={hanabiTable}
+          burntPileCards={burntPileCards}
+          activePlayer={+activePlayer}/>
+      }
+    </>
   );
 }
 
