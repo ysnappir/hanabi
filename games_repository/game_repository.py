@@ -1,4 +1,4 @@
-from typing import Set, Dict, Optional, List, Callable, Tuple
+from typing import Set, Dict, Optional, List, Callable
 
 from games_repository.card_mapper import CardMapper
 from games_repository.card_mapper_api import (
@@ -223,6 +223,7 @@ class HanabiGameWrapper:
             )
 
             return False
+        disposing_index: Optional[FECardIndex] = None
         if action_type is HanabiMoveType.INFORM:
             if action.information_data in [color.value for color in HanabiColor]:
                 update = HanabiColorUpdate(color=HanabiColor(action.information_data))
@@ -242,6 +243,7 @@ class HanabiGameWrapper:
                 update=update,
             )
         elif action_type is HanabiMoveType.PLACE:
+            disposing_index = action.placed_card_index
             move = IHanabiPlaceMove(
                 performer=self._players[action.acting_player].get_hanabi_player_id(),
                 card_hand_index=self._players[action.acting_player].get_game_card_index(
@@ -249,6 +251,7 @@ class HanabiGameWrapper:
                 ),
             )
         elif action_type is HanabiMoveType.BURN:
+            disposing_index = action.burn_card_index
             move = IHanabiBurnMove(
                 performer=self._players[action.acting_player].get_hanabi_player_id(),
                 card_hand_index=self._players[action.acting_player].get_game_card_index(
@@ -260,7 +263,7 @@ class HanabiGameWrapper:
 
         ret_val = self._game.perform_move(move=move)
         if ret_val and action_type in [HanabiMoveType.BURN, HanabiMoveType.PLACE]:
-            self._players[action.acting_player].dispose_card(move.card_hand_index)
+            self._players[action.acting_player].dispose_card(disposing_index)
 
         return ret_val
 

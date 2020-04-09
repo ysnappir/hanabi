@@ -1,6 +1,8 @@
-from games_repository.defs import MoveCardRequest
+from games_repository.defs import MoveCardRequest, GameAction
 from games_repository.game_repository import HanabiGamesRepository
-from games_repository.utils import jsonify_game_state
+from games_repository.utils import jsonify_game_state, deck_to_game_factory
+from hanabi_game.hanabi_deck import HanabiDeck
+from hanabi_game.utils import get_all_cards_list
 
 
 def test_get_state_of_non_started_game():
@@ -38,3 +40,51 @@ def test_flipped_cards():
     state_json = jsonify_game_state(repository.get_game_state(game_id=game_id, player_id=ethan_id))
     assert state_json["hands"][0]["cards"][0].get("flipped", False)
     assert not state_json["hands"][0]["cards"][1].get("flipped", False)
+
+
+def test_flipped_cards_dynamics():
+    repository = HanabiGamesRepository()
+
+    yuval_id = repository.register_player(display_name="Yuval", clothes_color_number=1)
+    ethan_id = repository.register_player(display_name="Ethan", clothes_color_number=3)
+    game_id = repository.create_game(game_factory=deck_to_game_factory(deck=HanabiDeck(cards=get_all_cards_list())))
+
+    repository.assign_player_to_game(player_id=yuval_id, game_id=game_id)
+    repository.assign_player_to_game(player_id=ethan_id, game_id=game_id)
+    repository.start_game(game_id=game_id)
+
+    ethan_informs_1 = GameAction(acting_player=ethan_id,
+                                 action_type="inform",
+                                 informed_player=yuval_id,
+                                 information_data=1,
+                                 placed_card_index=None,
+                                 burn_card_index=None,
+                                 )
+
+    assert repository.perform_action(action=ethan_informs_1)
+
+    repository.perform_card_motion(card_motion_request=MoveCardRequest(player_id=yuval_id,
+                                                                       initial_card_index=2,
+                                                                       final_card_index=0,
+                                                                       ))
+    repository.perform_card_motion(card_motion_request=MoveCardRequest(player_id=yuval_id,
+                                                                       initial_card_index=1,
+                                                                       final_card_index=1,
+                                                                       ))
+
+    state_json = jsonify_game_state(repository.get_game_state(game_id=game_id, player_id=ethan_id))
+    assert state_json["hands"][1]["cards"][1].get("flipped", False)
+    assert not state_json["hands"][1]["cards"][2].get("flipped", False)
+
+    assert repository.perform_action(action=GameAction(
+        acting_player=yuval_id,
+        action_type='place',
+        informed_player=None,
+        information_data=None,
+        placed_card_index=0,
+        burn_card_index=None,
+    ))
+
+    state_json = jsonify_game_state(repository.get_game_state(game_id=game_id, player_id=ethan_id))
+    assert state_json["hands"][1]["cards"][0].get("flipped", False)
+    assert not state_json["hands"][1]["cards"][1].get("flipped", False)
