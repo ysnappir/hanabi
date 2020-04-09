@@ -1,4 +1,4 @@
-from typing import Set, Dict, Optional, List, Callable
+from typing import Set, Dict, Optional, List, Callable, Tuple
 
 from games_repository.card_mapper import CardMapper
 from games_repository.card_mapper_api import (
@@ -12,7 +12,7 @@ from games_repository.defs import (
     HandState,
     GameAction,
     MoveCardRequest,
-    GameFactoryType)
+    GameFactoryType, CardInfo)
 from games_repository.games_repository_api import (
     IGamesRepository,
     GameIdType,
@@ -23,7 +23,7 @@ from hanabi_game.constants import MAXIMAL_PLAYERS, MINIMAL_PLAYERS, HANABI_DECK_
     INITIAL_BLUE_TOKENS
 from hanabi_game.defs import HanabiColor, PlayerIdType, HanabiNumber, HanabiMoveType
 from hanabi_game.hanabi_game import HanabiGame, HanabiState
-from hanabi_game.hanabi_game_api import IHanabiGame, IHanabiState
+from hanabi_game.hanabi_game_api import IHanabiGame, IHanabiState, IHanabiCard
 from hanabi_game.hanabi_moves import (
     IHanabiInfromMove,
     HanabiColorUpdate,
@@ -80,17 +80,24 @@ class HanabiPlayerWrapper:
 
     def get_formatted_hand_state(self, hanabi_state: IHanabiState, hide_cards: bool = False) -> HandState:
         hand = hanabi_state.get_hand(self._hanabi_player_id)
+        cards: Dict[FECardIndex, IHanabiCard] = {}
+        flipped_indices: List[FECardIndex] = []
         if hand:
-            cards = [
-                hand.get_card(self._card_mapper.get_hanabi_card_index(fe_card_index=i)) if not hide_cards else None
-                for i in range(hand.get_amount_of_cards())
-            ]
-        else:
-            cards = []
+            cards = {i: hand.get_card(self._card_mapper.get_hanabi_card_index(fe_card_index=i))
+                     for i in range(hand.get_amount_of_cards())
+                     }
+            flipped_indices = self._card_mapper.get_flipped_indices()
+
+        fe_cards = [CardInfo(color=None if hide_cards else card.get_color(),
+                             number=None if hide_cards else card.get_number(),
+                             is_flipped=i in flipped_indices)
+                    for i, card in cards.items()
+                    ]
+
         return HandState(
             id=self._network_id,
             display_name=self._display_name,
-            cards=cards,
+            cards=fe_cards,
         )
 
     def initialize_hand_mapping(self, number_of_cards: int) -> None:

@@ -11,10 +11,16 @@ TableState = Dict[HanabiColor, Optional[HanabiNumber]]
 GameFactoryType = Callable[[int, int], IHanabiGame]  # number of players and starting player
 
 
+class CardInfo(NamedTuple):
+    color: Optional[HanabiColor]
+    number: Optional[HanabiNumber]
+    is_flipped: Optional[bool]
+
+
 class HandState(NamedTuple):
     id: NetworkPlayerIdType
     display_name: str
-    cards: List[Optional[IHanabiCard]]
+    cards: List[CardInfo]
 
 
 HandsState = List[HandState]
