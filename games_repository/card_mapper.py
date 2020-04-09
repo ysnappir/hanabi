@@ -1,4 +1,4 @@
-from typing import Dict
+from typing import Dict, List
 
 from games_repository.card_mapper_api import (
     ICardMapper,
@@ -54,3 +54,6 @@ class CardMapper(ICardMapper):
 
         self._mapping[fe_card_final_index] = game_card_index
         return True
+
+    def get_flipped_indices(self) -> List[FECardIndex]:
+        return list(range(self._pinned_cards))

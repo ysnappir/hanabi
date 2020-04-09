@@ -1,3 +1,5 @@
+from typing import List
+
 FECardIndex = int
 HanabiGameCardIndex = int
 
@@ -19,3 +21,6 @@ class ICardMapper:
         self, fe_card_initial_index: FECardIndex, fe_card_final_index: FECardIndex
     ) -> bool:
         raise NotImplementedError("")
+
+    def get_flipped_indices(self) -> List[FECardIndex]:
+        return []
