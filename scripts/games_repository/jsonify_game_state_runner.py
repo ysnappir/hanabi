@@ -20,8 +20,8 @@ if __name__ == "__main__":
                 id="p_0",
                 display_name="Snap",
                 cards=[
-                    CardInfo(HanabiColor.RED, HanabiNumber.THREE, True),
-                    CardInfo(HanabiColor.RED, HanabiNumber.THREE, False),
+                    CardInfo(None, None, True),
+                    CardInfo(None, None, False),
                 ],
             ),
             HandState(
