@@ -7,6 +7,7 @@ from hanabi_game.hanabi_card import HanabiCard
 
 if __name__ == "__main__":
     game_state: GameState = GameState(
+        status='started',
         deck_size=42,
         blue_token_amount=5,
         red_token_amount=2,

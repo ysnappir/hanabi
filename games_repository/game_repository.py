@@ -155,6 +155,7 @@ class HanabiGameWrapper:
             hanabi_state = self._game.get_state()
 
         return GameState(
+            status=self._status.value,
             deck_size=hanabi_state.get_deck_size(),
             blue_token_amount=hanabi_state.get_blue_token_amount(),
             red_token_amount=hanabi_state.get_red_token_amount(),
