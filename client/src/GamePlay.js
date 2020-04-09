@@ -7,7 +7,7 @@ import {UserIdContext} from './Contex.js';
 import {MAX_CLUE_TOKENS, MAX_MISS_TOKENS} from './Tokens.js';
 import RemainingDeck, {HanabiTable, BurntPile} from './CardPiles.js';
 import {CARD_WIDTH} from './Cards.js';
-import ActionsPopup from './Actions';
+import InformPlayerOptions from './Actions';
 
 
 function WaitForGameStart(props) {
@@ -64,13 +64,14 @@ function HanabiBoard(props) {
 
   const [showActionsPopup, setShowActionsPopup] = useState(false);
   const [draggedIndex, setdraggedIndex] = useState(-1);
-  const [selfCardPressedIndex, setSelfCardPressedIndex] = useState(-1);
+  // const [selfCardPressedIndex, setSelfCardPressedIndex] = useState(-1);
   const [playerPressedId, setPlayerPressedId] = useState('');
   const [indexPressedId, setIndexPressedId] = useState(-1);
 
   const onActionPopupClose = () => {
     setShowActionsPopup(false);
     setPlayerPressedId('');
+    setIndexPressedId(-1);
   };
 
   const getPlayerCards = (id) => {
@@ -84,9 +85,18 @@ function HanabiBoard(props) {
     return [];
   };
 
+  const getInfromReporter = (userId, informedUserId) => {
+    const sendInform = (value) => {
+      console.log('Informing ' + informedUserId + ' about ' + value + '!');
+      axios.post( `/make_turn/inform/${userId}`, {'informed_player_id': informedUserId, 'information': value});
+      onActionPopupClose();
+    };
+    return sendInform;
+  };
+
   const informCard = (playerId) => {
     const inner = (cardIndex) => {
-      console.log('clicked card' + cardIndex + ' of player ' + playerId);
+      console.log('clicked card ' + cardIndex + ' of player ' + playerId);
       if (userId == activePlayer){
         setPlayerPressedId(playerId);
         setIndexPressedId(cardIndex);
@@ -94,6 +104,21 @@ function HanabiBoard(props) {
       }
     };
     return inner;
+  };
+
+  const getPlayerDisplayName = () => {
+    if (playerPressedId == ''){
+      return '';
+    }
+    return players.filter((value) => value['id'] == playerPressedId)[0]['display_name'];
+  };
+
+  const getCardPressedInfo = () => {
+    if (indexPressedId == -1){
+      return [];
+    }
+    const card = getPlayerCards(playerPressedId)[indexPressedId];
+    return [card['color'], card['number']];
   };
 
   informCard.propTypes = {
@@ -127,11 +152,12 @@ function HanabiBoard(props) {
       <RemainingDeck remainingCards={remainingDeckSize}/>
       <HanabiTable table={hanabiTable} droppedCardIndex={draggedIndex} isMyTurn={userId == activePlayer}/>
       Players:
+      <InformPlayerOptions onClose={onActionPopupClose} showPopup={showActionsPopup} 
+        reportSelection={getInfromReporter(userId, playerPressedId)} playerDisplayName={getPlayerDisplayName()} 
+        highlightArray={getCardPressedInfo()}/>
       {renderPlayers()}
       <BurntPile cardList={burntPileCards} droppedCardIndex={draggedIndex} isMyTurn={userId == activePlayer}/>
       <h1>End of board</h1>
-      <ActionsPopup cardIndex={+selfCardPressedIndex} playerId={playerPressedId}
-        onCloseFunc={onActionPopupClose} showPopup={showActionsPopup} activePlayer={activePlayer}/>
     </div>
   );
 }
