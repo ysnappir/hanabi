@@ -28,11 +28,10 @@ from hanabi_game.utils import get_all_cards_list
 app = Flask(__name__, template_folder="client/build", static_folder="client/build/static")
 cors = CORS(app, resources={r"/*": {"origins": "*"}})
 
-DB_FILE_NAME = "repository_db.pkl"
+DB_FILE_NAME = "/tmp/repository_db.pkl"
 
 
 def _save_pickle():
-    return
     pickle.dump(game_repository, open(DB_FILE_NAME, "wb"))
 
 
