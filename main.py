@@ -13,36 +13,21 @@
 # limitations under the License.
 
 # [START gae_python37_render_template]
-import pickle
-
 from flask import Flask, request, render_template
 from flask_cors import CORS
 
 from games_repository.defs import GameIdType, GameAction, MoveCardRequest
-from games_repository.game_repository import HanabiGamesRepository
 from games_repository.games_repository_api import IGamesRepository
 from games_repository.utils import jsonify_game_state, deck_to_game_factory
+from gcloud_datastore.gcloud_datastore_read_write import get_game_repository, save_game_repository_state
 from hanabi_game.hanabi_deck import HanabiDeck
 from hanabi_game.utils import get_all_cards_list
 
 app = Flask(__name__, template_folder="client/build", static_folder="client/build/static")
 cors = CORS(app, resources={r"/*": {"origins": "*"}})
 
-DB_FILE_NAME = "/tmp/repository_db.pkl"
 
-
-def _save_pickle():
-    pickle.dump(game_repository, open(DB_FILE_NAME, "wb"))
-
-
-try:
-    game_repository: IGamesRepository = pickle.load(open(DB_FILE_NAME, "rb"))
-    print(f"Loaded game repo. Available games: {game_repository.get_active_games()}. ")
-    # f"Players are {game_repository._players.keys()}")
-except Exception:
-    game_repository: IGamesRepository = HanabiGamesRepository()
-    print(f"NOT Loaded game repo. Initializing a new one...")
-    _save_pickle()
+game_repository: IGamesRepository = get_game_repository()
 
 
 @app.route('/')
@@ -54,8 +39,7 @@ def root():
     #                datetime.datetime(2018, 1, 3, 11, 0, 0),
     #                ]
 
-    return render_template('index.html')
-    return "Bucke's hanabi server is up", 200
+    return render_template("index.html")
 
 
 @app.route("/register", methods=["post"])
@@ -64,7 +48,7 @@ def register():
         player_id = game_repository.register_player(display_name=request.json["display_name"],
                                                     clothes_color_number=request.json["number_of_colors_in_clothes"],
                                                     )
-        _save_pickle()
+        save_game_repository_state(game_repository)
         return {"id": player_id}, 200
     except KeyError:
         return "", 400
@@ -81,7 +65,7 @@ def create_game(player_id: str):
         else:
             game_id = game_repository.create_game()
         assert game_repository.assign_player_to_game(player_id=player_id, game_id=game_id)
-        _save_pickle()
+        save_game_repository_state(game_repository)
         return {"game_id": game_id}, 200
     except KeyError:
         return "", 400
@@ -91,7 +75,7 @@ def create_game(player_id: str):
 def join_game(player_id: str, game_id: str):
     try:
         assert game_repository.assign_player_to_game(player_id=player_id, game_id=GameIdType(game_id))
-        _save_pickle()
+        save_game_repository_state(game_repository)
         return {}, 200
     except KeyError:
         return "", 400
@@ -101,7 +85,7 @@ def join_game(player_id: str, game_id: str):
 def start_game(game_id: str):
     try:
         assert game_repository.start_game(game_id=GameIdType(game_id))
-        _save_pickle()
+        save_game_repository_state(game_repository)
         return {}, 200
     except KeyError:
         return "", 400
@@ -133,7 +117,7 @@ def inform_move(player_id: str):
         print(action)
         ret_val = game_repository.perform_action(action=action)
         print(f"return value is {ret_val}")
-        _save_pickle()
+        save_game_repository_state(game_repository)
         return {}, 200
     except KeyError:
         return "", 400
@@ -155,7 +139,7 @@ def burn_move(player_id: str):
             burn_card_index=payload["card_index"],
         ))
         if ret_val:
-            _save_pickle()
+            save_game_repository_state(game_repository)
             return {}, 200
         return "Not your turn!", 400
     except KeyError:
@@ -176,7 +160,7 @@ def place_move(player_id: str):
             burn_card_index=None,
         ))
         print(f"Return value: {ret_val}")
-        _save_pickle()
+        save_game_repository_state(game_repository)
         return {}, 200
     except KeyError:
         return "", 400
@@ -191,7 +175,7 @@ def move_card(player_id: str):
             initial_card_index=payload["move_from_index"],
             final_card_index=payload["move_to_index"],
         ))
-        _save_pickle()
+        save_game_repository_state(game_repository)
         return {}, 200
     except KeyError:
         return "", 400
