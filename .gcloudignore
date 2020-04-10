@@ -12,3 +12,14 @@
 # below:
 .git
 .gitignore
+tests
+tests/*
+scripts
+scripts/*
+client/node_modules
+client/node_modules/*
+client/src
+client/src/*
+client/public
+client/public/*
+README.bat
