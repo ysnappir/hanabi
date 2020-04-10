@@ -13,7 +13,6 @@
 # limitations under the License.
 
 # [START gae_python37_render_template]
-import os
 import pickle
 
 from flask import Flask, request, render_template
@@ -33,6 +32,7 @@ DB_FILE_NAME = "repository_db.pkl"
 
 
 def _save_pickle():
+    return
     pickle.dump(game_repository, open(DB_FILE_NAME, "wb"))
 
 
