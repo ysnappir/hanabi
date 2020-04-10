@@ -200,7 +200,7 @@ function GamePlay(props) {
 
   const updateGameState = async () => {
     try {
-      const response = await axios.post('/game_state/' + userId + '/' + gameId, {});
+      const response = await axios.get('/game_state/' + userId + '/' + gameId, {});
       handleGetGameStateResponse(response);
     } catch (error) {
       handleGetGameStateError(error);
