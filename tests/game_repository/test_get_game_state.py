@@ -42,6 +42,26 @@ def test_flipped_cards():
     assert not state_json["hands"][0]["cards"][1].get("flipped", False)
 
 
+def test_last_action():
+    repository = HanabiGamesRepository()
+
+    yuval_id = repository.register_player(display_name="Yuval", clothes_color_number=1)
+    ethan_id = repository.register_player(display_name="Ethan", clothes_color_number=5)
+    game_id = repository.create_game()
+
+    repository.assign_player_to_game(player_id=yuval_id, game_id=game_id)
+    repository.assign_player_to_game(player_id=ethan_id, game_id=game_id)
+    repository.start_game(game_id=game_id)
+
+    action_dict = {'acting_player': '2', 'action_type': 'inform', 'informed_player': '1', 'information_data': 1,
+                   'placed_card_index': None, 'burn_card_index': None}
+
+    assert repository.perform_action(GameAction(**action_dict))
+
+    state_json = jsonify_game_state(repository.get_game_state(game_id=game_id, player_id=ethan_id))
+    assert state_json["last_action"] == action_dict
+
+
 def test_flipped_cards_dynamics():
     repository = HanabiGamesRepository()
 

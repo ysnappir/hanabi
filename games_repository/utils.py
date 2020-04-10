@@ -1,8 +1,7 @@
 from typing import Any
 
 from games_repository.defs import GameState, GameFactoryType
-from hanabi_game.defs import HanabiColor, HanabiNumber
-from hanabi_game.hanabi_card import HanabiCard
+from hanabi_game.defs import HanabiColor
 from hanabi_game.hanabi_game import HanabiGame
 from hanabi_game.hanabi_game_api import IHanabiDeck
 
@@ -35,6 +34,14 @@ def jsonify_game_state(game_state: GameState) -> Any:
             for card in game_state.burnt_pile
         ],
         "active_player_id": game_state.active_player,
+        "last_action": None if game_state.last_action is None else {
+            "acting_player": game_state.last_action.acting_player,
+            "action_type": game_state.last_action.action_type,
+            "informed_player": game_state.last_action.informed_player,
+            "information_data": game_state.last_action.information_data,
+            "placed_card_index": game_state.last_action.placed_card_index,
+            "burn_card_index": game_state.last_action.burn_card_index,
+        },
     }
 
 
