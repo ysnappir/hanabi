@@ -5,4 +5,5 @@ Run build:
 - npm run build
 
 Deploy to cloud:
+- cd ..
 - gcloud app deploy

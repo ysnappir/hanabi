@@ -87,7 +87,7 @@ def start_game(game_id: str):
         return "", 400
 
 
-@app.route("/game_state/<player_id>/<game_id>", methods=["get", "post"])
+@app.route("/game_state/<player_id>/<game_id>", methods=["get"])
 def game_state(player_id: str, game_id: str):
 
     try:
