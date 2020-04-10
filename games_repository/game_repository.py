@@ -128,6 +128,7 @@ class HanabiGameWrapper:
         self._game: Optional[IHanabiGame] = None
         self._players: Dict[NetworkPlayerIdType, HanabiPlayerWrapper] = {}
         self._ordered_players: List[NetworkPlayerIdType] = []
+        self._last_successful_action: Optional[GameAction] = None
 
     def _format_hands_state(
         self, hanabi_state: IHanabiState, player_id: NetworkPlayerIdType
@@ -155,7 +156,7 @@ class HanabiGameWrapper:
             hanabi_state = self._game.get_state()
 
         return GameState(
-            status=self._status.value,
+            status=str(self._status.value),
             deck_size=hanabi_state.get_deck_size(),
             blue_token_amount=hanabi_state.get_blue_token_amount(),
             red_token_amount=hanabi_state.get_red_token_amount(),
@@ -166,7 +167,8 @@ class HanabiGameWrapper:
                 hanabi_state=hanabi_state, player_id=player_id
             ),
             burnt_pile=hanabi_state.get_burnt_pile(),
-            active_player=self._ordered_players[hanabi_state.get_active_player()]
+            active_player=self._ordered_players[hanabi_state.get_active_player()],
+            last_action=self._last_successful_action,
         )
 
     def get_status(self) -> GameStatus:
@@ -263,8 +265,11 @@ class HanabiGameWrapper:
             return False
 
         ret_val = self._game.perform_move(move=move)
-        if ret_val and action_type in [HanabiMoveType.BURN, HanabiMoveType.PLACE]:
-            self._players[action.acting_player].dispose_card(disposing_index)
+        if ret_val:
+            self._last_successful_action = action
+
+            if action_type in [HanabiMoveType.BURN, HanabiMoveType.PLACE]:
+                self._players[action.acting_player].dispose_card(disposing_index)
 
         return ret_val
 

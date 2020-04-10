@@ -37,8 +37,11 @@ def _save_pickle():
 
 try:
     game_repository: IGamesRepository = pickle.load(open(DB_FILE_NAME, "rb"))
+    print(f"Loaded game repo. Available games: {game_repository.get_active_games()}. ")
+    # f"Players are {game_repository._players.keys()}")
 except Exception:
     game_repository: IGamesRepository = HanabiGamesRepository()
+    print(f"NOT Loaded game repo. Initializing a new one...")
     _save_pickle()
 
 

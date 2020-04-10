@@ -2,6 +2,9 @@ from games_repository.card_mapper import CardMapper
 from games_repository.card_mapper_api import ICardMapper
 from games_repository.defs import GameAction, MoveCardRequest
 from games_repository.game_repository import HanabiGamesRepository
+from games_repository.utils import deck_to_game_factory
+from hanabi_game.hanabi_deck import HanabiDeck
+from hanabi_game.utils import get_all_cards_list
 
 
 def test_correct_mapping_after_moving():
@@ -91,7 +94,8 @@ def test_moving_hot_seat_to_pinned():
     yuval_id = game_repository.register_player(display_name="Yuval", clothes_color_number=9)
     ethan_id = game_repository.register_player(display_name="Ethan", clothes_color_number=2)
 
-    game_id = game_repository.create_game()
+    game_id = game_repository.create_game(game_factory=deck_to_game_factory(
+        deck=HanabiDeck(cards=get_all_cards_list())))
     game_repository.assign_player_to_game(player_id=yuval_id, game_id=game_id)
     game_repository.assign_player_to_game(player_id=ethan_id, game_id=game_id)
 
@@ -116,4 +120,4 @@ def test_moving_hot_seat_to_pinned():
     ))
 
     game_state = game_repository.get_game_state(game_id=game_id, player_id=yuval_id)
-    assert game_state.hands_state[1].cards[0].get_number().value == 5
+    assert game_state.hands_state[1].cards[0].number.value == 5

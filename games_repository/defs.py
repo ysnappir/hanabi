@@ -44,6 +44,7 @@ class GameState(NamedTuple):
     hands_state: HandsState
     burnt_pile: List[IHanabiCard]
     active_player: NetworkPlayerIdType
+    last_action: GameAction
 
 
 class MoveCardRequest(NamedTuple):
