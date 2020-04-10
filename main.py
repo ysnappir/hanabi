@@ -89,6 +89,7 @@ def start_game(game_id: str):
 
 @app.route("/game_state/<player_id>/<game_id>", methods=["get", "post"])
 def game_state(player_id: str, game_id: str):
+
     try:
         ret_val = jsonify_game_state(game_repository.get_game_state(game_id=GameIdType(game_id), player_id=player_id))
         return ret_val, 200

@@ -1,5 +1,12 @@
 runtime: python37
 
+
+entrypoint: gunicorn -t 3600 -b :$PORT main:app --workers 1 --threads 1 --worker-class gthread 
+automatic_scaling:
+  min_instances: 1
+  max_instances: 1
+
+
 handlers:
   # This configures Google App Engine to serve the files in the app's static
   # directory.
