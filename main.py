@@ -13,6 +13,8 @@
 # limitations under the License.
 
 # [START gae_python37_render_template]
+import os
+import pickle
 
 from flask import Flask, request, render_template
 from flask_cors import CORS
@@ -26,7 +28,19 @@ from hanabi_game.utils import get_all_cards_list
 
 app = Flask(__name__, template_folder="client/build", static_folder="client/build/static")
 cors = CORS(app, resources={r"/*": {"origins": "*"}})
-game_repository: IGamesRepository = HanabiGamesRepository()
+
+DB_FILE_NAME = "repository_db.pkl"
+
+
+def _save_pickle():
+    pickle.dump(game_repository, open(DB_FILE_NAME, "wb"))
+
+
+try:
+    game_repository: IGamesRepository = pickle.load(open(DB_FILE_NAME, "rb"))
+except Exception:
+    game_repository: IGamesRepository = HanabiGamesRepository()
+    _save_pickle()
 
 
 @app.route('/')
@@ -48,6 +62,7 @@ def register():
         player_id = game_repository.register_player(display_name=request.json["display_name"],
                                                     clothes_color_number=request.json["number_of_colors_in_clothes"],
                                                     )
+        _save_pickle()
         return {"id": player_id}, 200
     except KeyError:
         return "", 400
@@ -64,6 +79,7 @@ def create_game(player_id: str):
         else:
             game_id = game_repository.create_game()
         assert game_repository.assign_player_to_game(player_id=player_id, game_id=game_id)
+        _save_pickle()
         return {"game_id": game_id}, 200
     except KeyError:
         return "", 400
@@ -73,6 +89,7 @@ def create_game(player_id: str):
 def join_game(player_id: str, game_id: str):
     try:
         assert game_repository.assign_player_to_game(player_id=player_id, game_id=GameIdType(game_id))
+        _save_pickle()
         return {}, 200
     except KeyError:
         return "", 400
@@ -82,6 +99,7 @@ def join_game(player_id: str, game_id: str):
 def start_game(game_id: str):
     try:
         assert game_repository.start_game(game_id=GameIdType(game_id))
+        _save_pickle()
         return {}, 200
     except KeyError:
         return "", 400
@@ -113,6 +131,7 @@ def inform_move(player_id: str):
         print(action)
         ret_val = game_repository.perform_action(action=action)
         print(f"return value is {ret_val}")
+        _save_pickle()
         return {}, 200
     except KeyError:
         return "", 400
@@ -134,6 +153,7 @@ def burn_move(player_id: str):
             burn_card_index=payload["card_index"],
         ))
         if ret_val:
+            _save_pickle()
             return {}, 200
         return "Not your turn!", 400
     except KeyError:
@@ -154,6 +174,7 @@ def place_move(player_id: str):
             burn_card_index=None,
         ))
         print(f"Return value: {ret_val}")
+        _save_pickle()
         return {}, 200
     except KeyError:
         return "", 400
@@ -168,6 +189,7 @@ def move_card(player_id: str):
             initial_card_index=payload["move_from_index"],
             final_card_index=payload["move_to_index"],
         ))
+        _save_pickle()
         return {}, 200
     except KeyError:
         return "", 400
