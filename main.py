@@ -14,7 +14,7 @@
 
 # [START gae_python37_render_template]
 
-from flask import Flask, request  # render_template,
+from flask import Flask, request, render_template
 from flask_cors import CORS
 
 from games_repository.defs import GameIdType, GameAction, MoveCardRequest
@@ -24,7 +24,7 @@ from games_repository.utils import jsonify_game_state, deck_to_game_factory
 from hanabi_game.hanabi_deck import HanabiDeck
 from hanabi_game.utils import get_all_cards_list
 
-app = Flask(__name__)
+app = Flask(__name__, template_folder="client/build", static_folder="client/build/static")
 cors = CORS(app, resources={r"/*": {"origins": "*"}})
 game_repository: IGamesRepository = HanabiGamesRepository()
 
@@ -38,7 +38,8 @@ def root():
     #                datetime.datetime(2018, 1, 3, 11, 0, 0),
     #                ]
 
-    return "Bucke's hanabi server is up", 200  # render_template('index.html', times=dummy_times)
+    return render_template('index.html')
+    return "Bucke's hanabi server is up", 200
 
 
 @app.route("/register", methods=["post"])
