@@ -1,49 +1,32 @@
 import React, { useState } from 'react';
 import './App.css';
+import { Formik } from 'formik';
+import * as Yup from 'yup';
 import axios from 'axios';
 import Options from './Options';
 import {UserIdContext} from './Contex.js';
 import GamePlay from './GamePlay';
+import Error from './Error';
 
-const BAD_INPUT_MSG = 'Empty Display Name or Color Num not a number';
-const WAIT_STR = 'Please Wait...';
+
+const ValidationSchema = Yup.object().shape({
+  displayName: Yup.string()
+    .min(2, 'Too Short! Come on - Give it at least two chars!')
+    .max(255, 'Too Long!')
+    .required('Required'),
+  numOfColors: Yup.number()
+    .positive('You\'ve Got To Be Wearing At Least One Color! (And make the number positive)')
+    .required('Required')
+});
+
 
 function App() {
   const [loginSuccess, setLoginSuccess] = useState(false);
-  const [userMsg, setUserMsg] = useState('');
   const [userId, setUserId] = useState('');
   const [pinCode, setPinCode] = useState(undefined);
 
-  const displayNameTextbox = React.createRef();
-  const colorNumTextbox = React.createRef();
-
-  const validateInput = () => {
-    const dispNameVal = displayNameTextbox.current.value;
-    const colorNumVal = colorNumTextbox.current.value;
-    if (colorNumVal.trim() === '' || isNaN(colorNumVal) || dispNameVal.trim() === '') {
-      return false;
-    }
-    return true;
-  };
-
-  const handleLoginClick = async () => {
-    if (!validateInput()) {
-      setUserMsg(BAD_INPUT_MSG);
-      return;
-    }
-    setUserMsg(WAIT_STR);
-
-    try {
-      const response = await axios.post('/register', { display_name: displayNameTextbox.current.value, 
-        number_of_colors_in_clothes: colorNumTextbox.current.value});
-      handleLoginResponse(response);
-    } catch (error) {
-      handleLoginError(error);
-    }
-  };
-
   const handleLoginError = (reason) => {
-    setUserMsg('Connection Error: ' + reason);
+    alert('Sorry! Error is ' + reason);
   };
 
   const handleLoginResponse = (response) => {
@@ -66,12 +49,66 @@ function App() {
   }
 
   return (
-    <div className='main__container'>
-        Display Name: <input type="text" ref={displayNameTextbox} /><br/>
-        How many colors are you wearing: <input type="text" ref={colorNumTextbox} /><br/><br/>
-      <button className='button' onClick={handleLoginClick}>Lets Start!</button>
-      <p>{userMsg}</p>
-    </div>
+    <Formik
+      initialValues={{displayName: '', numOfColors: ''}}
+      validationSchema={ValidationSchema}
+
+      onSubmit = {async (values, { setSubmitting }) => {
+        setSubmitting(true);
+        
+        try {
+          const response = await axios.post('/register', { display_name: values.displayName, 
+            number_of_colors_in_clothes: values.numOfColors});
+          handleLoginResponse(response);
+        } catch (error) {
+          handleLoginError(error);
+        }
+
+        setSubmitting(false);
+      }}
+    >
+      {({
+        values,
+        errors,
+        touched,
+        handleChange,
+        handleBlur,
+        handleSubmit,
+        isSubmitting,
+      }) => (
+        <form onSubmit={handleSubmit} className='main__container'>
+          <div className='input-row'>
+            <label>Display Name: </label>
+            <input
+              type='text'
+              name='displayName'
+              onChange={handleChange}
+              onBlur={handleBlur}
+              value={values.displayName}
+              className={touched.displayName && errors.displayName ? 'has-error' : null}
+            />
+            <Error touched={touched.displayName} message={errors.displayName} />
+          </div>
+
+          <div className='input-row'>
+            <label>How many colors are you wearing: </label>
+            <input
+              type='text'
+              name='numOfColors'
+              onChange={handleChange}
+              onBlur={handleBlur}
+              value={values.numOfColors}
+              className={touched.numOfColors && errors.numOfColors ? 'has-error' : null}
+            />
+            <Error touched={touched.numOfColors} message={errors.numOfColors} />
+          </div>
+
+          <div className='input-row'>
+            <button type='submit' disabled={isSubmitting}>Let&apos;s GO!</button>
+          </div>
+        </form>
+      )}
+    </Formik>
   );
 }
 
