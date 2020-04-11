@@ -15,6 +15,7 @@ class CardInfo(NamedTuple):
     color: Optional[HanabiColor]
     number: Optional[HanabiNumber]
     is_flipped: Optional[bool]
+    is_informed: Optional[bool]
 
 
 class HandState(NamedTuple):

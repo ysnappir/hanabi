@@ -23,6 +23,7 @@ def jsonify_game_state(game_state: GameState) -> Any:
                     {"number": card.number.value if card.number is not None else None,
                      "color": card.color.value if card.color is not None else None,
                      "flipped": card.is_flipped,
+                     "is_informed": card.is_informed,
                      } if card else None
                     for card in player.cards
                 ],
