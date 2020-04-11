@@ -15,7 +15,7 @@ def test_get_state_of_non_started_game():
     repository.assign_player_to_game(player_id=yuval_id, game_id=game_id)
     repository.assign_player_to_game(player_id=ethan_id, game_id=game_id)
 
-    state = repository.get_game_state(game_id=game_id, player_id=ethan_id)
+    state = repository.get_game_state(game_id=game_id)
     assert all(len(player_state.cards) == 0 for player_state in state.hands_state)
     assert state.active_player == ethan_id
 
@@ -31,13 +31,13 @@ def test_flipped_cards():
     repository.assign_player_to_game(player_id=ethan_id, game_id=game_id)
     repository.start_game(game_id=game_id)
 
-    state_json = jsonify_game_state(repository.get_game_state(game_id=game_id, player_id=ethan_id))
+    state_json = jsonify_game_state(repository.get_game_state(game_id=game_id), player_id=ethan_id)
     assert not state_json["hands"][0]["cards"][0].get("flipped", False)
 
     assert repository.perform_card_motion(
         card_motion_request=MoveCardRequest(player_id=ethan_id, initial_card_index=4, final_card_index=0))
 
-    state_json = jsonify_game_state(repository.get_game_state(game_id=game_id, player_id=ethan_id))
+    state_json = jsonify_game_state(repository.get_game_state(game_id=game_id), player_id=ethan_id)
     assert state_json["hands"][0]["cards"][0].get("flipped", False)
     assert not state_json["hands"][0]["cards"][1].get("flipped", False)
 
@@ -58,7 +58,7 @@ def test_last_action():
 
     assert repository.perform_action(GameAction(**action_dict))
 
-    state_json = jsonify_game_state(repository.get_game_state(game_id=game_id, player_id=ethan_id))
+    state_json = jsonify_game_state(repository.get_game_state(game_id=game_id), player_id=ethan_id)
     assert state_json["last_action"] == action_dict
 
 
@@ -92,7 +92,7 @@ def test_flipped_cards_dynamics():
                                                                        final_card_index=1,
                                                                        ))
 
-    state_json = jsonify_game_state(repository.get_game_state(game_id=game_id, player_id=ethan_id))
+    state_json = jsonify_game_state(repository.get_game_state(game_id=game_id), player_id=ethan_id)
     assert state_json["hands"][1]["cards"][1].get("flipped", False)
     assert not state_json["hands"][1]["cards"][2].get("flipped", False)
 
@@ -105,6 +105,6 @@ def test_flipped_cards_dynamics():
         burn_card_index=None,
     ))
 
-    state_json = jsonify_game_state(repository.get_game_state(game_id=game_id, player_id=ethan_id))
+    state_json = jsonify_game_state(repository.get_game_state(game_id=game_id), player_id=ethan_id)
     assert state_json["hands"][1]["cards"][0].get("flipped", False)
     assert not state_json["hands"][1]["cards"][1].get("flipped", False)

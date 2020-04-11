@@ -56,4 +56,4 @@ if __name__ == "__main__":
                                burn_card_index=None,
                                )
     )
-    print(json.dumps(jsonify_game_state(game_state)))
+    print(json.dumps(jsonify_game_state(game_state, player_id="p_1")))

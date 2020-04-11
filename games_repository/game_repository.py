@@ -137,50 +137,17 @@ class HanabiGameWrapper:
         self._players: Dict[NetworkPlayerIdType, HanabiPlayerWrapper] = {}
         self._ordered_players: List[NetworkPlayerIdType] = []
         self._last_successful_action: Optional[GameAction] = None
+        self._game_state: Optional[GameState] = None
 
-    def _format_hands_state(
-        self, hanabi_state: IHanabiState, player_id: NetworkPlayerIdType
-    ) -> HandsState:
-        i = self._ordered_players.index(player_id)
-        return [
-            self._players[player_id].get_formatted_hand_state(hanabi_state=hanabi_state,
-                                                              hide_cards=(j == 0),
-                                                              last_action=self._last_successful_action,
-                                                              )
-            for j, player_id in enumerate(self._ordered_players[i:] + self._ordered_players[:i])
-        ]
+    def _format_hands_state(self, hanabi_state: IHanabiState) -> HandsState:
+        return [self._players[player_id].get_formatted_hand_state(hanabi_state=hanabi_state,
+                                                                  hide_cards=False,
+                                                                  last_action=self._last_successful_action,
+                                                                  )
+                for player_id in self._ordered_players]
 
-    def get_hanabi_state(self, player_id: NetworkPlayerIdType) -> Optional[GameState]:
-        hanabi_state: IHanabiState
-        if self._status is GameStatus.CREATED:
-            hanabi_state = HanabiState(
-                deck_size=HANABI_DECK_SIZE,
-                red_tokens_amount=INITIAL_RED_TOKENS,
-                blue_tokens_amount=INITIAL_BLUE_TOKENS,
-                hands_dict={},
-                pile_tops={},
-                burnt_pile=[],
-                acting_player=max(range(len(self._ordered_players)),
-                                  key=lambda i: self._players[self._ordered_players[i]].get_number_of_cloth_colors()),
-               )
-        else:
-            hanabi_state = self._game.get_state()
-
-        return GameState(
-            status=str(self._status.value),
-            deck_size=hanabi_state.get_deck_size(),
-            blue_token_amount=hanabi_state.get_blue_token_amount(),
-            red_token_amount=hanabi_state.get_red_token_amount(),
-            table_state={
-                color: hanabi_state.get_pile_top(color=color) for color in HanabiColor
-            },
-            hands_state=self._format_hands_state(
-                hanabi_state=hanabi_state, player_id=player_id
-            ),
-            burnt_pile=hanabi_state.get_burnt_pile(),
-            active_player=self._ordered_players[hanabi_state.get_active_player()],
-            last_action=self._last_successful_action,
-        )
+    def get_hanabi_state(self) -> GameState:
+        return self._game_state
 
     def get_status(self) -> GameStatus:
         return self._status
@@ -195,6 +162,8 @@ class HanabiGameWrapper:
         if player.assign_to_game(self._game_id):
             self._players[player.get_network_player_id()] = player
             self._ordered_players.append(player.get_network_player_id())
+
+            self._game_state = self._get_game_state()
             return True
 
         return False
@@ -226,6 +195,7 @@ class HanabiGameWrapper:
             )
 
         self._status = GameStatus.ACTIVE
+        self._game_state = self._get_game_state()
         return True
 
     def perform_action(self, action: GameAction) -> bool:
@@ -282,7 +252,56 @@ class HanabiGameWrapper:
             if action_type in [HanabiMoveType.BURN, HanabiMoveType.PLACE]:
                 self._players[action.acting_player].dispose_card(disposing_index)
 
+            self._game_state = self._get_game_state()
+
         return ret_val
+
+    def _get_game_state(self) -> GameState:
+        hanabi_state: IHanabiState
+        if self._status is GameStatus.CREATED:
+            hanabi_state = HanabiState(
+                deck_size=HANABI_DECK_SIZE,
+                red_tokens_amount=INITIAL_RED_TOKENS,
+                blue_tokens_amount=INITIAL_BLUE_TOKENS,
+                hands_dict={},
+                pile_tops={},
+                burnt_pile=[],
+                acting_player=max(range(len(self._ordered_players)),
+                                  key=lambda i: self._players[self._ordered_players[i]].get_number_of_cloth_colors()),
+            )
+        else:
+            hanabi_state = self._game.get_state()
+
+        return GameState(
+            status=str(self._status.value),
+            deck_size=hanabi_state.get_deck_size(),
+            blue_token_amount=hanabi_state.get_blue_token_amount(),
+            red_token_amount=hanabi_state.get_red_token_amount(),
+            table_state={
+                color: hanabi_state.get_pile_top(color=color) for color in HanabiColor
+            },
+            hands_state=self._format_hands_state(hanabi_state=hanabi_state),
+            burnt_pile=hanabi_state.get_burnt_pile(),
+            active_player=self._ordered_players[hanabi_state.get_active_player()],
+            last_action=self._last_successful_action,
+        )
+
+    def perform_card_motion(self, card_motion_request: MoveCardRequest) -> bool:
+        if self.get_status() is not GameStatus.ACTIVE:
+            return False
+
+        try:
+            ret_val = self._players[card_motion_request.player_id].move_a_card(
+                card_initial_index=card_motion_request.initial_card_index,
+                card_final_index=card_motion_request.final_card_index,
+            )
+
+            if ret_val:
+                self._game_state = self._get_game_state()
+
+            return ret_val
+        except AssertionError:
+            return False
 
 
 class HanabiGamesRepository(IGamesRepository):
@@ -318,11 +337,9 @@ class HanabiGamesRepository(IGamesRepository):
             if game_wrapper.get_status() is GameStatus.ACTIVE
         )
 
-    def get_game_state(
-        self, game_id: GameIdType, player_id: NetworkPlayerIdType
-    ) -> GameState:
+    def get_game_state(self, game_id: GameIdType) -> GameState:
         assert game_id in self._games, f"Received not existing game {game_id}"
-        return self._games[game_id].get_hanabi_state(player_id=player_id)
+        return self._games[game_id].get_hanabi_state()
 
     def register_player(
         self,
@@ -404,13 +421,7 @@ class HanabiGamesRepository(IGamesRepository):
 
     def perform_card_motion(self, card_motion_request: MoveCardRequest) -> bool:
         players_game = self._get_players_game(player_id=card_motion_request.player_id)
-        if players_game is None or players_game.get_status() is not GameStatus.ACTIVE:
+        if players_game is None:
             return False
 
-        try:
-            return self._players[card_motion_request.player_id].move_a_card(
-                card_initial_index=card_motion_request.initial_card_index,
-                card_final_index=card_motion_request.final_card_index,
-            )
-        except AssertionError:
-            return False
+        return players_game.perform_card_motion(card_motion_request=card_motion_request)

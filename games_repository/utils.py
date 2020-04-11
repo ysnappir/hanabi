@@ -1,12 +1,13 @@
 from typing import Any
 
-from games_repository.defs import GameState, GameFactoryType
+from games_repository.defs import GameState, GameFactoryType, NetworkPlayerIdType
 from hanabi_game.defs import HanabiColor
 from hanabi_game.hanabi_game import HanabiGame
 from hanabi_game.hanabi_game_api import IHanabiDeck
 
 
-def jsonify_game_state(game_state: GameState) -> Any:
+def jsonify_game_state(game_state: GameState, player_id: NetworkPlayerIdType) -> Any:
+    player_index = [d.id for d in game_state.hands_state].index(player_id)
     return {
         "status": game_state.status,
         "deck_size": game_state.deck_size,
@@ -21,15 +22,15 @@ def jsonify_game_state(game_state: GameState) -> Any:
                 "id": player.id,
                 "display_name": player.display_name,
                 "cards": [
-                    {"number": card.number.value if card.number is not None else None,
-                     "color": card.color.value if card.color is not None else None,
+                    {"number": card.number.value if i > 0 and card.number is not None else None,
+                     "color": card.color.value if i > 0 and card.color is not None else None,
                      "flipped": card.is_flipped,
                      "is_informed": card.is_informed,
                      } if card else None
                     for card in player.cards
                 ],
             }
-            for player in game_state.hands_state
+            for i, player in enumerate(game_state.hands_state[player_index:] + game_state.hands_state[:player_index])
         ],
         "burnt_pile": [
             {"number": card.get_number().value, "color": card.get_color().value}
