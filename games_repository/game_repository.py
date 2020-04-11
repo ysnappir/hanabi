@@ -79,7 +79,6 @@ class HanabiPlayerWrapper:
         return self._number_of_color_in_clothes
 
     def get_formatted_hand_state(self, hanabi_state: IHanabiState,
-                                 hide_cards: bool = False,
                                  last_action: Optional[GameAction] = None,
                                  ) -> HandState:
         hand = hanabi_state.get_hand(self._hanabi_player_id)
@@ -92,10 +91,10 @@ class HanabiPlayerWrapper:
             flipped_indices = self._card_mapper.get_flipped_indices()
 
         fe_cards = [CardInfo(
-            color=None if hide_cards else card.get_color(),
-            number=None if hide_cards else card.get_number(),
+            color=card.get_color(),
+            number=card.get_number(),
             is_flipped=i in flipped_indices,
-            is_informed=(last_action is not None and (self._network_id == last_action.informed_player) and (
+            highlighted=(last_action is not None and (self._network_id == last_action.informed_player) and (
                     card.get_color().value == last_action.information_data or
                     card.get_number().value == last_action.information_data or
                     (card.get_color() is HanabiColor.RAINBOW and isinstance(last_action.information_data, str))
@@ -141,7 +140,6 @@ class HanabiGameWrapper:
 
     def _format_hands_state(self, hanabi_state: IHanabiState) -> HandsState:
         return [self._players[player_id].get_formatted_hand_state(hanabi_state=hanabi_state,
-                                                                  hide_cards=False,
                                                                   last_action=self._last_successful_action,
                                                                   )
                 for player_id in self._ordered_players]
@@ -281,7 +279,8 @@ class HanabiGameWrapper:
                 color: hanabi_state.get_pile_top(color=color) for color in HanabiColor
             },
             hands_state=self._format_hands_state(hanabi_state=hanabi_state),
-            burnt_pile=hanabi_state.get_burnt_pile(),
+            burnt_pile=[CardInfo(color=card.get_color(), number=card.get_number(), is_flipped=False, highlighted=False)
+                        for card in hanabi_state.get_burnt_pile()],
             active_player=self._ordered_players[hanabi_state.get_active_player()],
             last_action=self._last_successful_action,
         )

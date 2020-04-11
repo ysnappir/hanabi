@@ -25,7 +25,7 @@ def jsonify_game_state(game_state: GameState, player_id: NetworkPlayerIdType) ->
                     {"number": card.number.value if i > 0 and card.number is not None else None,
                      "color": card.color.value if i > 0 and card.color is not None else None,
                      "flipped": card.is_flipped,
-                     "is_informed": card.is_informed,
+                     "is_informed": card.highlighted,
                      } if card else None
                     for card in player.cards
                 ],
@@ -33,7 +33,7 @@ def jsonify_game_state(game_state: GameState, player_id: NetworkPlayerIdType) ->
             for i, player in enumerate(game_state.hands_state[player_index:] + game_state.hands_state[:player_index])
         ],
         "burnt_pile": [
-            {"number": card.get_number().value, "color": card.get_color().value}
+            {"number": card.number, "color": card.color}
             for card in game_state.burnt_pile
         ],
         "active_player_id": game_state.active_player,

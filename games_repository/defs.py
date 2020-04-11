@@ -3,7 +3,7 @@ from typing import NamedTuple, Optional, Dict, List, Union, Callable
 
 from games_repository.card_mapper_api import FECardIndex
 from hanabi_game.defs import HanabiColor, HanabiNumber
-from hanabi_game.hanabi_game_api import IHanabiCard, IHanabiGame
+from hanabi_game.hanabi_game_api import IHanabiGame
 
 GameIdType = int
 NetworkPlayerIdType = str
@@ -12,10 +12,10 @@ GameFactoryType = Callable[[int, int], IHanabiGame]  # number of players and sta
 
 
 class CardInfo(NamedTuple):
-    color: Optional[HanabiColor]
-    number: Optional[HanabiNumber]
-    is_flipped: Optional[bool]
-    is_informed: Optional[bool]
+    color: HanabiColor
+    number: HanabiNumber
+    is_flipped: bool
+    highlighted: bool
 
 
 class HandState(NamedTuple):
@@ -43,7 +43,7 @@ class GameState(NamedTuple):
     red_token_amount: int
     table_state: TableState
     hands_state: HandsState
-    burnt_pile: List[IHanabiCard]
+    burnt_pile: List[CardInfo]
     active_player: NetworkPlayerIdType
     last_action: GameAction
 
