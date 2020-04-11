@@ -26,7 +26,7 @@ function OwnCard(props) {
   
 
   return (  
-    <img src={require ('./img/BackRect125.png')} ref={drag} onDoubleClick={onDoubleClick}
+    <img src={require ('./img/BackRect125.png')} ref={drag} onDoubleClick={onDoubleClick} alt=''
       style={{
         opacity: isDragging ? 0.1 : 1,
         cursor: 'move',
@@ -54,7 +54,7 @@ function OwnSlot(props) {
     drop: () => {
       moveCard(draggedIndex, slotIndex);
     },
-    canDrop: () => draggedIndex != slotIndex,
+    canDrop: () => draggedIndex !== slotIndex,
     collect: monitor => ({
       isOver: !!monitor.isOver(),
     }),
@@ -82,7 +82,7 @@ function OwnSlot(props) {
 OwnSlot.propTypes = {
   slotIndex: PropTypes.number.isRequired,
   onDrag: PropTypes.func.isRequired,
-  draggedIndex: PropTypes.number.isRequired,
+  draggedIndex: PropTypes.number,
   card: PropTypes.object.isRequired,
 };
 
@@ -109,7 +109,7 @@ export function OwnHand(props) {
 OwnHand.propTypes = {
   cards: PropTypes.array.isRequired,
   setDraggedIndex: PropTypes.func.isRequired,
-  draggedIndex: PropTypes.number.isRequired,
+  draggedIndex: PropTypes.number,
 };
 
 function PlayerCards(props) {
@@ -125,6 +125,7 @@ function PlayerCards(props) {
           src={cardToImageFile(card['number'], card['color'])}
           key={index} 
           onClick={() => onClick(index)}
+          alt=''
           style={{
             padding: '5px',
             transform: `rotate(${card['flipped']? '180' : '0'}deg)`,

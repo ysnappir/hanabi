@@ -86,7 +86,7 @@ function HanabiBoard(props) {
   const informCard = (playerId) => {
     const inner = (cardIndex) => {
       console.log('clicked card ' + cardIndex + ' of player ' + playerId);
-      if (userId == activePlayer){
+      if (userId === activePlayer){
         setPlayerPressedId(playerId);
         setIndexPressedId(cardIndex);
         setShowActionsPopup(true);
@@ -104,7 +104,7 @@ function HanabiBoard(props) {
   };
 
   const getCardPressedInfo = () => {
-    if (!indexPressedId){
+    if(indexPressedId === undefined){
       return [];
     }
     const card = getPlayerCards(players, playerPressedId)[indexPressedId];
@@ -121,11 +121,16 @@ function HanabiBoard(props) {
       Tokens Status: <br/>
       <FullTokenPile clueTokens={+clueTokens} missTokens={+missTokens}/> <br/><br/>
       <RemainingDeck remainingCards={remainingDeckSize}/>
-      <HanabiTable table={hanabiTable} droppedCardIndex={draggedIndex} isMyTurn={userId == activePlayer}/>
+      <HanabiTable table={hanabiTable} droppedCardIndex={draggedIndex} isMyTurn={userId === activePlayer}/>
       Players:
-      <InformPlayerOptions onClose={onActionPopupClose} showPopup={showActionsPopup} 
-        reportSelection={getInfromReporter(userId, playerPressedId)} playerDisplayName={getPlayerDisplayName()} 
-        highlightArray={getCardPressedInfo()}/>
+      <InformPlayerOptions 
+        onClose={onActionPopupClose} 
+        showPopup={showActionsPopup} 
+        reportSelection={getInfromReporter(userId, playerPressedId)} 
+        playerDisplayName={getPlayerDisplayName()} 
+        highlightArray={getCardPressedInfo()}
+        key={'informPopUp'}
+      />
       <PlayersHands
         players={players}
         activePlayer={activePlayer}
@@ -134,7 +139,7 @@ function HanabiBoard(props) {
         onInformCard={informCard}
         lastAction={lastAction}
       />
-      <BurntPile cardList={burntPileCards} droppedCardIndex={draggedIndex} isMyTurn={userId == activePlayer}/>
+      <BurntPile cardList={burntPileCards} droppedCardIndex={draggedIndex} isMyTurn={userId === activePlayer}/>
       <h1>End of board</h1>
     </div>
   );
@@ -147,9 +152,9 @@ HanabiBoard.propTypes = {
   missTokens: PropTypes.number.isRequired,
   remainingDeckSize: PropTypes.number.isRequired,
   hanabiTable: PropTypes.object.isRequired,
-  activePlayer: PropTypes.number.isRequired,
+  activePlayer: PropTypes.string.isRequired,
   burntPileCards: PropTypes.array.isRequired,
-  lastAction: PropTypes.object.isRequired,
+  lastAction: PropTypes.object,
 };
 
 
@@ -163,7 +168,7 @@ function PlayersHands(props) {
       {players.map((player, index) => 
         <div 
           key={'player_div+' + player['id']}
-          style={{width: divWidth + 'px', border: player['id'] == activePlayer ? '2px solid red' : 'none'}}
+          style={{width: divWidth + 'px', border: player['id'] === activePlayer ? '2px solid red' : 'none'}}
         >
           {lastAction && player['id'] === lastAction['informed_player'] &&
             <span><font color="blue">Be informed about: {lastAction['information_data']}</font></span>
@@ -188,11 +193,11 @@ function PlayersHands(props) {
 
 PlayersHands.propTypes = {
   players: PropTypes.array.isRequired,
-  activePlayer: PropTypes.number.isRequired,
-  draggedIndex: PropTypes.number.isRequired,
+  activePlayer: PropTypes.string.isRequired,
+  draggedIndex: PropTypes.number,
   onDraggedIndex: PropTypes.func.isRequired,
   onInformCard: PropTypes.func.isRequired,
-  lastAction: PropTypes.object.isRequired,
+  lastAction: PropTypes.object,
 };
 
 function GamePlay(props) {
@@ -261,7 +266,7 @@ function GamePlay(props) {
           remainingDeckSize={remainingDeckSize}
           hanabiTable={hanabiTable}
           burntPileCards={burntPileCards}
-          activePlayer={+activePlayer}
+          activePlayer={activePlayer}
           lastAction={lastAction}
         />
       }

@@ -11,7 +11,7 @@ function RemainingDeck(props) {
   return (
     <div style={{width: CARD_WIDTH + 'px'}}>
       Remaining Deck: <br/>
-      <img src={require ('./img/BackRect125.png')} style={{width: '100%'}}/>
+      <img src={require ('./img/BackRect125.png')} style={{width: '100%'}} alt=''/>
       <div style={{position: 'relative', top: '-30px', marginTop: '-60px', textAlign: 'center', fontFamily: 'Frijole', fontSize: '40px', 
         color: 'white', textShadow:'-2px 0 black, 0 2px black, 2px 0 black, 0 -2px black'}}>{remainingCards}</div>
     </div>
@@ -49,7 +49,7 @@ export function HanabiTable(props) {
   const renderCards = (color, maxCardNumber) => {
     // console.log('Rendering ' + color + '. Number: ' + maxCardNumber);
     if(maxCardNumber > 0)
-      return <img src={cardToImageFile(maxCardNumber, color)} key={color}/>;
+      return <img src={cardToImageFile(maxCardNumber, color)} key={color} alt=''/>;
     else
       return <svg key={color} width="50" height="125"><rect width="40" height="100" fill={color === 'rainbow'? 'black' : color}/></svg>;
   };
@@ -64,7 +64,7 @@ export function HanabiTable(props) {
 
 HanabiTable.propTypes = {
   table: PropTypes.object.isRequired,
-  droppedCardIndex: PropTypes.number.isRequired,
+  droppedCardIndex: PropTypes.number,
   isMyTurn: PropTypes.bool.isRequired,
 };
 
@@ -109,7 +109,7 @@ export function BurntPile(props) {
                     return -1;
                 })
                 .map((value, counter) => <img src={cardToImageFile(value['number'], value['color'])} 
-                  key={'burntCard_' + index + '_ś' + counter}/>)
+                  key={'burntCard_' + index + '_ś' + counter} alt=''/>)
               }
             </div>)
         }
@@ -122,7 +122,7 @@ export function BurntPile(props) {
 
 BurntPile.propTypes = {
   cardList: PropTypes.array.isRequired,
-  droppedCardIndex: PropTypes.number.isRequired,
+  droppedCardIndex: PropTypes.number,
   isMyTurn: PropTypes.bool.isRequired,
 };
 
