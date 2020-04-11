@@ -8,6 +8,7 @@ from hanabi_game.hanabi_game_api import IHanabiDeck
 
 def jsonify_game_state(game_state: GameState) -> Any:
     return {
+        "status": game_state.status,
         "deck_size": game_state.deck_size,
         "blue_tokens": game_state.blue_token_amount,
         "red_tokens": game_state.red_token_amount,
