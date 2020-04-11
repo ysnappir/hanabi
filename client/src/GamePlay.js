@@ -166,7 +166,7 @@ function PlayersHands(props) {
           style={{width: divWidth + 'px', border: player['id'] == activePlayer ? '2px solid red' : 'none'}}
         >
           {lastAction && player['id'] === lastAction['informed_player'] &&
-            <span>Be informed about: {lastAction['information_data']}</span>
+            <span><font color="blue">Be informed about: {lastAction['information_data']}</font></span>
           }
           {index === 0 ?
             <OwnHand 
