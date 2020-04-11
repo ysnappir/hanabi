@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import Popup from 'reactjs-popup';
+
 function InformPlayerOptions(props) {
   const {onClose, showPopup, reportSelection, playerDisplayName, highlightArray} = props;
 
@@ -8,15 +9,15 @@ function InformPlayerOptions(props) {
 
   const renderPopUp = () => {
     return(
-      <Popup trigger={<div></div>} onClose={onClose} open={showPopup}>
+      <Popup onClose={onClose} open={showPopup}>
         <h1> Inform {playerDisplayName} about: </h1>
-        {informationOptions.map((value) => <button key={value} onClick={() => reportSelection(value)}
+        {informationOptions.map((value) => <button key={'btn_' + value} onClick={() => reportSelection(value)}
           style={{background: highlightArray.includes(value) ? 'yellow' : 'white'}}>{value}</button>)}
         <br/><br/>
-        <button onClick={onClose}>Do nothing!</button><button onClick={onClose}>Think!</button>
+        <button key='close' onClick={onClose}>Do nothing!</button><button key='think' onClick={onClose}>Think!</button>
       </Popup>
     );
-   };
+  };
 
   return renderPopUp();
 }
