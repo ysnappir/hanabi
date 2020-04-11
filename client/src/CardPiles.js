@@ -47,44 +47,17 @@ export function HanabiTable(props) {
   }
   
   const renderCards = (color, maxCardNumber) => {
-    let outCards = [];
-    for (let index = 1; index <= maxCardNumber; index++) {
-      let cardPath = cardToImageFile(index, color);
-      outCards.push(<img src={cardPath} key={'card_' + color + index}/>);
-    }
-    return <div key={'cardDiv' + color}>{outCards}</div>;
+    // console.log('Rendering ' + color + '. Number: ' + maxCardNumber);
+    if(maxCardNumber > 0)
+      return <img src={cardToImageFile(maxCardNumber, color)} key={color}/>;
+    else
+      return <svg key={color} width="50" height="125"><rect width="40" height="100" fill={color === 'rainbow'? 'black' : color}/></svg>;
   };
 
-  const generateBoard = () => {
-    let outBoards = [];
-    let colors = Object.keys(table); 
-
-    for (let index = 0; index < colors.length; index++) {
-      let currColor = colors[index];
-      //table[currColor] = 2; // Just for testing
-      let currColorOnBoard = table[currColor];
-      let style = {color: currColor};
-      if (currColor === 'white') {
-        style['backgroundColor'] = 'black';
-        style['alignItems'] = 'start';
-      }
-      outBoards.push(<tr key={'tr_' + index}>
-        <td key={'td1_' + index}> <h3 style={style} key={'h3_' + index}>{currColor}</h3> </td>
-        <td key={'td2_' + index}> {renderCards(currColor, currColorOnBoard)} </td>
-      </tr>);
-    }
-
-    return (
-      <div ref={drop} style={{background: (isOver && isMyTurn)? 'lightblue' : 'white',}}>  
-        <table key='table'>{outBoards}</table>
-      </div>
-    );
-  }; // 
-
   return (
-    <div>
+    <div ref={drop} style={{background: (isOver && isMyTurn)? 'lightblue' : 'white',}}>  
       <h2>Hanabi Board</h2>
-      {generateBoard()}
+      {Object.keys(table).map((color) => renderCards(color, table[color]))}
     </div>
   );
 }
@@ -127,7 +100,7 @@ export function BurntPile(props) {
         <h2>Burnt pile. length: {cardList.length}</h2>
         {
           numbers
-            .map((value) => <div key={value}>
+            .map((value, index) => <div key={value}>
               {cardList.filter(item => item['number'] === value)
                 .sort((x, y) => {
                   if(x['color'] > y['color'])
@@ -135,7 +108,8 @@ export function BurntPile(props) {
                   else
                     return -1;
                 })
-                .map((value) => <img src={cardToImageFile(value['number'], value['color'])} key={'burntCard_' + value['number'] + value['color']}/>)
+                .map((value, counter) => <img src={cardToImageFile(value['number'], value['color'])} 
+                  key={'burntCard_' + index + '_ś' + counter}/>)
               }
             </div>)
         }
