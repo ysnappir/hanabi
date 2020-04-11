@@ -4,7 +4,7 @@ import Popup from 'reactjs-popup';
 function InformPlayerOptions(props) {
   const {onClose, showPopup, reportSelection, playerDisplayName, highlightArray} = props;
 
-  let informationOptions = [1, 2, 3, 4, 5, 'red', 'green', 'blue', 'yellow', 'white', 'rainbow'];
+  let informationOptions = [1, 2, 3, 4, 5, 'red', 'green', 'blue', 'yellow', 'white'];
 
   const renderPopUp = () => {
     return(
@@ -16,7 +16,7 @@ function InformPlayerOptions(props) {
         <button onClick={onClose}>Do nothing!</button><button onClick={onClose}>Think!</button>
       </Popup>
     );
-  };
+   };
 
   return renderPopUp();
 }

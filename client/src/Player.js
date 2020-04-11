@@ -23,6 +23,8 @@ function OwnCard(props) {
     onDrag(index);
   }
 
+  
+
   return (  
     <img src={require ('./img/BackRect125.png')} ref={drag} onDoubleClick={onDoubleClick}
       style={{
@@ -30,6 +32,7 @@ function OwnCard(props) {
         cursor: 'move',
         transform: `rotate(${card['flipped']? '180' : '0'}deg)`,
         padding: '5px',
+        border: card['is_informed'] ? '4px solid blue' : 'none'
       }}/>
   );
 
@@ -124,7 +127,8 @@ function PlayerCards(props) {
           onClick={() => onClick(index)}
           style={{
             padding: '5px',
-            transform: `rotate(${cards[index]['flipped']? '180' : '0'}deg)`
+            transform: `rotate(${card['flipped']? '180' : '0'}deg)`,
+            border: card['is_informed'] ? '4px solid blue' : 'none',
           }}
         />)}
     </div>
