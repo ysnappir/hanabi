@@ -78,7 +78,10 @@ class HanabiPlayerWrapper:
     def get_number_of_cloth_colors(self) -> int:
         return self._number_of_color_in_clothes
 
-    def get_formatted_hand_state(self, hanabi_state: IHanabiState, hide_cards: bool = False) -> HandState:
+    def get_formatted_hand_state(self, hanabi_state: IHanabiState,
+                                 hide_cards: bool = False,
+                                 last_action: Optional[GameAction] = None,
+                                 ) -> HandState:
         hand = hanabi_state.get_hand(self._hanabi_player_id)
         cards: Dict[FECardIndex, IHanabiCard] = {}
         flipped_indices: List[FECardIndex] = []
@@ -88,11 +91,16 @@ class HanabiPlayerWrapper:
                      }
             flipped_indices = self._card_mapper.get_flipped_indices()
 
-        fe_cards = [CardInfo(color=None if hide_cards else card.get_color(),
-                             number=None if hide_cards else card.get_number(),
-                             is_flipped=i in flipped_indices)
-                    for i, card in cards.items()
-                    ]
+        fe_cards = [CardInfo(
+            color=None if hide_cards else card.get_color(),
+            number=None if hide_cards else card.get_number(),
+            is_flipped=i in flipped_indices,
+            is_informed=(last_action is not None and (self._network_id == last_action.informed_player) and (
+                    card.get_color().value == last_action.information_data or
+                    card.get_number().value == last_action.information_data or
+                    (card.get_color() is HanabiColor.RAINBOW and isinstance(last_action.information_data, str))
+                    )))
+                    for i, card in cards.items()]
 
         return HandState(
             id=self._network_id,
@@ -135,7 +143,10 @@ class HanabiGameWrapper:
     ) -> HandsState:
         i = self._ordered_players.index(player_id)
         return [
-            self._players[player_id].get_formatted_hand_state(hanabi_state=hanabi_state, hide_cards=(j == 0))
+            self._players[player_id].get_formatted_hand_state(hanabi_state=hanabi_state,
+                                                              hide_cards=(j == 0),
+                                                              last_action=self._last_successful_action,
+                                                              )
             for j, player_id in enumerate(self._ordered_players[i:] + self._ordered_players[:i])
         ]
 
