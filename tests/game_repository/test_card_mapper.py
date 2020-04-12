@@ -110,7 +110,7 @@ def test_moving_hot_seat_to_pinned():
         burn_card_index=None,
     ))
 
-    game_state = game_repository.get_game_state(game_id=game_id, player_id=yuval_id)
+    game_state = game_repository.get_game_state(game_id=game_id)
     assert game_state.active_player == ethan_id and game_state.blue_token_amount == 7
 
     game_repository.perform_card_motion(card_motion_request=MoveCardRequest(
@@ -119,5 +119,5 @@ def test_moving_hot_seat_to_pinned():
         final_card_index=0
     ))
 
-    game_state = game_repository.get_game_state(game_id=game_id, player_id=yuval_id)
+    game_state = game_repository.get_game_state(game_id=game_id)
     assert game_state.hands_state[1].cards[0].number.value == 5

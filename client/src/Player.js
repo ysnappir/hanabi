@@ -32,7 +32,7 @@ function OwnCard(props) {
         cursor: 'move',
         transform: `rotate(${card['flipped']? '180' : '0'}deg)`,
         padding: '5px',
-        border: card['is_informed'] ? '4px solid blue' : 'none'
+        border: card['highlighted'] ? '4px solid blue' : 'none'
       }}/>
   );
 
@@ -129,7 +129,7 @@ function PlayerCards(props) {
           style={{
             padding: '5px',
             transform: `rotate(${card['flipped']? '180' : '0'}deg)`,
-            border: card['is_informed'] ? '4px solid blue' : 'none',
+            border: card['highlighted'] ? '4px solid blue' : 'none',
           }}
         />)}
     </div>

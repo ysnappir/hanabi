@@ -266,10 +266,10 @@ class HanabiGame(IHanabiGame):
             deck_size=self._deck.get_size(),
             red_tokens_amount=self._red_tokens_amount,
             blue_tokens_amount=self._blue_tokens_amount,
-            hands_dict=self._players_hands,
-            pile_tops=self._piles,
+            hands_dict=self._players_hands.copy(),
+            pile_tops=self._piles.copy(),
             acting_player=self._acting_player,
-            burnt_pile=self._burnt_pile,
+            burnt_pile=self._burnt_pile.copy(),
         )
 
     def get_players_ids(self) -> List[PlayerIdType]:
