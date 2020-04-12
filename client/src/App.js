@@ -5,10 +5,12 @@ import Options from './Options';
 import {UserIdContext} from './Contex.js';
 import GamePlay from './GamePlay';
 
-import { AppBar, Toolbar, Typography, Button, IconButton } from '@material-ui/core';
+import { AppBar, Toolbar, Typography, Button, IconButton, TextField, 
+  Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@material-ui/core';
 import MenuIcon from '@material-ui/icons/Menu';
 import AccountCircle from '@material-ui/icons/AccountCircle';
 import { makeStyles } from '@material-ui/core/styles';
+
 
 
 const BAD_INPUT_MSG = 'Empty Display Name or Color Num not a number';
@@ -102,6 +104,48 @@ function App() {
           </Toolbar>
         </AppBar>
       </div>
+
+      <div>
+        <img src={require ('./img/game_box.png')} style={{ alignItems: 'center', justifyContent:'center'}}/>
+      </div>
+
+      <Dialog open={startLogin} onClose={() => setStartLogin(false)} aria-labelledby="form-dialog-title">
+        <DialogTitle id="form-dialog-title">Login!</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            Let go. Tell us your display name and how many colors you are wearing.
+          </DialogContentText>
+          <TextField
+            autoFocus
+            margin="normal"
+            id="displayName"
+            label="Display Name"
+            type="string"
+            fullWidth
+          />
+          <TextField
+            autoFocus
+            autoComplete="off"
+            margin="normal"
+            id="numOfColors"
+            label="Number Of Colors"
+            type="number"
+            fullWidth
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setStartLogin(false)} color="primary">
+            Cancel
+          </Button>
+          <Button onClick={() => setStartLogin(false)} color="primary">
+            Subscribe
+          </Button>
+        </DialogActions>
+      </Dialog>
+    </Fragment>
+  );
+}
+/*
       {startLogin ? 
         <div className='main__container'>
         Display Name: <input type="text" ref={displayNameTextbox} /><br/>
@@ -112,9 +156,64 @@ function App() {
         :
         <div/>
       }
-    </Fragment>
+
+*/
+
+
+/*
+import React from 'react';
+
+export default function FormDialog() {
+  const [open, setOpen] = React.useState(false);
+
+  const handleClickOpen = () => {
+    setOpen(true);
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+  };
+
+  return (
+    <div>
+      <Button variant="outlined" color="primary" onClick={handleClickOpen}>
+        Open form dialog
+      </Button>
+      <Dialog open={open} onClose={handleClose} aria-labelledby="form-dialog-title">
+        <DialogTitle id="form-dialog-title">Subscribe</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            To subscribe to this website, please enter your email address here. We will send updates
+            occasionally.
+          </DialogContentText>
+          <TextField
+            autoFocus
+            margin="dense"
+            id="name"
+            label="Email Address"
+            type="email"
+            fullWidth
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleClose} color="primary">
+            Cancel
+          </Button>
+          <Button onClick={handleClose} color="primary">
+            Subscribe
+          </Button>
+        </DialogActions>
+      </Dialog>
+    </div>
   );
 }
+
+*/
+
+
+
+
+
 /*
 {auth && (
   <div>
