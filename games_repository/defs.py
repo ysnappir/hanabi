@@ -7,7 +7,6 @@ from hanabi_game.hanabi_game_api import IHanabiGame
 
 GameIdType = int
 NetworkPlayerIdType = str
-TableState = Dict[HanabiColor, Optional[HanabiNumber]]
 GameFactoryType = Callable[[int, int], IHanabiGame]  # number of players and starting player
 
 
@@ -16,6 +15,9 @@ class CardInfo(NamedTuple):
     number: HanabiNumber
     is_flipped: bool
     highlighted: bool
+
+
+TableState = Dict[HanabiColor, Optional[CardInfo]]
 
 
 class HandState(NamedTuple):

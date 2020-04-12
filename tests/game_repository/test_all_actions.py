@@ -37,7 +37,7 @@ def test_moving_hot_seat_to_pinned():
     ))
 
     game_state = game_repository.get_game_state(game_id=game_id)
-    assert game_state.hands_state[1].cards[0].number.value == 5
+    assert game_state.hands_state[1].cards[0].number is HanabiNumber.FIVE
 
     assert game_repository.perform_action(GameAction(acting_player=ethan_id,
                                                      action_type="inform",
@@ -46,6 +46,9 @@ def test_moving_hot_seat_to_pinned():
                                                      placed_card_index=None,
                                                      burn_card_index=None,
                                                      ))
+
+    game_state = game_repository.get_game_state(game_id=game_id)
+    assert game_state.hands_state[0].cards[0].highlighted
 
     assert game_repository.perform_action(GameAction(acting_player=yuval_id,
                                                      action_type="place",
@@ -56,7 +59,8 @@ def test_moving_hot_seat_to_pinned():
                                                      ))
 
     game_state = game_repository.get_game_state(game_id=game_id)
-    assert (game_state.table_state[HanabiColor.RED] is HanabiNumber.ONE
+    assert (game_state.table_state[HanabiColor.RED].number is HanabiNumber.ONE
+            and game_state.table_state[HanabiColor.RED].highlighted
             and game_state.active_player == ethan_id
             and (game_state.hands_state[0].cards[0].number,
                  game_state.hands_state[0].cards[0].color) == (HanabiNumber.ONE, HanabiColor.BLUE)

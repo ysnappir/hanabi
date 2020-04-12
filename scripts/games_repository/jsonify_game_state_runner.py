@@ -3,7 +3,7 @@ import json
 from games_repository.defs import GameState, HandState, CardInfo, GameAction
 from games_repository.utils import jsonify_game_state
 from hanabi_game.defs import HanabiColor, HanabiNumber
-from hanabi_game.hanabi_card import HanabiCard
+
 
 if __name__ == "__main__":
     game_state: GameState = GameState(
@@ -12,17 +12,17 @@ if __name__ == "__main__":
         blue_token_amount=5,
         red_token_amount=2,
         table_state={
-            HanabiColor.RAINBOW: HanabiNumber.THREE,
+            HanabiColor.RAINBOW: CardInfo(HanabiColor.RAINBOW, HanabiNumber.THREE, False, False),
             HanabiColor.BLUE: None,
-            HanabiColor.RED: HanabiNumber.FIVE,
+            HanabiColor.RED: CardInfo(HanabiColor.RED, HanabiNumber.FIVE, False, True),
         },
         hands_state=[
             HandState(
                 id="p_0",
                 display_name="Snap",
                 cards=[
-                    CardInfo(None, None, True, True),
-                    CardInfo(None, None, False, True),
+                    CardInfo(HanabiColor.RED, HanabiNumber.THREE, True, True),
+                    CardInfo(HanabiColor.RED, HanabiNumber.THREE, False, True),
                 ],
             ),
             HandState(
@@ -43,9 +43,9 @@ if __name__ == "__main__":
             ),
         ],
         burnt_pile=[
-            HanabiCard(HanabiColor.YELLOW, HanabiNumber.TWO),
-            HanabiCard(HanabiColor.YELLOW, HanabiNumber.TWO),
-            HanabiCard(HanabiColor.YELLOW, HanabiNumber.TWO),
+            CardInfo(HanabiColor.YELLOW, HanabiNumber.TWO, False, False),
+            CardInfo(HanabiColor.YELLOW, HanabiNumber.TWO, False, False),
+            CardInfo(HanabiColor.YELLOW, HanabiNumber.TWO, False, True),
         ],
         active_player="p_1",
         last_action=GameAction(acting_player="p_0",

@@ -136,7 +136,14 @@ class HanabiGameWrapper:
         self._players: Dict[NetworkPlayerIdType, HanabiPlayerWrapper] = {}
         self._ordered_players: List[NetworkPlayerIdType] = []
         self._last_successful_action: Optional[GameAction] = None
+        self._last_pile_topped: Optional[HanabiColor] = None
+        self._last_action_burnt: bool = False
         self._game_state: Optional[GameState] = None
+
+    def _clear_last_action(self) -> None:
+        self._last_successful_action = None
+        self._last_pile_topped = None
+        self._last_action_burnt = False
 
     def _format_hands_state(self, hanabi_state: IHanabiState) -> HandsState:
         return [self._players[player_id].get_formatted_hand_state(hanabi_state=hanabi_state,
@@ -243,12 +250,28 @@ class HanabiGameWrapper:
         else:
             return False
 
+        prev_game_state = self._game.get_state()
+
         ret_val = self._game.perform_move(move=move)
         if ret_val:
+            self._clear_last_action()
             self._last_successful_action = action
+
+            new_game_state = self._game.get_state()
 
             if action_type in [HanabiMoveType.BURN, HanabiMoveType.PLACE]:
                 self._players[action.acting_player].dispose_card(disposing_index)
+
+            color_pile_changed = {color for color in HanabiColor
+                                  if prev_game_state.get_pile_top(color) is not new_game_state.get_pile_top(color)}
+            if len(color_pile_changed) > 0:
+                if len(color_pile_changed) > 1:
+                    print("Warning! two piles changed together!")
+                else:
+                    self._last_pile_topped = next(iter(color_pile_changed))
+
+            if len(prev_game_state.get_burnt_pile()) < len(new_game_state.get_burnt_pile()):
+                self._last_action_burnt = True
 
             self._game_state = self._get_game_state()
 
@@ -276,11 +299,14 @@ class HanabiGameWrapper:
             blue_token_amount=hanabi_state.get_blue_token_amount(),
             red_token_amount=hanabi_state.get_red_token_amount(),
             table_state={
-                color: hanabi_state.get_pile_top(color=color) for color in HanabiColor
+                color: CardInfo(color=color, number=hanabi_state.get_pile_top(color=color), is_flipped=False,
+                                highlighted=self._last_pile_topped is color)
+                for color in HanabiColor
             },
             hands_state=self._format_hands_state(hanabi_state=hanabi_state),
-            burnt_pile=[CardInfo(color=card.get_color(), number=card.get_number(), is_flipped=False, highlighted=False)
-                        for card in hanabi_state.get_burnt_pile()],
+            burnt_pile=[CardInfo(color=card.get_color(), number=card.get_number(), is_flipped=False,
+                                 highlighted=self._last_action_burnt and i + 1 == len(hanabi_state.get_burnt_pile()))
+                        for i, card in enumerate(hanabi_state.get_burnt_pile())],
             active_player=self._ordered_players[hanabi_state.get_active_player()],
             last_action=self._last_successful_action,
         )

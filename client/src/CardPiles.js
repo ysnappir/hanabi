@@ -46,10 +46,10 @@ export function HanabiTable(props) {
     }
   }
   
-  const renderCards = (color, maxCardNumber) => {
+  const renderCards = (color, card) => {
     // console.log('Rendering ' + color + '. Number: ' + maxCardNumber);
-    if(maxCardNumber > 0)
-      return <img src={cardToImageFile(maxCardNumber, color)} key={color} alt=''/>;
+    if(card['number'] !== null)
+      return <img src={cardToImageFile(card['number'], color)} key={color} alt='' style={{border: card['highlighted'] ? '4px solid blue' : 'none'}}/>;
     else
       return <svg key={color} width="50" height="125"><rect width="40" height="100" fill={color === 'rainbow'? 'black' : color}/></svg>;
   };
@@ -108,8 +108,8 @@ export function BurntPile(props) {
                   else
                     return -1;
                 })
-                .map((value, counter) => <img src={cardToImageFile(value['number'], value['color'])} 
-                  key={'burntCard_' + index + '_ś' + counter} alt=''/>)
+                .map((card, counter) => <img src={cardToImageFile(card['number'], card['color'])} 
+                  key={'burntCard_' + index + '_ś' + counter} alt='' style={{border: card['highlighted'] ? '4px solid blue' : 'none'}}/>)
               }
             </div>)
         }
