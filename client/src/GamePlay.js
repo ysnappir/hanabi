@@ -9,6 +9,22 @@ import RemainingDeck, {HanabiTable, BurntPile} from './CardPiles.js';
 import {CARD_WIDTH} from './Cards.js';
 import InformPlayerOptions from './Actions';
 
+import { makeStyles } from '@material-ui/core/styles';
+import { Paper, Grid, Typography } from '@material-ui/core';
+
+
+const useStyles = makeStyles((theme) => ({
+  root: {
+    flexGrow: 1,
+  },
+  paper: {
+    padding: theme.spacing(2),
+    textAlign: 'center',
+    color: theme.palette.text.secondary,
+  },
+}));
+
+
 
 function WaitForGameStart(props) {
   const {gameId, currPlayers } = props;
@@ -58,6 +74,7 @@ const getPlayerCards = (players, id) => {
 
 
 function HanabiBoard(props) {
+  const classes = useStyles();
 
   const {gameId, players, clueTokens, missTokens, remainingDeckSize, hanabiTable, activePlayer, burntPileCards, lastAction} = props;
 
@@ -116,32 +133,65 @@ function HanabiBoard(props) {
   };
 
   return (
-    <div style={{padding: '30px'}}>
-      <h1>Full game play - game number {gameId}</h1> <br/><br/>
+    <div>
+      <div className={classes.root}>
+        <Grid container spacing={3}>
+          <Grid item xs={12}>
+            <Paper className={classes.paper}>
+              <Typography variant="h3">
+              Full game play - game number {gameId}
+              </Typography>
+            </Paper>
+          </Grid>
+          <Grid item xs={6}>
+            <Paper className={classes.paper}>xs=6</Paper>
+          </Grid>
+          <Grid item xs={6}>
+            <Paper className={classes.paper}>xs=6</Paper>
+          </Grid>
+          <Grid item xs={3}>
+            <Paper className={classes.paper}>xs=3</Paper>
+          </Grid>
+          <Grid item xs={3}>
+            <Paper className={classes.paper}>xs=3</Paper>
+          </Grid>
+          <Grid item xs={3}>
+            <Paper className={classes.paper}>xs=3</Paper>
+          </Grid>
+          <Grid item xs={3}>
+            <Paper className={classes.paper}>xs=3</Paper>
+          </Grid>
+        </Grid>
+      </div>
+
+      <div style={{padding: '30px'}}>
+        <h1>Full game play - game number {gameId}</h1> <br/><br/>
       Tokens Status: <br/>
-      <FullTokenPile clueTokens={+clueTokens} missTokens={+missTokens}/> <br/><br/>
-      <RemainingDeck remainingCards={remainingDeckSize}/>
-      <HanabiTable table={hanabiTable} droppedCardIndex={draggedIndex} isMyTurn={userId === activePlayer}/>
+        <FullTokenPile clueTokens={+clueTokens} missTokens={+missTokens}/> <br/><br/>
+        <RemainingDeck remainingCards={remainingDeckSize}/>
+        <HanabiTable table={hanabiTable} droppedCardIndex={draggedIndex} isMyTurn={userId === activePlayer}/>
       Players:
-      <InformPlayerOptions 
-        onClose={onActionPopupClose} 
-        showPopup={showActionsPopup} 
-        reportSelection={getInfromReporter(userId, playerPressedId)} 
-        playerDisplayName={getPlayerDisplayName()} 
-        highlightArray={getCardPressedInfo()}
-        key={'informPopUp'}
-      />
-      <PlayersHands
-        players={players}
-        activePlayer={activePlayer}
-        draggedIndex={draggedIndex}
-        onDraggedIndex={setDraggedIndex}
-        onInformCard={informCard}
-        lastAction={lastAction}
-      />
-      <BurntPile cardList={burntPileCards} droppedCardIndex={draggedIndex} isMyTurn={userId === activePlayer}/>
-      <h1>End of board</h1>
+        <InformPlayerOptions 
+          onClose={onActionPopupClose} 
+          showPopup={showActionsPopup} 
+          reportSelection={getInfromReporter(userId, playerPressedId)} 
+          playerDisplayName={getPlayerDisplayName()} 
+          highlightArray={getCardPressedInfo()}
+          key={'informPopUp'}
+        />
+        <PlayersHands
+          players={players}
+          activePlayer={activePlayer}
+          draggedIndex={draggedIndex}
+          onDraggedIndex={setDraggedIndex}
+          onInformCard={informCard}
+          lastAction={lastAction}
+        />
+        <BurntPile cardList={burntPileCards} droppedCardIndex={draggedIndex} isMyTurn={userId === activePlayer}/>
+        <h1>End of board</h1>
+      </div>
     </div>
+
   );
 }
 
