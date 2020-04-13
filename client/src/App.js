@@ -6,7 +6,8 @@ import {UserIdContext} from './Contex.js';
 import GamePlay from './GamePlay';
 
 import { AppBar, Toolbar, Typography, Button, IconButton, TextField, 
-  Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@material-ui/core';
+  Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle,
+  FormHelperText, CircularProgress } from '@material-ui/core';
 import MenuIcon from '@material-ui/icons/Menu';
 import AccountCircle from '@material-ui/icons/AccountCircle';
 import { makeStyles } from '@material-ui/core/styles';
@@ -32,8 +33,12 @@ function App() {
   const [startLogin, setStartLogin] = useState(false);
   const [loginSuccess, setLoginSuccess] = useState(false);
   const [userMsg, setUserMsg] = useState('');
+  
   const [userId, setUserId] = useState('');
   const [pinCode, setPinCode] = useState(undefined);
+
+  const [fetchingData, setFetchingData] = useState(false);
+  const [loginData, setLoginData] = useState({displayName : '', numOfColors : undefined});
 
   const displayNameTextbox = React.createRef();
   const colorNumTextbox = React.createRef();
@@ -49,18 +54,39 @@ function App() {
     return true;
   };
 
+
+  const changeLoginData = (event) => {
+    let { id, value } = event.target;
+
+    setLoginData(prev => ({ 
+      ...prev,
+      [id]: value
+    }));
+  };
+
+
   const handleLoginClick = async () => {
+    console.log(loginData);
+    /*
     if (!validateInput()) {
       setUserMsg(BAD_INPUT_MSG);
       return;
     }
     setUserMsg(WAIT_STR);
-
+    */
+    // TODO: validate
     try {
+      /*
       const response = await axios.post('/register', { display_name: displayNameTextbox.current.value, 
         number_of_colors_in_clothes: colorNumTextbox.current.value});
+        */
+      setFetchingData(true);
+      const response = await axios.post('/register', { display_name: loginData['displayName'], 
+        number_of_colors_in_clothes: loginData['numOfColors']});
       handleLoginResponse(response);
+      setFetchingData(false);
     } catch (error) {
+      setFetchingData(false);
       handleLoginError(error);
     }
   };
@@ -108,43 +134,61 @@ function App() {
       <div>
         <img src={require ('./img/game_box.png')} style={{ alignItems: 'center', justifyContent:'center'}}/>
       </div>
-
+      {fetchingData ? <CircularProgress /> : <div/> }
       <Dialog open={startLogin} onClose={() => setStartLogin(false)} aria-labelledby="form-dialog-title">
-        <DialogTitle id="form-dialog-title">Login!</DialogTitle>
+        <DialogTitle id="form-dialog-title">
+            Login!
+        </DialogTitle>
         <DialogContent>
-          <DialogContentText>
+          <form>
+            <DialogContentText>
             Let go. Tell us your display name and how many colors you are wearing.
-          </DialogContentText>
-          <TextField
-            autoFocus
-            margin="normal"
-            id="displayName"
-            label="Display Name"
-            type="string"
-            fullWidth
-          />
-          <TextField
-            autoFocus
-            autoComplete="off"
-            margin="normal"
-            id="numOfColors"
-            label="Number Of Colors"
-            type="number"
-            fullWidth
-          />
+            </DialogContentText>
+            <TextField
+              autoFocus
+              required
+              margin="normal"
+              id="displayName"
+              label="Display Name"
+              type="string"
+              fullWidth
+              onChange={(event) => changeLoginData(event)}
+            />
+            <TextField
+              required
+              autoComplete="off"
+              margin="normal"
+              id="numOfColors"
+              label="Number Of Colors"
+              type="number"
+              fullWidth
+              onChange={(event) => changeLoginData(event)}
+            />
+          </form>
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setStartLogin(false)} color="primary">
             Cancel
           </Button>
-          <Button onClick={() => setStartLogin(false)} color="primary">
+          <Button type='submit' onClick={() => {handleLoginClick(); setStartLogin(false);}} color="primary">
             Subscribe
           </Button>
         </DialogActions>
+        
       </Dialog>
     </Fragment>
   );
 }
+
+/*
+          This dialog spans the entire width of the screen.
+          <TextField name="email" hintText="Email" />
+          <TextField name="pwd" type="password" hintText="Password" />
+          <div style={{ textAlign: 'right', padding: 8, margin: '24px -24px -24px -24px' }}>
+            {actions}
+          </div>
+*/
+
 /*
       {startLogin ? 
         <div className='main__container'>
