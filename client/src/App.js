@@ -7,8 +7,7 @@ import GamePlay from './GamePlay';
 
 import { AppBar, Toolbar, Typography, Button, IconButton, TextField, 
   Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle,
-  FormHelperText, CircularProgress } from '@material-ui/core';
-import MenuIcon from '@material-ui/icons/Menu';
+  CircularProgress, Hidden, Paper } from '@material-ui/core';
 import AccountCircle from '@material-ui/icons/AccountCircle';
 import { makeStyles } from '@material-ui/core/styles';
 
@@ -92,13 +91,13 @@ function App() {
       handleLoginResponse(response);
       setFetchingData(false);
     } catch (error) {
-      setFetchingData(false);
       handleLoginError(error);
+      setFetchingData(false);
     }
   };
 
   const handleLoginError = (reason) => {
-    setUserMsg('Connection Error: ' + reason);
+    // TODO: handle login error
   };
 
   const handleLoginResponse = (response) => {
@@ -110,16 +109,6 @@ function App() {
     setPinCode(pinCode);
   };
 
-  if (loginSuccess || pinCode) {
-    return (
-      <UserIdContext.Provider value={userId}>
-        <div>
-          { pinCode ? <GamePlay gameId={pinCode} /> : <Options onDisplayGame={onDisplayGame}/> }
-        </div>
-      </UserIdContext.Provider>
-    );
-  }
-
   return (
     <Fragment>
       <div className={classes.root}>
@@ -128,6 +117,13 @@ function App() {
             <Typography variant="h6" className={classes.title} align='center'>
               Hanabi Online!
             </Typography>
+            {loginSuccess ? 
+              <Typography variant="subtitle1" className={classes.title} align='right'>
+                {loginData['displayName']}
+              </Typography>
+              :
+              <div/>
+            }
             <IconButton 
               color="inherit"
               onClick={() => setStartLogin(true)}>
@@ -137,56 +133,68 @@ function App() {
         </AppBar>
       </div>
 
-      <div>
-        <img src={require ('./img/game_box.png')} style={{ alignItems: 'center', justifyContent:'center'}}/>
-      </div>
-      {fetchingData ? <CircularProgress /> : <div/> }
-      <Dialog open={startLogin} onClose={() => setStartLogin(false)} aria-labelledby="form-dialog-title">
-        <DialogTitle id="form-dialog-title">
-            Login!
-        </DialogTitle>
-        <DialogContent>
-          <form>
-            <DialogContentText>
-            Let go. Tell us your display name and how many colors you are wearing.
-            </DialogContentText>
-            <TextField
-              autoFocus
-              required
-              margin="normal"
-              id="displayName"
-              label="Display Name"
-              type="string"
-              fullWidth
-              onChange={(event) => changeLoginData(event)}
-              error={loginErrors['displayName']}
-              helperText={loginErrors['displayName']}
-            />
-            <TextField
-              required
-              autoComplete="off"
-              margin="normal"
-              id="numOfColors"
-              label="Number Of Colors"
-              type="number"
-              fullWidth
-              onChange={(event) => changeLoginData(event)}
-              error={loginErrors['numOfColors']}
-              helperText={loginErrors['numOfColors']}
+      { (loginSuccess || pinCode) ?
+        <UserIdContext.Provider value={userId}>
+          <div>
+            { pinCode ? <GamePlay gameId={pinCode} /> : <Options onDisplayGame={onDisplayGame}/> }
+          </div>
+        </UserIdContext.Provider>
 
-            />
-          </form>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setStartLogin(false)} color="primary">
-            Cancel
-          </Button>
-          <Button type='submit' onClick={handleLoginClick} color="primary">
-            Subscribe
-          </Button>
-        </DialogActions>
-        
-      </Dialog>
+        :
+
+        <Fragment>
+          <div>
+            <img src={require ('./img/game_box.png')} style={{ alignItems: 'center', justifyContent:'center'}}/>
+          </div>
+
+          <Dialog open={startLogin} onClose={() => setStartLogin(false)} aria-labelledby="form-dialog-title">
+            <DialogTitle id="form-dialog-title">
+          Login!
+            </DialogTitle>
+            <DialogContent>
+              <form>
+                <DialogContentText>
+          Let go. Tell us your display name and how many colors you are wearing.
+                </DialogContentText>
+                <TextField
+                  autoFocus
+                  required
+                  margin="normal"
+                  id="displayName"
+                  label="Display Name"
+                  type="string"
+                  fullWidth
+                  onChange={(event) => changeLoginData(event)}
+                  error={loginErrors['displayName']}
+                  helperText={loginErrors['displayName']}
+                />
+                <TextField
+                  required
+                  autoComplete="off"
+                  margin="normal"
+                  id="numOfColors"
+                  label="Number Of Colors"
+                  type="number"
+                  fullWidth
+                  onChange={(event) => changeLoginData(event)}
+                  error={loginErrors['numOfColors']}
+                  helperText={loginErrors['numOfColors']}
+
+                />
+              </form>
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={() => setStartLogin(false)} color="primary">
+          Cancel
+              </Button>
+              <Button type='submit' onClick={handleLoginClick} color="primary">
+          Subscribe
+              </Button>
+            </DialogActions>
+      
+          </Dialog>
+        </Fragment>
+      }
     </Fragment>
   );
 }

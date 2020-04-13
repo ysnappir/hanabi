@@ -1,9 +1,27 @@
-import React, {useState, useContext } from 'react';
+import React, {useState, useContext, Fragment } from 'react';
 import PropTypes from 'prop-types';
 import axios from 'axios';
 import {UserIdContext} from './Contex.js';
 
+import { Card, CardActionArea, CardActions, CardContent, CardMedia, Button, Typography } from '@material-ui/core';
+import { makeStyles } from '@material-ui/core/styles';
+
+const useStyles = makeStyles({
+  root: {
+    maxWidth: 345,
+  },
+  button: {
+    width: 200,
+  },
+  media: {
+    height: 140,
+  },
+});
+
+  
 function JoinGame(props) {
+  const classes = useStyles();
+
   const {onJoinGame} = props;
   const userId = useContext(UserIdContext);
   const [showPinField, setShowPinField] = useState(false);
@@ -35,16 +53,18 @@ function JoinGame(props) {
   return (
     <>
       <div>
-        <button className='button' onClick={() => setShowPinField(!showPinField)}>
+        <Button className={classes.button} variant="contained" color="primary" margin="normal" onClick={() => setShowPinField(!showPinField)}>
           {showPinField ? 'Don\'t Join Game': 'Join Game'}
-        </button>
+        </Button>
       </div>
 
       {showPinField && 
       <div>
           PIN code:
         <input type="text" ref={pinCode}/>
-        <button className='button' onClick={handleJoinClick}>Join!</button> <br/>
+        <Button className={classes.button} variant="contained" color="secondary" margin="normal" onClick={handleJoinClick}>
+          Join!
+        </Button>
       </div>}
     </>
   );
@@ -57,7 +77,7 @@ JoinGame.propTypes = {
 
 
 function CreateGame(props) {
-
+  const classes = useStyles();
   const {onCreateGame, onJoinGame} = props;
   
   const userId = useContext(UserIdContext);
@@ -81,7 +101,9 @@ function CreateGame(props) {
 
   return (
     <div>
-      <button className='button' onClick={() => handleCreateClick()}>Create Game!</button>
+      <Button className={classes.button} variant="contained" color="primary" margin="normal" onClick={() => handleCreateClick()}>
+        Create Game!
+      </Button>
     </div>
   );
 
@@ -92,8 +114,10 @@ CreateGame.propTypes = {
   onCreateGame: PropTypes.func,
 };
 
-function Options(props) {
+function Options(props) {  
   const {onDisplayGame} = props;
+  const classes = useStyles();
+
  
   const onJoinGame = (NewPinCode) => {
     onDisplayGame(String(NewPinCode));
@@ -101,13 +125,14 @@ function Options(props) {
 
   return (
     <div className='main__container'>
-        What Do You Want To Do? <br/> <br/>
+      <Typography variant="h4" component="h2">
+                What Do You Want To Do?
+      </Typography>
       <CreateGame onJoinGame={onJoinGame} onCreateGame={() => {}} />
       <JoinGame onJoinGame={onJoinGame} />
     </div>
   );
 }
-//}
 
 Options.propTypes = {
   onDisplayGame: PropTypes.func.isRequired,
