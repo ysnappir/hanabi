@@ -5,12 +5,31 @@ import { useDrop } from 'react-dnd';
 import axios from 'axios';
 import {UserIdContext} from './Contex.js';
 
+import { makeStyles } from '@material-ui/core/styles';
+import { Paper, Grid, Typography } from '@material-ui/core';
+
+const useStyles = makeStyles((theme, index) => ({
+  root: {
+    flexGrow: 1,
+  },
+  paper: {
+    padding: theme.spacing(2),
+    textAlign: 'center',
+    color: theme.palette.text.secondary,
+  },
+}));
+
+
 function RemainingDeck(props) {
+  const classes = useStyles();
+
   const {remainingCards} = props;
 
   return (
     <div style={{width: CARD_WIDTH + 'px'}}>
-      Remaining Deck: <br/>
+      <Typography variant="h4">
+              Remaining Deck:
+      </Typography>
       <img src={require ('./img/BackRect125.png')} style={{width: '100%'}} alt=''/>
       <div style={{position: 'relative', top: '-30px', marginTop: '-60px', textAlign: 'center', fontFamily: 'Frijole', fontSize: '40px', 
         color: 'white', textShadow:'-2px 0 black, 0 2px black, 2px 0 black, 0 -2px black'}}>{remainingCards}</div>
