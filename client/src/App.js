@@ -82,11 +82,11 @@ function App() {
   };
 
 
-  const handleLoginClick = async () => {
+  const handleLoginClick = async (e) => {
+    e.preventDefault(); // to prevent page refresh at submit
     if (!validateInput()) {
       return;
     }
-
     try {
       setFetchingData(true);
       const response = await axios.post('/register', { display_name: loginData['displayName'], 
@@ -154,8 +154,8 @@ function App() {
             <DialogTitle id="form-dialog-title">
           Login!
             </DialogTitle>
-            <DialogContent>
-              <form>
+            <form onSubmit={(e) => handleLoginClick(e)}>
+              <DialogContent>
                 <DialogContentText>
           Let go. Tell us your display name and how many colors you are wearing.
                 </DialogContentText>
@@ -182,19 +182,17 @@ function App() {
                   onChange={(event) => changeLoginData(event)}
                   error={loginErrors['numOfColors']}
                   helperText={loginErrors['numOfColors']}
-
                 />
-              </form>
-            </DialogContent>
-            <DialogActions>
-              <Button onClick={() => setStartLogin(false)} color="primary">
-          Cancel
-              </Button>
-              <Button type='submit' onClick={handleLoginClick} color="primary">
-          Subscribe
-              </Button>
-            </DialogActions>
-      
+              </DialogContent>
+              <DialogActions>
+                <Button onClick={() => setStartLogin(false)} color="primary">
+                  Cancel
+                </Button>
+                <Button type='submit' color="primary">
+                  Subscribe
+                </Button>
+              </DialogActions>
+            </form>
           </Dialog>
         </Fragment>
       }
