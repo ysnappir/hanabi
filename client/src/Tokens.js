@@ -46,8 +46,8 @@ function SingleTokenPile(props) {
     
   return (
     <div>
-        Clue Tokens: {draw_tokens('clue', clueTokens)}<br/> <br/>
-        Miss Tokens: {draw_tokens('miss', missTokens)}
+      {draw_tokens('clue', clueTokens)} <br/>
+      {draw_tokens('miss', missTokens)}
     </div>
   );
 }

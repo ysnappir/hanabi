@@ -93,7 +93,7 @@ export function OwnHand(props) {
     <div style={{
       display: 'flex',
       flexDirection: 'row-reverse'
-    }}> 
+    }}>
       {cards.map((card, index) =>
         <OwnSlot
           slotIndex={index}
