@@ -239,21 +239,29 @@ function HanabiBoard(props) {
           <Grid item xs={12}>
             <Paper className={classes.paper}>
               <Typography variant="h3">
-              Full game play - game number {gameId}
+                Full game play - game number {gameId}
               </Typography>
             </Paper>
           </Grid>
-          <Grid item xs={6}>
-            <Paper className={classes.paper}>xs=6</Paper>
-          </Grid>
-          <Grid item xs={6}>
-            <Paper className={classes.paper}>xs=6</Paper>
-          </Grid>
-          <Grid item xs={3}>
-            <Paper className={classes.paper}>xs=3</Paper>
+          <Grid item xs={9}>
+            <Paper className={classes.paper}>
+              <FullTokenPile clueTokens={+clueTokens} missTokens={+missTokens}/> <br/><br/>
+            </Paper>
           </Grid>
           <Grid item xs={3}>
-            <Paper className={classes.paper}>xs=3</Paper>
+            <Paper className={classes.paper}>
+              <RemainingDeck remainingCards={remainingDeckSize}/>
+            </Paper>
+          </Grid>
+          <Grid item xs={6}>
+            <Paper className={classes.paper}>
+              <HanabiTable table={hanabiTable} droppedCardIndex={draggedIndex} isMyTurn={userId === activePlayer}/>
+            </Paper>
+          </Grid>
+          <Grid item xs={6}>
+            <Paper className={classes.paper}>
+              <BurntPile cardList={burntPileCards} droppedCardIndex={draggedIndex} isMyTurn={userId === activePlayer}/>
+            </Paper>
           </Grid>
           <Grid item xs={3}>
             <Paper className={classes.paper}>xs=3</Paper>
