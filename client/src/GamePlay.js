@@ -109,7 +109,7 @@ const useStyles = makeStyles((theme) => ({
     flexGrow: 1,
   },
   paper: {
-    padding: theme.spacing(2),
+    padding: theme.spacing(1),
     textAlign: 'center',
     color: theme.palette.text.secondary,
   },
@@ -234,16 +234,6 @@ function HanabiBoard(props) {
               </Typography>
             </Paper>
           </Grid>
-          <Grid item xs={9}>
-            <Paper className={classes.paper}>
-              <FullTokenPile clueTokens={+clueTokens} missTokens={+missTokens}/> <br/><br/>
-            </Paper>
-          </Grid>
-          <Grid item xs={3}>
-            <Paper className={classes.paper}>
-              <RemainingDeck remainingCards={remainingDeckSize}/>
-            </Paper>
-          </Grid>
           <Grid item xs={6}>
             <Paper className={classes.paper}>
               <HanabiTable table={hanabiTable} droppedCardIndex={draggedIndex} isMyTurn={userId === activePlayer}/>
@@ -254,40 +244,37 @@ function HanabiBoard(props) {
               <BurntPile cardList={burntPileCards} droppedCardIndex={draggedIndex} isMyTurn={userId === activePlayer}/>
             </Paper>
           </Grid>
-          <Grid item xs={3}>
-            <Paper className={classes.paper}>xs=3</Paper>
+          <Grid item xs={4}>
+            <Paper className={classes.paper}>
+              <FullTokenPile clueTokens={+clueTokens} missTokens={+missTokens}/> <br/><br/>
+            </Paper>
           </Grid>
-          <Grid item xs={3}>
-            <Paper className={classes.paper}>xs=3</Paper>
+          <Grid item xs={2}>
+            <Paper className={classes.paper}>
+              <RemainingDeck remainingCards={remainingDeckSize}/>
+            </Paper>
+          </Grid>
+          <Grid item xs={6}>
+            <Paper className={classes.paper}>
+              <InformPlayerOptions 
+                onClose={onActionPopupClose} 
+                showPopup={showActionsPopup} 
+                reportSelection={getInfromReporter(userId, playerPressedId)} 
+                playerDisplayName={getPlayerDisplayName()} 
+                highlightArray={getCardPressedInfo()}
+                key={'informPopUp'}
+              />
+              <PlayersHands
+                players={players}
+                activePlayer={activePlayer}
+                draggedIndex={draggedIndex}
+                onDraggedIndex={setDraggedIndex}
+                onInformCard={informCard}
+                lastAction={lastAction}
+              />
+            </Paper>
           </Grid>
         </Grid>
-      </div>
-
-      <div style={{padding: '30px'}}>
-        <h1>Full game play - game number {gameId}</h1> <br/><br/>
-      Tokens Status: <br/>
-        <FullTokenPile clueTokens={+clueTokens} missTokens={+missTokens}/> <br/><br/>
-        <RemainingDeck remainingCards={remainingDeckSize}/>
-        <HanabiTable table={hanabiTable} droppedCardIndex={draggedIndex} isMyTurn={userId === activePlayer}/>
-      Players:
-        <InformPlayerOptions 
-          onClose={onActionPopupClose} 
-          showPopup={showActionsPopup} 
-          reportSelection={getInfromReporter(userId, playerPressedId)} 
-          playerDisplayName={getPlayerDisplayName()} 
-          highlightArray={getCardPressedInfo()}
-          key={'informPopUp'}
-        />
-        <PlayersHands
-          players={players}
-          activePlayer={activePlayer}
-          draggedIndex={draggedIndex}
-          onDraggedIndex={setDraggedIndex}
-          onInformCard={informCard}
-          lastAction={lastAction}
-        />
-        <BurntPile cardList={burntPileCards} droppedCardIndex={draggedIndex} isMyTurn={userId === activePlayer}/>
-        <h1>End of board</h1>
       </div>
     </div>
 
