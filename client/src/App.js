@@ -25,7 +25,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 function App() {
-  const [startLogin, setStartLogin] = useState(false);
+  const [startLogin, setStartLogin] = useState(true);
   const [loginSuccess, setLoginSuccess] = useState(false);
   
   const [userId, setUserId] = useState('');
