@@ -28,8 +28,11 @@ function App() {
   const [startLogin, setStartLogin] = useState(false);
   const [loginSuccess, setLoginSuccess] = useState(false);
   
-  const [userId, setUserId] = useState('');
-  const [pinCode, setPinCode] = useState(undefined);
+  //const [userId, setUserId] = useState('');
+  //const [pinCode, setPinCode] = useState(undefined);
+
+  const [userId, setUserId] = useState('1');
+  const [pinCode, setPinCode] = useState('1');
 
   const [fetchingData, setFetchingData] = useState(false);
   const [loginData, setLoginData] = useState({displayName : '', numOfColors : undefined});

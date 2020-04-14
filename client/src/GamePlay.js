@@ -12,6 +12,97 @@ import InformPlayerOptions from './Actions';
 import { makeStyles } from '@material-ui/core/styles';
 import { Paper, Grid, Typography } from '@material-ui/core';
 
+const TEST_JSON = {
+  'active_player_id': '31', 
+  'blue_tokens': 8, 
+  'burnt_pile': [], 
+  'deck_size': 45, 
+  'hands': [
+    {
+      'cards': [
+        {
+          'color': null, 
+          'flipped': false, 
+          'is_informed': false, 
+          'number': null
+        }, 
+        {
+          'color': null, 
+          'flipped': false, 
+          'is_informed': false, 
+          'number': null
+        }, 
+        {
+          'color': null, 
+          'flipped': false, 
+          'is_informed': false, 
+          'number': null
+        }, 
+        {
+          'color': null, 
+          'flipped': false, 
+          'is_informed': false, 
+          'number': null
+        }, 
+        {
+          'color': null, 
+          'flipped': false, 
+          'is_informed': false, 
+          'number': null
+        }
+      ], 
+      'display_name': 'sdl;fk', 
+      'id': '32'
+    }, 
+    {
+      'cards': [
+        {
+          'color': 'yellow', 
+          'flipped': false, 
+          'is_informed': false, 
+          'number': 4
+        }, 
+        {
+          'color': 'rainbow', 
+          'flipped': false, 
+          'is_informed': false, 
+          'number': 4
+        }, 
+        {
+          'color': 'white', 
+          'flipped': false, 
+          'is_informed': false, 
+          'number': 4
+        }, 
+        {
+          'color': 'yellow', 
+          'flipped': false, 
+          'is_informed': false, 
+          'number': 1
+        }, 
+        {
+          'color': 'green', 
+          'flipped': false, 
+          'is_informed': false, 
+          'number': 1
+        }
+      ], 
+      'display_name': 'asdf', 
+      'id': '31'
+    }
+  ], 
+  'last_action': null, 
+  'red_tokens': 3, 
+  'status': 'active', 
+  'table': {
+    'blue': 0, 
+    'green': 0, 
+    'rainbow': 0, 
+    'red': 0, 
+    'white': 0, 
+    'yellow': 0
+  }
+};
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -275,7 +366,8 @@ function GamePlay(props) {
 
   const updateGameState = async () => {
     try {
-      const response = await axios.get('/game_state/' + userId + '/' + gameId, {});
+      //const response = await axios.get('/game_state/' + userId + '/' + gameId, {});
+      const response = '';
       handleGetGameStateResponse(response);
     } catch (error) {
       handleGetGameStateError(error);
@@ -288,8 +380,9 @@ function GamePlay(props) {
   );
 
   const handleGetGameStateResponse = (response) => {
-    let myJson = response.data;
-
+    //let myJson = response.data;
+    let myJson = TEST_JSON;
+    console.log(myJson);
     setAvailableClueTokens(myJson['blue_tokens']);
     setAvailableMissTokens(myJson['red_tokens']);
 
