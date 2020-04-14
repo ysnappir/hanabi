@@ -226,7 +226,7 @@ function HanabiBoard(props) {
   return (
     <div>
       <div className={classes.root}>
-        <Grid container spacing={3}>
+        <Grid container spacing={1}>
           <Grid item xs={12}>
             <Paper className={classes.paper}>
               <Typography variant="h3">
@@ -234,45 +234,75 @@ function HanabiBoard(props) {
               </Typography>
             </Paper>
           </Grid>
-          <Grid item xs={6}>
-            <Paper className={classes.paper}>
-              <HanabiTable table={hanabiTable} droppedCardIndex={draggedIndex} isMyTurn={userId === activePlayer}/>
-            </Paper>
+
+          <Grid 
+            container
+            direction="column"
+            justify="center"
+            alignItems="center"          
+            xs={6}
+          >
+            <Grid item justify="center" alignItems="flex-start">
+              <Paper className={classes.paper}>
+                <InformPlayerOptions 
+                  onClose={onActionPopupClose} 
+                  showPopup={showActionsPopup} 
+                  reportSelection={getInfromReporter(userId, playerPressedId)} 
+                  playerDisplayName={getPlayerDisplayName()} 
+                  highlightArray={getCardPressedInfo()}
+                  key={'informPopUp'}
+                />
+                <PlayersHands
+                  players={players}
+                  activePlayer={activePlayer}
+                  draggedIndex={draggedIndex}
+                  onDraggedIndex={setDraggedIndex}
+                  onInformCard={informCard}
+                  lastAction={lastAction}
+                />
+              </Paper>
+            </Grid>
+            <Grid item>
+              <Grid             
+                container
+                direction="row"
+                justify="center"
+                alignItems="center"
+              >
+                <Grid item xs={8}>
+                  <Paper className={classes.paper}>
+                    <FullTokenPile clueTokens={+clueTokens} missTokens={+missTokens}/> <br/><br/>
+                  </Paper>
+                </Grid>
+                <Grid item xs={4}>
+                  <Paper className={classes.paper}>
+                    <RemainingDeck remainingCards={remainingDeckSize}/>
+                  </Paper>
+                </Grid>
+              </Grid>
+            </Grid>
           </Grid>
-          <Grid item xs={6}>
-            <Paper className={classes.paper}>
-              <BurntPile cardList={burntPileCards} droppedCardIndex={draggedIndex} isMyTurn={userId === activePlayer}/>
-            </Paper>
-          </Grid>
-          <Grid item xs={4}>
-            <Paper className={classes.paper}>
-              <FullTokenPile clueTokens={+clueTokens} missTokens={+missTokens}/> <br/><br/>
-            </Paper>
-          </Grid>
-          <Grid item xs={2}>
-            <Paper className={classes.paper}>
-              <RemainingDeck remainingCards={remainingDeckSize}/>
-            </Paper>
-          </Grid>
-          <Grid item xs={6}>
-            <Paper className={classes.paper}>
-              <InformPlayerOptions 
-                onClose={onActionPopupClose} 
-                showPopup={showActionsPopup} 
-                reportSelection={getInfromReporter(userId, playerPressedId)} 
-                playerDisplayName={getPlayerDisplayName()} 
-                highlightArray={getCardPressedInfo()}
-                key={'informPopUp'}
-              />
-              <PlayersHands
-                players={players}
-                activePlayer={activePlayer}
-                draggedIndex={draggedIndex}
-                onDraggedIndex={setDraggedIndex}
-                onInformCard={informCard}
-                lastAction={lastAction}
-              />
-            </Paper>
+
+
+          <Grid 
+            container
+            direction="column"
+            justify="flex-start"
+            alignItems="center"          
+            xs={6}
+          >
+            <Grid item>
+              <Paper className={classes.paper}>
+                <HanabiTable table={hanabiTable} droppedCardIndex={draggedIndex} isMyTurn={userId === activePlayer}/>
+              </Paper>
+            </Grid>
+
+            <Grid item>
+              <Paper className={classes.paper}>
+                <BurntPile cardList={burntPileCards} droppedCardIndex={draggedIndex} isMyTurn={userId === activePlayer}/>
+              </Paper>
+            </Grid>
+
           </Grid>
         </Grid>
       </div>

@@ -16,7 +16,7 @@ const useStyles = makeStyles((theme, index) => ({
     flexGrow: 1,
   },
   paper: {
-    padding: theme.spacing(2),
+    padding: theme.spacing(1),
     textAlign: 'center',
     color: theme.palette.text.secondary,
   },
@@ -65,17 +65,17 @@ function FullTokenPile(props) {
 
   return (
     <div>
-      <Grid container spacing={3}>
+      <Grid container spacing={1}>
         <Grid item xs={12}>
           <Paper className={classes.paper}>
-            <Typography variant="h4">
+            <Typography variant="h6">
               Tokens Status:
             </Typography>
           </Paper>
         </Grid>
         <Grid item xs={6}>
           <Paper className={classes.paper}>
-            <Typography variant="h5">
+            <Typography variant="subtitle1">
             Available Tokens:
             </Typography>
             <SingleTokenPile clueTokens={clueTokens} missTokens={missTokens}/>
@@ -83,7 +83,7 @@ function FullTokenPile(props) {
         </Grid>
         <Grid item xs={6}>
           <Paper className={classes.paper}>
-            <Typography variant="h5">
+            <Typography variant="subtitle1">
               Used Tokens:
             </Typography>
             <SingleTokenPile clueTokens={MAX_CLUE_TOKENS - clueTokens} missTokens={MAX_MISS_TOKENS - missTokens}/>

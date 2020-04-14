@@ -27,8 +27,8 @@ function RemainingDeck(props) {
 
   return (
     <div style={{width: CARD_WIDTH + 'px'}}>
-      <Typography variant="h4">
-              Remaining Deck:
+      <Typography variant="h6" align='center'>
+        Remaining Deck:
       </Typography>
       <img src={require ('./img/BackRect125.png')} style={{width: '100%'}} alt=''/>
       <div style={{position: 'relative', top: '-30px', marginTop: '-60px', textAlign: 'center', fontFamily: 'Frijole', fontSize: '40px', 
