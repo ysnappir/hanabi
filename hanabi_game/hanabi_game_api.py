@@ -11,17 +11,23 @@ class IHanabiCard:
     def get_number(self) -> HanabiNumber:
         raise NotImplementedError("")
 
+    def __hash__(self):
+        # colors_len = len([color for color in HanabiColor])
+        numbers_num = len([number for number in HanabiNumber])
+        return self.get_number().value + numbers_num * [color for color in HanabiColor].index(self.get_color())
+
+    def __eq__(self, other):
+        return hash(self) == hash(other)
+
 
 class IHandType:
     def __repr__(self):
-        return ", ".join(
-            str(self.get_card(i)) for i in range(self.get_amount_of_cards())
-        )
+        return ", ".join(str(self.get_cards()))
 
     def get_amount_of_cards(self) -> int:
         raise NotImplementedError("")
 
-    def get_card(self, index: int) -> IHanabiCard:
+    def get_cards(self) -> List[IHanabiCard]:
         raise NotImplementedError("")
 
     def pop_card(self, index: int) -> IHanabiCard:
@@ -59,6 +65,9 @@ class IHanabiState:
     def get_burnt_pile(self) -> List[IHanabiCard]:
         raise NotImplementedError("")
 
+    def get_verdict(self) -> GameVerdict:
+        raise NotImplementedError("")
+
 
 class IHanabiDeck:
     def take_a_card(self) -> IHanabiCard:
@@ -82,7 +91,4 @@ class IHanabiGame:
         raise NotImplementedError("")
 
     def get_cards_per_player(self) -> int:
-        raise NotImplementedError("")
-
-    def get_verdict(self) -> GameVerdict:
         raise NotImplementedError("")

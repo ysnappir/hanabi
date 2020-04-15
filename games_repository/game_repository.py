@@ -21,7 +21,7 @@ from games_repository.games_repository_api import (
 )
 from hanabi_game.constants import MAXIMAL_PLAYERS, MINIMAL_PLAYERS, HANABI_DECK_SIZE, INITIAL_RED_TOKENS, \
     INITIAL_BLUE_TOKENS
-from hanabi_game.defs import HanabiColor, PlayerIdType, HanabiNumber, HanabiMoveType
+from hanabi_game.defs import HanabiColor, PlayerIdType, HanabiNumber, HanabiMoveType, GameVerdict
 from hanabi_game.hanabi_game import HanabiGame, HanabiState
 from hanabi_game.hanabi_game_api import IHanabiGame, IHanabiState, IHanabiCard
 from hanabi_game.hanabi_moves import (
@@ -85,7 +85,7 @@ class HanabiPlayerWrapper:
         cards: Dict[FECardIndex, IHanabiCard] = {}
         flipped_indices: List[FECardIndex] = []
         if hand:
-            cards = {i: hand.get_card(self._card_mapper.get_hanabi_card_index(fe_card_index=i))
+            cards = {i: hand.get_cards()[self._card_mapper.get_hanabi_card_index(fe_card_index=i)]
                      for i in range(hand.get_amount_of_cards())
                      }
             flipped_indices = self._card_mapper.get_flipped_indices()
@@ -289,6 +289,7 @@ class HanabiGameWrapper:
                 burnt_pile=[],
                 acting_player=max(range(len(self._ordered_players)),
                                   key=lambda i: self._players[self._ordered_players[i]].get_number_of_cloth_colors()),
+                game_verdict=GameVerdict.ONGOING,
             )
         else:
             hanabi_state = self._game.get_state()
@@ -309,6 +310,7 @@ class HanabiGameWrapper:
                         for i, card in enumerate(hanabi_state.get_burnt_pile())],
             active_player=self._ordered_players[hanabi_state.get_active_player()],
             last_action=self._last_successful_action,
+            result=hanabi_state.get_verdict(),
         )
 
     def perform_card_motion(self, card_motion_request: MoveCardRequest) -> bool:

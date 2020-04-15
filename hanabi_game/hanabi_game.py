@@ -1,7 +1,8 @@
-from typing import List, Optional, Dict, Callable, Hashable
+from typing import List, Optional, Dict, Callable
 
 from hanabi_game.constants import INITIAL_BLUE_TOKENS, INITIAL_RED_TOKENS
 from hanabi_game.defs import PlayerIdType, HanabiColor, HanabiNumber, HanabiMoveType, GameVerdict
+from hanabi_game.game_verdict_utils import is_lost_by_open_information, is_lost_by_concealed_information
 from hanabi_game.hanabi_deck import HanabiDeck
 from hanabi_game.hanabi_game_api import (
     IHanabiGame,
@@ -23,6 +24,7 @@ from hanabi_game.utils import (
 
 
 class HanabiState(IHanabiState):
+
     def __init__(
         self,
         deck_size: int,
@@ -32,7 +34,9 @@ class HanabiState(IHanabiState):
         pile_tops: Dict[HanabiColor, Optional[HanabiNumber]],
         acting_player: PlayerIdType,
         burnt_pile: List[IHanabiCard],
+        game_verdict: GameVerdict,
     ):
+        self._game_verdict = game_verdict
         self._pile_tops = pile_tops
         self._hands = hands_dict
         self._player_ids = list(self._hands.keys())
@@ -107,6 +111,9 @@ class HanabiState(IHanabiState):
     def get_burnt_pile(self) -> List[IHanabiCard]:
         return self._burnt_pile
 
+    def get_verdict(self) -> GameVerdict:
+        return self._game_verdict
+
 
 class HanabiHand(IHandType):
     def __init__(self, initial_cards: Optional[List[IHanabiCard]]):
@@ -115,33 +122,14 @@ class HanabiHand(IHandType):
     def get_amount_of_cards(self) -> int:
         return len(self._cards)
 
-    def get_card(self, index: int) -> IHanabiCard:
-        return self._cards[index]
+    def get_cards(self) -> List[IHanabiCard]:
+        return self._cards
 
     def pop_card(self, index: int) -> IHanabiCard:
         return self._cards.pop(index)
 
     def add_card(self, card: IHanabiCard, index: int) -> None:
         self._cards = self._cards[:index] + [card] + self._cards[index:]
-
-
-def _card_to_hashable(card: IHanabiCard) -> Hashable:
-    return tuple((card.get_number().value, card.get_color().value))
-
-
-def is_exist_card_only_in_burnt_pile(game_state: IHanabiState, deck_cards: List[IHanabiCard]) -> bool:
-    card_hashes_in_burnt: set = set(map(_card_to_hashable, game_state.get_burnt_pile()))
-    cards_not_in_burnt: List[IHanabiCard] = deck_cards + [
-        game_state.get_hand(j).get_card(i)
-        for j in range(game_state.get_number_of_players())
-        for i in range(game_state.get_hand(j).get_amount_of_cards())]
-    card_not_in_burnt_hashes = set(map(_card_to_hashable, cards_not_in_burnt))
-    return len(card_hashes_in_burnt.difference(card_not_in_burnt_hashes)) > 0
-
-
-def is_lost_by_deck_ordering(game_state: IHanabiState, deck_cards: List[IHanabiCard]) -> bool:
-    return False
-    # raise NotImplementedError("")
 
 
 class HanabiGame(IHanabiGame):
@@ -151,9 +139,10 @@ class HanabiGame(IHanabiGame):
         n_players: int,
         predifined_deck: IHanabiDeck = None,
         starting_player: PlayerIdType = None,
+        red_tokens_amount: int = INITIAL_RED_TOKENS,
     ):
         self._blue_tokens_amount: int = INITIAL_BLUE_TOKENS
-        self._red_tokens_amount: int = INITIAL_RED_TOKENS
+        self._red_tokens_amount: int = red_tokens_amount
         self._n_players = n_players
         self._acting_player: PlayerIdType = 0 if starting_player is None else starting_player
         self._number_of_cards_per_player = get_amount_of_cards_per_player(
@@ -185,6 +174,7 @@ class HanabiGame(IHanabiGame):
             HanabiMoveType.INFORM: self._perform_inform,
         }
         self._game_verdict: GameVerdict = GameVerdict.ONGOING
+        self._update_verdict()
         self._moves_log = []
 
     def last_move(self) -> Optional[IHanabiMove]:
@@ -199,6 +189,7 @@ class HanabiGame(IHanabiGame):
         self._moves_log.append(move)
         self._perform_move[move.move_type](move)
         self._pass_the_turn()
+        self._update_verdict()
         return True
 
     def _perform_burn(self, move: IHanabiBurnMove) -> None:
@@ -270,6 +261,7 @@ class HanabiGame(IHanabiGame):
             pile_tops=self._piles.copy(),
             acting_player=self._acting_player,
             burnt_pile=self._burnt_pile.copy(),
+            game_verdict=self._game_verdict,
         )
 
     def get_players_ids(self) -> List[PlayerIdType]:
@@ -281,15 +273,15 @@ class HanabiGame(IHanabiGame):
     def _is_game_winable(self) -> bool:
         raise NotImplementedError("")
 
-    def get_verdict(self) -> GameVerdict:
+    def _update_verdict(self) -> GameVerdict:
         if self._game_verdict in [GameVerdict.LOST, GameVerdict.WON]:
             return self._game_verdict
 
-        if is_exist_card_only_in_burnt_pile(self.get_state(), self._deck.observe_cards()):
+        if is_lost_by_open_information(self.get_state(), self._deck.observe_cards()):
             self._game_verdict = GameVerdict.UNWINABLE
             return self._game_verdict
 
-        if is_lost_by_deck_ordering(self.get_state(), self._deck.observe_cards()):
+        if is_lost_by_concealed_information(self.get_state(), self._deck.observe_cards()):
             self._game_verdict = GameVerdict.UNWINABLE_BY_DECK
             return self._game_verdict
 

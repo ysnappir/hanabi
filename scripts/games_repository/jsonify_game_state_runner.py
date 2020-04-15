@@ -2,8 +2,7 @@ import json
 
 from games_repository.defs import GameState, HandState, CardInfo, GameAction
 from games_repository.utils import jsonify_game_state
-from hanabi_game.defs import HanabiColor, HanabiNumber
-
+from hanabi_game.defs import HanabiColor, HanabiNumber, GameVerdict
 
 if __name__ == "__main__":
     game_state: GameState = GameState(
@@ -54,6 +53,7 @@ if __name__ == "__main__":
                                information_data=1,
                                placed_card_index=None,
                                burn_card_index=None,
-                               )
+                               ),
+        result=GameVerdict.UNWINABLE,
     )
     print(json.dumps(jsonify_game_state(game_state, player_id="p_1")))
