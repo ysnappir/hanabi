@@ -1,6 +1,7 @@
 from typing import List
 
 from hanabi_game.defs import HanabiNumber, HanabiColor, GameVerdict
+from hanabi_game.hanabi_card import HanabiCard
 from hanabi_game.hanabi_deck import HanabiDeck
 from hanabi_game.hanabi_game import is_lost_by_open_information, HanabiGame, is_lost_by_concealed_information
 from hanabi_game.hanabi_game_api import IHanabiCard, IHanabiDeck
@@ -13,6 +14,11 @@ def _pop_from_cards_list(cards_list: List[IHanabiCard], color: HanabiColor, numb
         lambda i: cards_list[i].get_number() is number and cards_list[i].get_color() is color,
         range(len(cards_list)))))
     return cards_list.pop(card_index)
+
+
+def test_is_card_equalization_based_only_on_content():
+    assert (HanabiCard(color=HanabiColor.RAINBOW, number=HanabiNumber.TWO) ==
+            HanabiCard(color=HanabiColor.RAINBOW, number=HanabiNumber.TWO))
 
 
 def test_is_exist_card_only_in_burnt_pile_false_at_start():

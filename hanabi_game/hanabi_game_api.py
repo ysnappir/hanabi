@@ -12,7 +12,12 @@ class IHanabiCard:
         raise NotImplementedError("")
 
     def __hash__(self):
-        return self.get_number().value, self.get_color().value,
+        # colors_len = len([color for color in HanabiColor])
+        numbers_num = len([number for number in HanabiNumber])
+        return self.get_number().value + numbers_num * [color for color in HanabiColor].index(self.get_color())
+
+    def __eq__(self, other):
+        return hash(self) == hash(other)
 
 
 class IHandType:

@@ -29,7 +29,7 @@ def _is_lost_by_last_card_being_single_not_burnt(game_state: IHanabiState, deck_
     if deck_cards[-1].get_number() is HanabiNumber.FIVE:
         return False
 
-    return True
+    return False
 
 
 def is_lost_by_concealed_information(game_state: IHanabiState, deck_cards: List[IHanabiCard]) -> bool:
