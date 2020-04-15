@@ -21,7 +21,7 @@ from games_repository.games_repository_api import (
 )
 from hanabi_game.constants import MAXIMAL_PLAYERS, MINIMAL_PLAYERS, HANABI_DECK_SIZE, INITIAL_RED_TOKENS, \
     INITIAL_BLUE_TOKENS
-from hanabi_game.defs import HanabiColor, PlayerIdType, HanabiNumber, HanabiMoveType
+from hanabi_game.defs import HanabiColor, PlayerIdType, HanabiNumber, HanabiMoveType, GameVerdict
 from hanabi_game.hanabi_game import HanabiGame, HanabiState
 from hanabi_game.hanabi_game_api import IHanabiGame, IHanabiState, IHanabiCard
 from hanabi_game.hanabi_moves import (
@@ -289,6 +289,7 @@ class HanabiGameWrapper:
                 burnt_pile=[],
                 acting_player=max(range(len(self._ordered_players)),
                                   key=lambda i: self._players[self._ordered_players[i]].get_number_of_cloth_colors()),
+                game_verdict=GameVerdict.ONGOING,
             )
         else:
             hanabi_state = self._game.get_state()
