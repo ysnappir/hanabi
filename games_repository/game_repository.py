@@ -85,7 +85,7 @@ class HanabiPlayerWrapper:
         cards: Dict[FECardIndex, IHanabiCard] = {}
         flipped_indices: List[FECardIndex] = []
         if hand:
-            cards = {i: hand.get_card(self._card_mapper.get_hanabi_card_index(fe_card_index=i))
+            cards = {i: hand.get_cards()[self._card_mapper.get_hanabi_card_index(fe_card_index=i)]
                      for i in range(hand.get_amount_of_cards())
                      }
             flipped_indices = self._card_mapper.get_flipped_indices()
@@ -310,6 +310,7 @@ class HanabiGameWrapper:
                         for i, card in enumerate(hanabi_state.get_burnt_pile())],
             active_player=self._ordered_players[hanabi_state.get_active_player()],
             last_action=self._last_successful_action,
+            result=hanabi_state.get_verdict(),
         )
 
     def perform_card_motion(self, card_motion_request: MoveCardRequest) -> bool:

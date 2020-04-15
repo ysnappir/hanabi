@@ -2,7 +2,7 @@ from enum import Enum
 from typing import NamedTuple, Optional, Dict, List, Union, Callable
 
 from games_repository.card_mapper_api import FECardIndex
-from hanabi_game.defs import HanabiColor, HanabiNumber
+from hanabi_game.defs import HanabiColor, HanabiNumber, GameVerdict
 from hanabi_game.hanabi_game_api import IHanabiGame
 
 GameIdType = int
@@ -48,6 +48,7 @@ class GameState(NamedTuple):
     burnt_pile: List[CardInfo]
     active_player: NetworkPlayerIdType
     last_action: GameAction
+    result: GameVerdict
 
 
 class MoveCardRequest(NamedTuple):

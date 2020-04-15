@@ -122,8 +122,8 @@ class HanabiHand(IHandType):
     def get_amount_of_cards(self) -> int:
         return len(self._cards)
 
-    def get_card(self, index: int) -> IHanabiCard:
-        return self._cards[index]
+    def get_cards(self) -> List[IHanabiCard]:
+        return self._cards
 
     def pop_card(self, index: int) -> IHanabiCard:
         return self._cards.pop(index)
@@ -139,9 +139,10 @@ class HanabiGame(IHanabiGame):
         n_players: int,
         predifined_deck: IHanabiDeck = None,
         starting_player: PlayerIdType = None,
+        red_tokens_amount: int = INITIAL_RED_TOKENS,
     ):
         self._blue_tokens_amount: int = INITIAL_BLUE_TOKENS
-        self._red_tokens_amount: int = INITIAL_RED_TOKENS
+        self._red_tokens_amount: int = red_tokens_amount
         self._n_players = n_players
         self._acting_player: PlayerIdType = 0 if starting_player is None else starting_player
         self._number_of_cards_per_player = get_amount_of_cards_per_player(

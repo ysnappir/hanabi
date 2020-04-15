@@ -20,6 +20,7 @@ def jsonify_game_state(game_state: GameState, player_id: NetworkPlayerIdType) ->
     player_index = [d.id for d in game_state.hands_state].index(player_id)
     return {
         "status": game_state.status,
+        "result": game_state.result.value,
         "deck_size": game_state.deck_size,
         "blue_tokens": game_state.blue_token_amount,
         "red_tokens": game_state.red_token_amount,

@@ -22,14 +22,12 @@ class IHanabiCard:
 
 class IHandType:
     def __repr__(self):
-        return ", ".join(
-            str(self.get_card(i)) for i in range(self.get_amount_of_cards())
-        )
+        return ", ".join(str(self.get_cards()))
 
     def get_amount_of_cards(self) -> int:
         raise NotImplementedError("")
 
-    def get_card(self, index: int) -> IHanabiCard:
+    def get_cards(self) -> List[IHanabiCard]:
         raise NotImplementedError("")
 
     def pop_card(self, index: int) -> IHanabiCard:
