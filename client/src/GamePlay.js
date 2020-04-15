@@ -234,7 +234,7 @@ function HanabiBoard(props) {
   return (
     <div>
       <div className={classes.root}>
-        <Grid container spacing={1}>
+        <Grid container spacing={2}>
           <Grid item xs={12}>
             <Paper className={classes.paper}>
               <Typography variant="h3">
@@ -249,6 +249,7 @@ function HanabiBoard(props) {
             justify="center"
             alignItems="center"          
             xs={6}
+            spacing={2}
           >
             <Grid item justify="center" alignItems="flex-start">
               <Paper className={classes.paper}>
@@ -276,6 +277,7 @@ function HanabiBoard(props) {
                 direction="row"
                 justify="center"
                 alignItems="center"
+                spacing={2}
               >
                 <Grid item xs={8}>
                   <Paper className={classes.paper}>
@@ -298,6 +300,7 @@ function HanabiBoard(props) {
             justify="flex-start"
             alignItems="center"          
             xs={6}
+            spacing={2}
           >
             <Grid item>
               <Paper className={classes.paper}>
