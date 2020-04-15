@@ -116,7 +116,6 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 
-
 let colorByResult = {
   'ongoing': 'white',
   'won': 'green',
