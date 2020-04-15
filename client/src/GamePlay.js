@@ -10,6 +10,15 @@ import {CARD_WIDTH} from './Cards.js';
 import InformPlayerOptions from './Actions';
 
 
+let colorByResult = {
+  'ongoing': 'white',
+  'won': 'green',
+  'lost': 'black',
+  'unwinable': 'red',
+  'unwinable_by_deck': 'orange',
+};
+
+
 function WaitForGameStart(props) {
   const {gameId, currPlayers } = props;
 
@@ -212,6 +221,7 @@ function GamePlay(props) {
   const [activePlayer, setActivePlayer] = useState(-1);
   const [burntPileCards, setBurntPileCards] = useState([]);
   const [lastAction, setLastAction] = useState(undefined);
+  const [gameResult, setGameResult] = useState('ongoin');
 
   const updateGameState = async () => {
     try {
@@ -234,7 +244,7 @@ function GamePlay(props) {
     setAvailableMissTokens(myJson['red_tokens']);
 
     setPlayers(myJson['hands']);
-
+    setGameResult(myJson['result']);
     setRemainingDeckSize(myJson['deck_size']);
     setHanabiTable(myJson['table']);
     setActivePlayer(myJson['active_player_id']);
@@ -254,7 +264,7 @@ function GamePlay(props) {
   };
 
   return (
-    <>
+    <div style={{background: colorByResult[gameResult]}}>
       { !isGameStarted ? 
         <WaitForGameStart gameId={gameId} currPlayers={players}/> 
         :
@@ -270,7 +280,7 @@ function GamePlay(props) {
           lastAction={lastAction}
         />
       }
-    </>
+    </div>
   );
 }
 

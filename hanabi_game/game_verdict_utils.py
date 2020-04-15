@@ -30,14 +30,20 @@ def _is_card_exist_only_in_burnt(game_state: IHanabiState, deck_cards: List[IHan
         for j in range(game_state.get_number_of_players())
         for i in range(game_state.get_hand(j).get_amount_of_cards())]
     card_not_in_burnt_hashes = set(cards_not_in_burnt)
-    return len(card_hashes_in_burnt.difference(card_not_in_burnt_hashes)) > 0
+    if len(card_hashes_in_burnt.difference(card_not_in_burnt_hashes)) > 0:
+        print("Game is unwinnable. There are card exclusively in burnt pile!")
+        return True
+    return False
 
 
 def _is_lost_by_remaining_place_turns(game_state: IHanabiState) -> bool:
     cards_left_to_put = _minimal_place_turns(game_state=game_state)
     max_place_turns = game_state.get_deck_size() + len(game_state.get_players_ids())
 
-    return max_place_turns < cards_left_to_put
+    if max_place_turns < cards_left_to_put:
+        print("Game is unwinnable. Not enough turns left")
+        return True
+    return False
 
 
 def is_lost_by_open_information(game_state: IHanabiState, deck_cards: List[IHanabiCard]) -> bool:
@@ -57,9 +63,12 @@ def _is_lost_by_last_card_being_single_not_burnt(game_state: IHanabiState, deck_
             _hanabi_number_to_number(last_card.get_number())):
         return False
 
-    return hash(last_card) not in set(deck_cards[:-1] + [
+    if hash(last_card) not in set(deck_cards[:-1] + [
         card for player_id in game_state.get_players_ids()
-        for card in game_state.get_hand(player_id=player_id).get_cards()])
+        for card in game_state.get_hand(player_id=player_id).get_cards()]):
+        print(f"Game is unwinnable since the last card is critical and it not a 5 ({last_card})")
+        return True
+    return False
 
 
 class ColorMinPaths:
@@ -120,7 +129,10 @@ class ColorMinPaths:
 def _is_lost_by_counting_turns_after_available_instances(game_state: IHanabiState,
                                                          deck_cards: List[IHanabiCard]) -> bool:
     min_paths = ColorMinPaths(game_state=game_state, deck_cards=deck_cards)
-    return min_paths.is_lost_by_iterate_backwards()
+    if min_paths.is_lost_by_iterate_backwards():
+        print("Game is unwinnable since there are to many low critical low cards in the end of the pile")
+        return True
+    return False
 
 
 def is_lost_by_concealed_information(game_state: IHanabiState, deck_cards: List[IHanabiCard]) -> bool:
