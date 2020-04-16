@@ -9,6 +9,113 @@ import RemainingDeck, {HanabiTable, BurntPile} from './CardPiles.js';
 import {CARD_WIDTH} from './Cards.js';
 import InformPlayerOptions from './Actions';
 
+import { makeStyles } from '@material-ui/core/styles';
+import { Paper, Grid, Typography } from '@material-ui/core';
+
+// a game status json - for tests...
+const TEST_JSON = {
+  'active_player_id': '31', 
+  'blue_tokens': 8, 
+  'burnt_pile': [], 
+  'deck_size': 45, 
+  'hands': [
+    {
+      'cards': [
+        {
+          'color': null, 
+          'flipped': false, 
+          'is_informed': false, 
+          'number': null
+        }, 
+        {
+          'color': null, 
+          'flipped': false, 
+          'is_informed': false, 
+          'number': null
+        }, 
+        {
+          'color': null, 
+          'flipped': false, 
+          'is_informed': false, 
+          'number': null
+        }, 
+        {
+          'color': null, 
+          'flipped': false, 
+          'is_informed': false, 
+          'number': null
+        }, 
+        {
+          'color': null, 
+          'flipped': false, 
+          'is_informed': false, 
+          'number': null
+        }
+      ], 
+      'display_name': 'sdl;fk', 
+      'id': '32'
+    }, 
+    {
+      'cards': [
+        {
+          'color': 'yellow', 
+          'flipped': false, 
+          'is_informed': false, 
+          'number': 4
+        }, 
+        {
+          'color': 'rainbow', 
+          'flipped': false, 
+          'is_informed': false, 
+          'number': 4
+        }, 
+        {
+          'color': 'white', 
+          'flipped': false, 
+          'is_informed': false, 
+          'number': 4
+        }, 
+        {
+          'color': 'yellow', 
+          'flipped': false, 
+          'is_informed': false, 
+          'number': 1
+        }, 
+        {
+          'color': 'green', 
+          'flipped': false, 
+          'is_informed': false, 
+          'number': 1
+        }
+      ], 
+      'display_name': 'asdf', 
+      'id': '31'
+    }
+  ], 
+  'last_action': null, 
+  'red_tokens': 3, 
+  'status': 'active', 
+  'table': {
+    'blue': 0, 
+    'green': 0, 
+    'rainbow': 0, 
+    'red': 0, 
+    'white': 0, 
+    'yellow': 0
+  }
+};
+
+const useStyles = makeStyles((theme) => ({
+  root: {
+    flexGrow: 1,
+  },
+  paper: {
+    padding: theme.spacing(1),
+    textAlign: 'center',
+    color: theme.palette.text.secondary,
+  },
+}));
+
 
 let colorByResult = {
   'ongoing': 'white',
@@ -67,6 +174,7 @@ const getPlayerCards = (players, id) => {
 
 
 function HanabiBoard(props) {
+  const classes = useStyles();
 
   const {gameId, players, clueTokens, missTokens, remainingDeckSize, hanabiTable, activePlayer, burntPileCards, lastAction} = props;
 
@@ -125,32 +233,93 @@ function HanabiBoard(props) {
   };
 
   return (
-    <div style={{padding: '30px'}}>
-      <h1>Full game play - game number {gameId}</h1> <br/><br/>
-      Tokens Status: <br/>
-      <FullTokenPile clueTokens={+clueTokens} missTokens={+missTokens}/> <br/><br/>
-      <RemainingDeck remainingCards={remainingDeckSize}/>
-      <HanabiTable table={hanabiTable} droppedCardIndex={draggedIndex} isMyTurn={userId === activePlayer}/>
-      Players:
-      <InformPlayerOptions 
-        onClose={onActionPopupClose} 
-        showPopup={showActionsPopup} 
-        reportSelection={getInfromReporter(userId, playerPressedId)} 
-        playerDisplayName={getPlayerDisplayName()} 
-        highlightArray={getCardPressedInfo()}
-        key={'informPopUp'}
-      />
-      <PlayersHands
-        players={players}
-        activePlayer={activePlayer}
-        draggedIndex={draggedIndex}
-        onDraggedIndex={setDraggedIndex}
-        onInformCard={informCard}
-        lastAction={lastAction}
-      />
-      <BurntPile cardList={burntPileCards} droppedCardIndex={draggedIndex} isMyTurn={userId === activePlayer}/>
-      <h1>End of board</h1>
+    <div>
+      <div className={classes.root}>
+        <Grid container spacing={2}>
+          <Grid item xs={12}>
+            <Paper className={classes.paper}>
+              <Typography variant="h3">
+                Full game play - game number {gameId}
+              </Typography>
+            </Paper>
+          </Grid>
+
+          <Grid 
+            container
+            direction="column"
+            justify="center"
+            alignItems="center"          
+            xs={6}
+            spacing={2}
+          >
+            <Grid item justify="center" alignItems="flex-start">
+              <Paper className={classes.paper}>
+                <InformPlayerOptions 
+                  onClose={onActionPopupClose} 
+                  showPopup={showActionsPopup} 
+                  reportSelection={getInfromReporter(userId, playerPressedId)} 
+                  playerDisplayName={getPlayerDisplayName()} 
+                  highlightArray={getCardPressedInfo()}
+                  key={'informPopUp'}
+                />
+                <PlayersHands
+                  players={players}
+                  activePlayer={activePlayer}
+                  draggedIndex={draggedIndex}
+                  onDraggedIndex={setDraggedIndex}
+                  onInformCard={informCard}
+                  lastAction={lastAction}
+                />
+              </Paper>
+            </Grid>
+            <Grid item>
+              <Grid             
+                container
+                direction="row"
+                justify="center"
+                alignItems="center"
+                spacing={2}
+              >
+                <Grid item xs={8}>
+                  <Paper className={classes.paper}>
+                    <FullTokenPile clueTokens={+clueTokens} missTokens={+missTokens}/> <br/><br/>
+                  </Paper>
+                </Grid>
+                <Grid item xs={4}>
+                  <Paper className={classes.paper}>
+                    <RemainingDeck remainingCards={remainingDeckSize}/>
+                  </Paper>
+                </Grid>
+              </Grid>
+            </Grid>
+          </Grid>
+
+
+          <Grid 
+            container
+            direction="column"
+            justify="flex-start"
+            alignItems="center"          
+            xs={6}
+            spacing={2}
+          >
+            <Grid item>
+              <Paper className={classes.paper}>
+                <HanabiTable table={hanabiTable} droppedCardIndex={draggedIndex} isMyTurn={userId === activePlayer}/>
+              </Paper>
+            </Grid>
+
+            <Grid item>
+              <Paper className={classes.paper}>
+                <BurntPile cardList={burntPileCards} droppedCardIndex={draggedIndex} isMyTurn={userId === activePlayer}/>
+              </Paper>
+            </Grid>
+
+          </Grid>
+        </Grid>
+      </div>
     </div>
+
   );
 }
 
