@@ -149,6 +149,7 @@ class HanabiGame(IHanabiGame):
             self._n_players
         )
         self._deck: IHanabiDeck = HanabiDeck() if predifined_deck is None else predifined_deck
+        self._initial_deck: List[IHanabiCard] = self._deck.observe_cards().copy()
         self._burnt_pile: List[IHanabiCard] = []
         self._players_ids: List[PlayerIdType] = list(range(self._n_players))
         self._piles: Dict[HanabiColor, Optional[HanabiNumber]] = {}
