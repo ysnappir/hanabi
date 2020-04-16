@@ -42,16 +42,6 @@ function InformPlayerOptions(props) {
   return renderPopUp();
 }
 
-/*
-      <Popup onClose={onClose} open={showPopup}>
-        <h1> Inform {playerDisplayName} about: </h1>
-        {informationOptions.map((value) => <button key={'btn_' + value} onClick={() => reportSelection(value)}
-          style={{background: tempHighlightArray.includes(value) ? 'yellow' : 'white'}}>{value}</button>)}
-        <br/><br/>
-        <button key='close' onClick={onClose}>Do nothing!</button><button key='think' onClick={onClose}>Think!</button>
-      </Popup>
-
-*/
 InformPlayerOptions.propTypes = {
   onClose: PropTypes.func.isRequired,
   showPopup: PropTypes.bool.isRequired,

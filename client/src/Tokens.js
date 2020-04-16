@@ -34,8 +34,6 @@ function SingleTokenPile(props) {
     const out_tokens = [];
     for (let index = 0; index < num_of_tokens; index++) {
       var uniq_key = token_type + index;
-      //let left = index * (-20) + 'px';
-      //style={{left: left}}
       out_tokens.push(<img className={classes.token} src={TOKENS_ARR[token_type]} alt="" key={uniq_key}/>);
     }
     return out_tokens;

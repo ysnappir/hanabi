@@ -5,19 +5,7 @@ import { useDrop } from 'react-dnd';
 import axios from 'axios';
 import {UserIdContext} from './Contex.js';
 
-import { makeStyles } from '@material-ui/core/styles';
 import { Typography } from '@material-ui/core';
-
-const useStyles = makeStyles((theme) => ({
-  root: {
-    flexGrow: 1,
-  },
-  paper: {
-    padding: theme.spacing(2),
-    textAlign: 'center',
-    color: theme.palette.text.secondary,
-  },
-}));
 
 
 function RemainingDeck(props) {
@@ -65,7 +53,6 @@ export function HanabiTable(props) {
   }
   
   const renderCards = (color, card) => {
-    // console.log('Rendering ' + color + '. Number: ' + maxCardNumber);
     if(card['number'] !== null)
       return <img src={cardToImageFile(card['number'], color)} key={color} alt='' style={{border: card['highlighted'] ? '4px solid blue' : 'none'}}/>;
     else
