@@ -6,8 +6,7 @@ import {UserIdContext} from './Contex.js';
 import GamePlay from './GamePlay';
 
 import { AppBar, Toolbar, Typography, Button, IconButton, TextField, 
-  Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle,
-  CircularProgress, Hidden, Paper } from '@material-ui/core';
+  Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@material-ui/core';
 import AccountCircle from '@material-ui/icons/AccountCircle';
 import { makeStyles } from '@material-ui/core/styles';
 
@@ -31,10 +30,7 @@ function App() {
   const [userId, setUserId] = useState('');
   const [pinCode, setPinCode] = useState(undefined);
 
-  //const [userId, setUserId] = useState('1');
-  //const [pinCode, setPinCode] = useState('1');
-
-  const [fetchingData, setFetchingData] = useState(false);
+  const [, setFetchingData] = useState(false);
   const [loginData, setLoginData] = useState({displayName : '', numOfColors : undefined});
   const [loginErrors, setLoginErrors] = useState({displayName : '', numOfColors : ''});
   
@@ -99,7 +95,7 @@ function App() {
     }
   };
 
-  const handleLoginError = (reason) => {
+  const handleLoginError = () => {
     // TODO: handle login error
   };
 

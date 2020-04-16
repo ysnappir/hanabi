@@ -12,6 +12,7 @@ import InformPlayerOptions from './Actions';
 import { makeStyles } from '@material-ui/core/styles';
 import { Paper, Grid, Typography } from '@material-ui/core';
 
+// a game status json - for tests...
 const TEST_JSON = {
   'active_player_id': '31', 
   'blue_tokens': 8, 
@@ -394,7 +395,6 @@ function GamePlay(props) {
   const updateGameState = async () => {
     try {
       const response = await axios.get('/game_state/' + userId + '/' + gameId, {});
-      //const response = '';
       handleGetGameStateResponse(response);
     } catch (error) {
       handleGetGameStateError(error);
@@ -408,8 +408,7 @@ function GamePlay(props) {
 
   const handleGetGameStateResponse = (response) => {
     let myJson = response.data;
-    //let myJson = TEST_JSON;
-    console.log(myJson);
+
     setAvailableClueTokens(myJson['blue_tokens']);
     setAvailableMissTokens(myJson['red_tokens']);
 

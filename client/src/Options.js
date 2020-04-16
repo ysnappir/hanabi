@@ -1,9 +1,9 @@
-import React, {useState, useContext, Fragment } from 'react';
+import React, {useState, useContext } from 'react';
 import PropTypes from 'prop-types';
 import axios from 'axios';
 import {UserIdContext} from './Contex.js';
 
-import { Card, CardActionArea, CardActions, CardContent, CardMedia, Button, Typography } from '@material-ui/core';
+import { Button, Typography } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 
 const useStyles = makeStyles({
@@ -116,7 +116,6 @@ CreateGame.propTypes = {
 
 function Options(props) {  
   const {onDisplayGame} = props;
-  const classes = useStyles();
 
  
   const onJoinGame = (NewPinCode) => {

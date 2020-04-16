@@ -11,7 +11,7 @@ const TOKENS_ARR = { 'clue' : clue_token, 'miss' : miss_token };
 export const MAX_CLUE_TOKENS = '8';
 export const MAX_MISS_TOKENS = '3';
 
-const useStyles = makeStyles((theme, index) => ({
+const useStyles = makeStyles((theme) => ({
   root: {
     flexGrow: 1,
   },
@@ -22,9 +22,6 @@ const useStyles = makeStyles((theme, index) => ({
   },
   token: {
     height: '30px',
-    //position: 'relative',
-    //left: '-20px',
-    //marginRight: '-50%'
   }
 }));
 

@@ -1,9 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import Popup from 'reactjs-popup';
-import { AppBar, Toolbar, Typography, Button, IconButton, TextField, 
-  Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle,
-  CircularProgress, Hidden, Paper } from '@material-ui/core';
+import { Button, Dialog, DialogActions, DialogContent, DialogTitle } from '@material-ui/core';
 
 function InformPlayerOptions(props) {
   const {onClose, showPopup, reportSelection, playerDisplayName, highlightArray} = props;

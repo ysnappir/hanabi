@@ -6,9 +6,9 @@ import axios from 'axios';
 import {UserIdContext} from './Contex.js';
 
 import { makeStyles } from '@material-ui/core/styles';
-import { Paper, Grid, Typography } from '@material-ui/core';
+import { Typography } from '@material-ui/core';
 
-const useStyles = makeStyles((theme, index) => ({
+const useStyles = makeStyles((theme) => ({
   root: {
     flexGrow: 1,
   },
@@ -21,7 +21,6 @@ const useStyles = makeStyles((theme, index) => ({
 
 
 function RemainingDeck(props) {
-  const classes = useStyles();
 
   const {remainingCards} = props;
 
