@@ -28,7 +28,12 @@ def dict_to_obj(dct: Dict[str, bytes]) -> Any:
         bts_array[counter: counter + len(v)] = v
         counter += len(v)
 
-    return pickle.loads(bts_array)
+    obj = None
+    try:
+        obj = pickle.loads(bts_array)
+    except Exception as pkl_error:
+        print(f"Couldn't unpickle data from storage ({pkl_error}). Try reinitializing repository")
+    return obj
 
 
 def _read_game_repository() -> Optional[IGamesRepository]:
@@ -81,3 +86,4 @@ if __name__ == '__main__':
     # script for reseting db
     new_repository: IGamesRepository = HanabiGamesRepository()
     save_game_repository_state(new_repository)
+    # repository = get_game_repository()
