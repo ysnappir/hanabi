@@ -243,78 +243,86 @@ function HanabiBoard(props) {
               </Typography>
             </Paper>
           </Grid>
-
-          <Grid 
-            container
-            direction="column"
-            justify="center"
-            alignItems="center"          
-            xs={6}
-            spacing={2}
-          >
-            <Grid item justify="center" alignItems="flex-start">
-              <Paper className={classes.paper}>
-                <InformPlayerOptions 
-                  onClose={onActionPopupClose} 
-                  showPopup={showActionsPopup} 
-                  reportSelection={getInfromReporter(userId, playerPressedId)} 
-                  playerDisplayName={getPlayerDisplayName()} 
-                  highlightArray={getCardPressedInfo()}
-                  key={'informPopUp'}
-                />
-                <PlayersHands
-                  players={players}
-                  activePlayer={activePlayer}
-                  draggedIndex={draggedIndex}
-                  onDraggedIndex={setDraggedIndex}
-                  onInformCard={informCard}
-                  lastAction={lastAction}
-                />
-              </Paper>
+          <Grid container>
+            <Grid 
+              container
+              direction="column"
+              justify="center"
+              alignItems="center"          
+              xs={5}
+            >
+              <Grid item justify="center" alignItems="flex-start">
+                <Paper className={classes.paper}>
+                  <InformPlayerOptions 
+                    onClose={onActionPopupClose} 
+                    showPopup={showActionsPopup} 
+                    reportSelection={getInfromReporter(userId, playerPressedId)} 
+                    playerDisplayName={getPlayerDisplayName()} 
+                    highlightArray={getCardPressedInfo()}
+                    key={'informPopUp'}
+                  />
+                  <PlayersHands
+                    players={players}
+                    activePlayer={activePlayer}
+                    draggedIndex={draggedIndex}
+                    onDraggedIndex={setDraggedIndex}
+                    onInformCard={informCard}
+                    lastAction={lastAction}
+                  />
+                </Paper>
+              </Grid>
             </Grid>
-            <Grid item>
+            <Grid 
+              container
+              direction="column"
+              justify="center"
+              alignItems="center"          
+              xs={2}
+            >
               <Grid             
                 container
                 direction="row"
                 justify="center"
                 alignItems="center"
-                spacing={2}
               >
-                <Grid item xs={8}>
+                <Grid item>
                   <Paper className={classes.paper}>
                     <FullTokenPile clueTokens={+clueTokens} missTokens={+missTokens}/> <br/><br/>
                   </Paper>
                 </Grid>
-                <Grid item xs={4}>
+                <Grid item>
                   <Paper className={classes.paper}>
                     <RemainingDeck remainingCards={remainingDeckSize}/>
+                  </Paper>
+              
+                </Grid>
+              </Grid>
+            </Grid>
+            <Grid 
+              container
+              direction="column"
+              justify="center"
+              alignItems="center"          
+              xs={5}
+            >
+              <Grid 
+                container
+                direction="column"
+                justify="flex-start"
+                alignItems="center"          
+              >
+                <Grid item>
+                  <Paper className={classes.paper}>
+                    <HanabiTable table={hanabiTable} droppedCardIndex={draggedIndex} isMyTurn={userId === activePlayer}/>
+                  </Paper>
+                </Grid>
+                <Grid item>
+                  <Paper className={classes.paper}>
+                    <BurntPile cardList={burntPileCards} droppedCardIndex={draggedIndex} isMyTurn={userId === activePlayer}/>
                   </Paper>
                 </Grid>
               </Grid>
             </Grid>
-          </Grid>
-
-
-          <Grid 
-            container
-            direction="column"
-            justify="flex-start"
-            alignItems="center"          
-            xs={6}
-            spacing={2}
-          >
-            <Grid item>
-              <Paper className={classes.paper}>
-                <HanabiTable table={hanabiTable} droppedCardIndex={draggedIndex} isMyTurn={userId === activePlayer}/>
-              </Paper>
-            </Grid>
-
-            <Grid item>
-              <Paper className={classes.paper}>
-                <BurntPile cardList={burntPileCards} droppedCardIndex={draggedIndex} isMyTurn={userId === activePlayer}/>
-              </Paper>
-            </Grid>
-
           </Grid>
         </Grid>
       </div>
