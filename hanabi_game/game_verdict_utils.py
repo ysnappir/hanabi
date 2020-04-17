@@ -30,7 +30,13 @@ def _is_card_exist_only_in_burnt(game_state: IHanabiState, deck_cards: List[IHan
         for j in range(game_state.get_number_of_players())
         for i in range(game_state.get_hand(j).get_amount_of_cards())]
     card_not_in_burnt_hashes = set(cards_not_in_burnt)
-    if len(card_hashes_in_burnt.difference(card_not_in_burnt_hashes)) > 0:
+    failure_candidates = card_hashes_in_burnt.difference(card_not_in_burnt_hashes)
+    for card in list(failure_candidates):
+        if (_hanabi_number_to_number(game_state.get_pile_top(card.get_color())) >=
+                _hanabi_number_to_number(card.get_number())):
+            failure_candidates.remove(card)
+
+    if len(failure_candidates) > 0:
         print("Game is unwinnable. There are card exclusively in burnt pile!")
         return True
     return False
