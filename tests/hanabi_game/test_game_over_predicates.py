@@ -27,6 +27,28 @@ def test_is_exist_card_only_in_burnt_pile_false_at_start():
     assert is_lost_by_open_information(game_state=game_state, deck_cards=[]) is False
 
 
+def test_is_exist_card_only_in_burnt_pile_false_at_start_and_not_in_table():
+    n_players = 4
+    cards: List[IHanabiCard] = get_all_cards_list()
+
+    first_color = cards[0].get_color()
+    cards_per_player = get_amount_of_cards_per_player(n_players)
+
+    card_for_test = [_pop_from_cards_list(cards_list=cards, color=first_color, number=HanabiNumber.TWO)
+                     for _ in range(2)]
+
+    for i in range(1, 3):
+        cards.insert(i * cards_per_player, card_for_test.pop(0))
+
+    deck = HanabiDeck(cards=cards)
+    game = HanabiGame(n_players=4, predifined_deck=deck)
+
+    for i in range(3):
+        assert game.perform_move(move=IHanabiPlaceMove(performer=i, card_hand_index=0))
+
+    assert is_lost_by_open_information(game_state=game.get_state(), deck_cards=deck.observe_cards()) is False
+
+
 def test_is_exist_card_only_in_burnt_pile_true_when_five_in_burnt():
     cards: List[IHanabiCard] = get_all_cards_list()
     five_card_index = next(iter(filter(lambda i: cards[i].get_number() is HanabiNumber.FIVE, range(len(cards)))))
