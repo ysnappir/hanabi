@@ -56,7 +56,7 @@ function App() {
       isError = true;
     }
     
-    if (dispNameVal.trim().length <= 1) {
+    if (dispNameVal.trim().length < 1) {
       setLoginErrors(prev => ({ 
         ...prev,
         ['displayName']: 'Display Name Must Be Longer Than 1 Char!'
@@ -86,7 +86,7 @@ function App() {
     try {
       setFetchingData(true);
       const response = await axios.post('/register', { display_name: loginData['displayName'], 
-        number_of_colors_in_clothes: loginData['numOfColors']});
+        number_of_colors_in_clothes: parseInt(loginData['numOfColors'])});
       handleLoginResponse(response);
       setFetchingData(false);
     } catch (error) {
