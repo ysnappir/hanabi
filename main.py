@@ -16,6 +16,7 @@
 from flask import Flask, request, render_template
 from flask_cors import CORS
 
+from games_repository.contants import SPECTATOR_ID
 from games_repository.defs import GameIdType, GameAction, MoveCardRequest
 from games_repository.games_repository_api import IGamesRepository
 from games_repository.utils import jsonify_game_state, deck_to_game_factory
@@ -91,10 +92,23 @@ def start_game(game_id: str):
         return "", 400
 
 
-@app.route("/game_state/<player_id>/<game_id>", methods=["get"])
-def game_state(player_id: str, game_id: str):
+@app.route("/player_state/<player_id>", methods=["get"])
+def player_state(player_id: str):
     try:
+        assert player_id != SPECTATOR_ID
+        game_id = game_repository.get_players_game(player_id=player_id)
+
         ret_val = jsonify_game_state(game_repository.get_game_state(game_id=GameIdType(game_id)), player_id=player_id)
+        return ret_val, 200
+    except KeyError:
+        return "", 400
+
+
+@app.route("/game_state/<game_id>", methods=["get"])
+def game_state(game_id: str):
+    try:
+        ret_val = jsonify_game_state(game_repository.get_game_state(game_id=GameIdType(game_id)),
+                                     player_id=SPECTATOR_ID)
         return ret_val, 200
     except KeyError:
         return "", 400
@@ -198,6 +212,38 @@ def move_card(player_id: str):
         return "", 400
     except AssertionError:
         return "Couldn't move the card", 400
+
+
+@app.route("/rematch/<player_id>", methods=["post"])
+def rematch(player_id: str):
+    try:
+        print("Rematching")
+        game_id = game_repository.get_players_game(player_id=player_id)
+        print(f"Game id to close {game_id}")
+        assert game_id is not None
+
+        player_ids = [hand.id for hand in game_repository.get_game_state(game_id).hands_state]
+        print(f"Players to move {player_ids}")
+
+        game_repository.finish_game(game_id=game_id)
+        print(f"Finished game!")
+
+        new_game_id = game_repository.create_game()
+        print(f"Game {new_game_id} created")
+        for p_id in player_ids:
+            assert game_repository.assign_player_to_game(player_id=p_id, game_id=new_game_id)
+            assert game_repository.get_players_game(player_id=p_id) == new_game_id
+
+        print(f"Assigned players")
+        assert game_repository.start_game(game_id=new_game_id)
+
+        save_game_repository_state(game_repository)
+        return jsonify_game_state(game_state=game_repository.get_game_state(game_id=GameIdType(new_game_id)),
+                                  player_id=player_id), 200
+    except KeyError:
+        return "", 400
+    except AssertionError:
+        return "Couldn't find a game to restart", 400
 
 
 if __name__ == '__main__':

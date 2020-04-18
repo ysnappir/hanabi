@@ -7,6 +7,7 @@ from hanabi_game.defs import HanabiColor, HanabiNumber, GameVerdict
 
 if __name__ == "__main__":
     game_state: GameState = GameState(
+        gamd_id=23,
         status='started',
         deck_size=42,
         blue_token_amount=5,

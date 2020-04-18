@@ -144,7 +144,7 @@ function App() {
       { (loginSuccess || pinCode) ?
         <UserIdContext.Provider value={userId}>
           <div>
-            { pinCode ? <GamePlay gameId={pinCode} /> : <Options onDisplayGame={onDisplayGame}/> }
+            { pinCode ? <GamePlay gameId={pinCode} setGameId={setPinCode}/> : <Options onDisplayGame={onDisplayGame}/> }
           </div>
         </UserIdContext.Provider>
 

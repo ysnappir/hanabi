@@ -53,7 +53,7 @@ class HanabiPlayerWrapper:
 
     def assign_to_game(self, hanabi_game_id: GameIdType) -> bool:
         if self._hanabi_game_id is not None:
-            print("Player already assigned to a game!s")
+            print("Player already assigned to a game!")
             return False
 
         self._hanabi_game_id = hanabi_game_id
@@ -125,6 +125,10 @@ class HanabiPlayerWrapper:
             fe_card_initial_index=card_initial_index,
             fe_card_final_index=card_final_index,
         )
+
+    def unassign_to_game(self):
+        self._hanabi_game_id = None
+        self._card_mapper = None
 
 
 class HanabiGameWrapper:
@@ -295,6 +299,7 @@ class HanabiGameWrapper:
             hanabi_state = self._game.get_state()
 
         return GameState(
+            gamd_id=self._game_id,
             status=str(self._status.value),
             deck_size=hanabi_state.get_deck_size(),
             blue_token_amount=hanabi_state.get_blue_token_amount(),
@@ -332,6 +337,11 @@ class HanabiGameWrapper:
 
     def get_game_id(self) -> GameIdType:
         return self._game_id
+
+    def finish(self) -> None:
+        self._status = GameStatus.FINISHED
+        for player in self._players.values():
+            player.unassign_to_game()
 
 
 class HanabiGamesRepository(IGamesRepository):
@@ -463,3 +473,10 @@ class HanabiGamesRepository(IGamesRepository):
             return None
 
         return game.get_game_id()
+
+    def finish_game(self, game_id: GameIdType) -> bool:
+        if self._games.get(game_id) is None or self._games[game_id].get_status() is not GameStatus.ACTIVE:
+            print("The speciefied game is not active for finish")
+            return False
+
+        self._games[game_id].finish()

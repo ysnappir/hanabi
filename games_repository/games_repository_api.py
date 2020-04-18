@@ -44,3 +44,6 @@ class IGamesRepository:
         self, player_id: NetworkPlayerIdType, game_id: GameIdType
     ) -> bool:
         raise NotImplementedError("")
+
+    def finish_game(self, game_id: GameIdType) -> bool:
+        raise NotImplementedError("")

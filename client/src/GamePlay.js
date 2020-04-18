@@ -220,6 +220,11 @@ function HanabiBoard(props) {
     return burnActionFunc;
   };
 
+  const startNewGame = async () => {
+    let response = await axios.post('/rematch/' + userId);
+    await handleGetGameStateResponse(response);  
+  };
+
   const informCard = (playerId) => {
     const inner = (cardIndex) => {
       console.log('clicked card ' + cardIndex + ' of player ' + playerId);
@@ -310,6 +315,11 @@ function HanabiBoard(props) {
               >
                 <Grid item>
                   <Paper className={classes.paper}>
+                    <button onClick={startNewGame}>Start a new game!</button>
+                  </Paper>
+                </Grid>
+                <Grid item>
+                  <Paper className={classes.paper}>
                     <FullTokenPile clueTokens={+clueTokens} missTokens={+missTokens}/> <br/><br/>
                   </Paper>
                 </Grid>
@@ -317,7 +327,6 @@ function HanabiBoard(props) {
                   <Paper className={classes.paper}>
                     <RemainingDeck remainingCards={remainingDeckSize}/>
                   </Paper>
-              
                 </Grid>
               </Grid>
             </Grid>
@@ -418,7 +427,7 @@ PlayersHands.propTypes = {
 
 function GamePlay(props) {
   const userId = useContext(UserIdContext);
-  const {gameId} = props;
+  const {gameId, setGameId} = props;
   const [isGameStarted, setIsGameStarted] = useState(false);
   const [players, setPlayers] = useState([]);
   const [availableClueTokens, setAvailableClueTokens] = useState(MAX_CLUE_TOKENS);
@@ -432,7 +441,9 @@ function GamePlay(props) {
 
   const updateGameState = async () => {
     try {
-      const response = await axios.get('/game_state/' + userId + '/' + gameId, {});
+      console.log({'game_id': gameId});
+      const request = (userId !== 'spectator' ? '/player_state/' + userId : '/game_state/' + gameId);
+      const response = await axios.get(request);
       handleGetGameStateResponse(response);
     } catch (error) {
       handleGetGameStateError(error);
@@ -462,6 +473,7 @@ function GamePlay(props) {
     setActivePlayer(myJson['active_player_id']);
     setBurntPileCards(myJson['burnt_pile']);
     setLastAction(myJson['last_action']);
+    setGameId(myJson['game_id']);
 
     if (!isGameStarted) {
       if (myJson['hands'].length > 0 && myJson['hands'][0].cards.length > 0) {
@@ -499,6 +511,7 @@ function GamePlay(props) {
 
 GamePlay.propTypes = {
   gameId: PropTypes.string.isRequired,
+  setGameId: PropTypes.func.isRequired,
 };
 
 export default GamePlay;

@@ -36,6 +36,7 @@ def jsonify_game_state(game_state: GameState, player_id: NetworkPlayerIdType) ->
             }
             for i, player in enumerate(game_state.hands_state[player_index:] + game_state.hands_state[:player_index])]
     return {
+        "game_id": game_state.gamd_id,
         "status": game_state.status,
         "result": game_state.result.value,
         "deck_size": game_state.deck_size,
