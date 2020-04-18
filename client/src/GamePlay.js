@@ -176,7 +176,7 @@ const getPlayerCards = (players, id) => {
 function HanabiBoard(props) {
   const classes = useStyles();
 
-  const {gameId, players, clueTokens, missTokens, remainingDeckSize, hanabiTable, activePlayer, burntPileCards, lastAction} = props;
+  const {handleGetGameStateResponse, gameId, players, clueTokens, missTokens, remainingDeckSize, hanabiTable, activePlayer, burntPileCards, lastAction} = props;
 
   const userId = useContext(UserIdContext);
 
@@ -192,12 +192,37 @@ function HanabiBoard(props) {
   };
 
   const getInfromReporter = (userId, informedUserId) => {
-    const sendInform = (value) => {
+    async function sendInform(value){
       console.log('Informing ' + informedUserId + ' about ' + value + '!');
-      axios.post( `/make_turn/inform/${userId}`, {'informed_player_id': informedUserId, 'information': value});
+      let response = await axios.post( `/make_turn/inform/${userId}`, {'informed_player_id': informedUserId, 'information': value});
+      console.log('inform response:');
+      console.log(response);
+      await handleGetGameStateResponse(response);
+      console.log('inform response handling done');
       onActionPopupClose();
-    };
+    }
     return sendInform;
+  };
+
+  const reportPlaceAction = (cardIndex) => {
+    async function placeActionFunc() {
+      let response = await axios.post('/make_turn/place/' + userId, {'card_index': cardIndex});
+      await handleGetGameStateResponse(response);
+    }
+    return placeActionFunc;
+  };
+
+  const reportBurnAction = (cardIndex) => {
+    async function burnActionFunc() {
+      let response = await axios.post('/make_turn/burn/' + userId, {'card_index': cardIndex});
+      await handleGetGameStateResponse(response);
+    }
+    return burnActionFunc;
+  };
+
+  const startNewGame = async () => {
+    let response = await axios.post('/rematch/' + userId);
+    await handleGetGameStateResponse(response);  
   };
 
   const informCard = (playerId) => {
@@ -225,6 +250,9 @@ function HanabiBoard(props) {
       return [];
     }
     const card = getPlayerCards(players, playerPressedId)[indexPressedId];
+    if(card === undefined){
+      return [];
+    }
     return [card['color'], card['number']];
   };
 
@@ -287,6 +315,11 @@ function HanabiBoard(props) {
               >
                 <Grid item>
                   <Paper className={classes.paper}>
+                    <button onClick={startNewGame}>Start a new game!</button>
+                  </Paper>
+                </Grid>
+                <Grid item>
+                  <Paper className={classes.paper}>
                     <FullTokenPile clueTokens={+clueTokens} missTokens={+missTokens}/> <br/><br/>
                   </Paper>
                 </Grid>
@@ -294,7 +327,6 @@ function HanabiBoard(props) {
                   <Paper className={classes.paper}>
                     <RemainingDeck remainingCards={remainingDeckSize}/>
                   </Paper>
-              
                 </Grid>
               </Grid>
             </Grid>
@@ -313,12 +345,18 @@ function HanabiBoard(props) {
               >
                 <Grid item>
                   <Paper className={classes.paper}>
-                    <HanabiTable table={hanabiTable} droppedCardIndex={draggedIndex} isMyTurn={userId === activePlayer}/>
+                    <HanabiTable 
+                      table={hanabiTable} 
+                      placeActionFunc={reportPlaceAction(draggedIndex)} 
+                      isMyTurn={userId === activePlayer}/>
                   </Paper>
                 </Grid>
                 <Grid item>
                   <Paper className={classes.paper}>
-                    <BurntPile cardList={burntPileCards} droppedCardIndex={draggedIndex} isMyTurn={userId === activePlayer}/>
+                    <BurntPile 
+                      cardList={burntPileCards} 
+                      reportBurnAction={reportBurnAction(draggedIndex)} 
+                      isMyTurn={userId === activePlayer}/>
                   </Paper>
                 </Grid>
               </Grid>
@@ -332,6 +370,7 @@ function HanabiBoard(props) {
 }
 
 HanabiBoard.propTypes = {
+  handleGetGameStateResponse: PropTypes.func.isRequired,
   gameId: PropTypes.string.isRequired,
   players: PropTypes.array.isRequired,
   clueTokens: PropTypes.number.isRequired,
@@ -346,12 +385,12 @@ HanabiBoard.propTypes = {
 
 function PlayersHands(props) {
   const {players, activePlayer, draggedIndex, onDraggedIndex, onInformCard, lastAction} = props;
-
+  const userId = useContext(UserIdContext);
   const divWidth = (getPlayerCards(players, players[0]['id']).length + 0.25) * (CARD_WIDTH + 10); // the width of a card. Not sure why I need the 0.25
 
   return (
     <>
-      {players.map((player, index) => 
+      {players.map((player) => 
         <div 
           key={'player_div+' + player['id']}
           style={{width: divWidth + 'px', border: player['id'] === activePlayer ? '2px solid red' : 'none'}}
@@ -359,7 +398,7 @@ function PlayersHands(props) {
           {lastAction && player['id'] === lastAction['informed_player'] &&
             <span><font color="blue">Be informed about: {lastAction['information_data']}</font></span>
           }
-          {index === 0 ?
+          {player['id'] === userId ?
             <OwnHand 
               cards={getPlayerCards(players, player['id'])} 
               setDraggedIndex={onDraggedIndex} 
@@ -388,7 +427,7 @@ PlayersHands.propTypes = {
 
 function GamePlay(props) {
   const userId = useContext(UserIdContext);
-  const {gameId} = props;
+  const {gameId, setGameId} = props;
   const [isGameStarted, setIsGameStarted] = useState(false);
   const [players, setPlayers] = useState([]);
   const [availableClueTokens, setAvailableClueTokens] = useState(MAX_CLUE_TOKENS);
@@ -402,7 +441,9 @@ function GamePlay(props) {
 
   const updateGameState = async () => {
     try {
-      const response = await axios.get('/game_state/' + userId + '/' + gameId, {});
+      console.log({'game_id': gameId});
+      const request = (userId !== 'spectator' ? '/player_state/' + userId : '/game_state/' + gameId);
+      const response = await axios.get(request);
       handleGetGameStateResponse(response);
     } catch (error) {
       handleGetGameStateError(error);
@@ -415,6 +456,11 @@ function GamePlay(props) {
   );
 
   const handleGetGameStateResponse = (response) => {
+    console.log(response);
+    if(response.status !== 200){
+      console.log('Request failed so no update occurs');
+      return;
+    }
     let myJson = response.data;
 
     setAvailableClueTokens(myJson['blue_tokens']);
@@ -427,6 +473,7 @@ function GamePlay(props) {
     setActivePlayer(myJson['active_player_id']);
     setBurntPileCards(myJson['burnt_pile']);
     setLastAction(myJson['last_action']);
+    setGameId(myJson['game_id']);
 
     if (!isGameStarted) {
       if (myJson['hands'].length > 0 && myJson['hands'][0].cards.length > 0) {
@@ -446,6 +493,7 @@ function GamePlay(props) {
         <WaitForGameStart gameId={gameId} currPlayers={players}/> 
         :
         <HanabiBoard
+          handleGetGameStateResponse={handleGetGameStateResponse}
           gameId={gameId}
           players={players}
           clueTokens={+availableClueTokens}
@@ -463,6 +511,7 @@ function GamePlay(props) {
 
 GamePlay.propTypes = {
   gameId: PropTypes.string.isRequired,
+  setGameId: PropTypes.func.isRequired,
 };
 
 export default GamePlay;

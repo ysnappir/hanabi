@@ -1,9 +1,7 @@
-import React, {useContext} from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 import {cardToImageFile, CARD_WIDTH} from './Cards.js';
 import { useDrop } from 'react-dnd';
-import axios from 'axios';
-import {UserIdContext} from './Contex.js';
 
 import { Typography } from '@material-ui/core';
 
@@ -29,28 +27,19 @@ RemainingDeck.propTypes = {
 };
 
 export function HanabiTable(props) {
-  const {table, droppedCardIndex, isMyTurn} = props;
-  const userId = useContext(UserIdContext);
+  const {table, placeActionFunc, isMyTurn} = props;
+
 
   const [{ isOver }, drop] = useDrop({
     accept: 'OwnCard',  // DraggableType['DraggableOwnCard'], // 
     drop: () => {
-      placeActionFunc(userId, droppedCardIndex);
+      placeActionFunc();
     },
     canDrop: () => isMyTurn,
     collect: monitor => ({
       isOver: !!monitor.isOver(),
     }),
   });
-
-  async function placeActionFunc(userId, cardIndex) {
-    try {
-      await axios.post('/make_turn/place/' + userId, {'card_index': cardIndex});  // const response = 
-    }
-    catch(error) {
-      console.log('Error placing card ' + error);
-    }
-  }
   
   const renderCards = (color, card) => {
     if(card['number'] !== null)
@@ -69,34 +58,23 @@ export function HanabiTable(props) {
 
 HanabiTable.propTypes = {
   table: PropTypes.object.isRequired,
-  droppedCardIndex: PropTypes.number,
+  placeActionFunc: PropTypes.func.isRequired,
   isMyTurn: PropTypes.bool.isRequired,
 };
 
 export function BurntPile(props) {
-  const {cardList, droppedCardIndex, isMyTurn} = props;
-  const userId = useContext(UserIdContext);
+  const {cardList, reportBurnAction, isMyTurn} = props;
 
   const [{ isOver }, drop] = useDrop({
     accept: 'OwnCard',
     drop: () => {
-      burnActionFunc(userId, droppedCardIndex);
+      reportBurnAction();
     },
     canDrop: () => isMyTurn,
     collect: monitor => ({
       isOver: !!monitor.isOver(),
     }),
   });
-
-  async function burnActionFunc(userId, cardIndex) {
-    try {
-      console.log('burning card ' + cardIndex);
-      await axios.post('/make_turn/burn/' + userId, {'card_index': cardIndex});
-    }
-    catch(error) {
-      console.log('Error burning card ' + error);
-    }
-  }
   
   const renderCardsByNumberSortedByColor = () => {
     let numbers = [1, 2, 3, 4, 5];
@@ -127,7 +105,7 @@ export function BurntPile(props) {
 
 BurntPile.propTypes = {
   cardList: PropTypes.array.isRequired,
-  droppedCardIndex: PropTypes.number,
+  reportBurnAction: PropTypes.func.isRequired,
   isMyTurn: PropTypes.bool.isRequired,
 };
 

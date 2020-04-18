@@ -39,6 +39,7 @@ class GameAction(NamedTuple):
 
 
 class GameState(NamedTuple):
+    gamd_id: int
     status: str
     deck_size: int
     blue_token_amount: int

@@ -29,6 +29,7 @@ function App() {
   
   const [userId, setUserId] = useState('');
   const [pinCode, setPinCode] = useState(undefined);
+  const [spectatePinCode, setSpectatePinCode] = useState(undefined);
 
   const [, setFetchingData] = useState(false);
   const [loginData, setLoginData] = useState({displayName : '', numOfColors : undefined});
@@ -67,7 +68,6 @@ function App() {
     return !isError;
   };
 
-
   const changeLoginData = (event) => {
     let { id, value } = event.target;
 
@@ -77,6 +77,15 @@ function App() {
     }));
   };
 
+  const changeSpectatePin = (event) => {
+    setSpectatePinCode(parseInt(event.target.value));
+  };
+
+  const onSpectatePress = () => {
+    setPinCode(spectatePinCode);
+    setUserId('spectator');
+    setLoginSuccess(true);
+  };
 
   const handleLoginClick = async (e) => {
     e.preventDefault(); // to prevent page refresh at submit
@@ -135,7 +144,7 @@ function App() {
       { (loginSuccess || pinCode) ?
         <UserIdContext.Provider value={userId}>
           <div>
-            { pinCode ? <GamePlay gameId={pinCode} /> : <Options onDisplayGame={onDisplayGame}/> }
+            { pinCode ? <GamePlay gameId={pinCode} setGameId={setPinCode}/> : <Options onDisplayGame={onDisplayGame}/> }
           </div>
         </UserIdContext.Provider>
 
@@ -153,7 +162,7 @@ function App() {
             <form onSubmit={(e) => handleLoginClick(e)}>
               <DialogContent>
                 <DialogContentText>
-          Let go. Tell us your display name and how many colors you are wearing.
+          Let's go. Tell us your display name and how many colors you are wearing.
                 </DialogContentText>
                 <TextField
                   autoFocus
@@ -186,6 +195,28 @@ function App() {
                 </Button>
                 <Button type='submit' color="primary">
                   Subscribe
+                </Button>
+              </DialogActions>
+            </form>
+            <form onSubmit={onSpectatePress}>
+              <DialogContent>
+                <DialogContentText>
+        To specatate a game
+                </DialogContentText>
+                <TextField
+                  required
+                  autoComplete="off"
+                  margin="normal"
+                  id="spectateGameId"
+                  label="Game PIN"
+                  type="number"
+                  onChange={changeSpectatePin}
+                  fullWidth
+                />
+              </DialogContent>
+              <DialogActions>
+                <Button type='submit' color="primary">
+                Spectate
                 </Button>
               </DialogActions>
             </form>

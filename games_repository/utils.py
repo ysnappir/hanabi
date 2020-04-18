@@ -1,5 +1,6 @@
 from typing import Any, Dict, Optional
 
+from games_repository.contants import SPECTATOR_ID
 from games_repository.defs import GameState, GameFactoryType, NetworkPlayerIdType, CardInfo
 from hanabi_game.defs import HanabiColor
 from hanabi_game.hanabi_game import HanabiGame
@@ -12,13 +13,30 @@ def _jsonify_card(card: Optional[CardInfo], hide: bool = False) -> Dict[str, Any
     return {"number": card.number.value if not hide and card.number is not None else None,
             "color": card.color.value if not hide and card.color is not None else None,
             "flipped": card.is_flipped,
-                "highlighted": card.highlighted,
+            "highlighted": card.highlighted,
             }
 
 
 def jsonify_game_state(game_state: GameState, player_id: NetworkPlayerIdType) -> Any:
-    player_index = [d.id for d in game_state.hands_state].index(player_id)
+    if player_id == SPECTATOR_ID:
+        hands = [{
+                "id": player.id,
+                "display_name": player.display_name,
+                "cards": [_jsonify_card(card=card)
+                          for card in player.cards],
+            }
+            for player in game_state.hands_state]
+    else:
+        player_index = [d.id for d in game_state.hands_state].index(player_id)
+        hands = [{
+                "id": player.id,
+                "display_name": player.display_name,
+                "cards": [_jsonify_card(card=card, hide=(i == 0))
+                          for card in player.cards],
+            }
+            for i, player in enumerate(game_state.hands_state[player_index:] + game_state.hands_state[:player_index])]
     return {
+        "game_id": game_state.gamd_id,
         "status": game_state.status,
         "result": game_state.result.value,
         "deck_size": game_state.deck_size,
@@ -28,15 +46,7 @@ def jsonify_game_state(game_state: GameState, player_id: NetworkPlayerIdType) ->
             k.value: _jsonify_card(game_state.table_state.get(k))
             for k in HanabiColor
         },
-        "hands": [
-            {
-                "id": player.id,
-                "display_name": player.display_name,
-                "cards": [_jsonify_card(card=card, hide=(i == 0))
-                          for card in player.cards],
-            }
-            for i, player in enumerate(game_state.hands_state[player_index:] + game_state.hands_state[:player_index])
-        ],
+        "hands": hands,
         "burnt_pile": [_jsonify_card(card=card) for card in game_state.burnt_pile],
         "active_player_id": game_state.active_player,
         "last_action": None if game_state.last_action is None else {
