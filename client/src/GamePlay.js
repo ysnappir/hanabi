@@ -376,12 +376,12 @@ HanabiBoard.propTypes = {
 
 function PlayersHands(props) {
   const {players, activePlayer, draggedIndex, onDraggedIndex, onInformCard, lastAction} = props;
-
+  const userId = useContext(UserIdContext);
   const divWidth = (getPlayerCards(players, players[0]['id']).length + 0.25) * (CARD_WIDTH + 10); // the width of a card. Not sure why I need the 0.25
 
   return (
     <>
-      {players.map((player, index) => 
+      {players.map((player) => 
         <div 
           key={'player_div+' + player['id']}
           style={{width: divWidth + 'px', border: player['id'] === activePlayer ? '2px solid red' : 'none'}}
@@ -389,7 +389,7 @@ function PlayersHands(props) {
           {lastAction && player['id'] === lastAction['informed_player'] &&
             <span><font color="blue">Be informed about: {lastAction['information_data']}</font></span>
           }
-          {index === 0 ?
+          {player['id'] === userId ?
             <OwnHand 
               cards={getPlayerCards(players, player['id'])} 
               setDraggedIndex={onDraggedIndex} 
