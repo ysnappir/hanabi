@@ -176,7 +176,7 @@ const getPlayerCards = (players, id) => {
 function HanabiBoard(props) {
   const classes = useStyles();
 
-  const {gameId, players, clueTokens, missTokens, remainingDeckSize, hanabiTable, activePlayer, burntPileCards, lastAction} = props;
+  const {handleGetGameStateResponse, gameId, players, clueTokens, missTokens, remainingDeckSize, hanabiTable, activePlayer, burntPileCards, lastAction} = props;
 
   const userId = useContext(UserIdContext);
 
@@ -192,12 +192,32 @@ function HanabiBoard(props) {
   };
 
   const getInfromReporter = (userId, informedUserId) => {
-    const sendInform = (value) => {
+    async function sendInform(value){
       console.log('Informing ' + informedUserId + ' about ' + value + '!');
-      axios.post( `/make_turn/inform/${userId}`, {'informed_player_id': informedUserId, 'information': value});
+      let response = await axios.post( `/make_turn/inform/${userId}`, {'informed_player_id': informedUserId, 'information': value});
+      console.log('inform response:');
+      console.log(response);
+      await handleGetGameStateResponse(response);
+      console.log('inform response handling done');
       onActionPopupClose();
-    };
+    }
     return sendInform;
+  };
+
+  const reportPlaceAction = (cardIndex) => {
+    async function placeActionFunc() {
+      let response = await axios.post('/make_turn/place/' + userId, {'card_index': cardIndex});
+      await handleGetGameStateResponse(response);
+    }
+    return placeActionFunc;
+  };
+
+  const reportBurnAction = (cardIndex) => {
+    async function burnActionFunc() {
+      let response = await axios.post('/make_turn/burn/' + userId, {'card_index': cardIndex});
+      await handleGetGameStateResponse(response);
+    }
+    return burnActionFunc;
   };
 
   const informCard = (playerId) => {
@@ -225,6 +245,9 @@ function HanabiBoard(props) {
       return [];
     }
     const card = getPlayerCards(players, playerPressedId)[indexPressedId];
+    if(card === undefined){
+      return [];
+    }
     return [card['color'], card['number']];
   };
 
@@ -313,12 +336,18 @@ function HanabiBoard(props) {
               >
                 <Grid item>
                   <Paper className={classes.paper}>
-                    <HanabiTable table={hanabiTable} droppedCardIndex={draggedIndex} isMyTurn={userId === activePlayer}/>
+                    <HanabiTable 
+                      table={hanabiTable} 
+                      placeActionFunc={reportPlaceAction(draggedIndex)} 
+                      isMyTurn={userId === activePlayer}/>
                   </Paper>
                 </Grid>
                 <Grid item>
                   <Paper className={classes.paper}>
-                    <BurntPile cardList={burntPileCards} droppedCardIndex={draggedIndex} isMyTurn={userId === activePlayer}/>
+                    <BurntPile 
+                      cardList={burntPileCards} 
+                      reportBurnAction={reportBurnAction(draggedIndex)} 
+                      isMyTurn={userId === activePlayer}/>
                   </Paper>
                 </Grid>
               </Grid>
@@ -332,6 +361,7 @@ function HanabiBoard(props) {
 }
 
 HanabiBoard.propTypes = {
+  handleGetGameStateResponse: PropTypes.func.isRequired,
   gameId: PropTypes.string.isRequired,
   players: PropTypes.array.isRequired,
   clueTokens: PropTypes.number.isRequired,
@@ -415,6 +445,11 @@ function GamePlay(props) {
   );
 
   const handleGetGameStateResponse = (response) => {
+    console.log(response);
+    if(response.status !== 200){
+      console.log('Request failed so no update occurs');
+      return;
+    }
     let myJson = response.data;
 
     setAvailableClueTokens(myJson['blue_tokens']);
@@ -446,6 +481,7 @@ function GamePlay(props) {
         <WaitForGameStart gameId={gameId} currPlayers={players}/> 
         :
         <HanabiBoard
+          handleGetGameStateResponse={handleGetGameStateResponse}
           gameId={gameId}
           players={players}
           clueTokens={+availableClueTokens}

@@ -29,6 +29,9 @@ class IGamesRepository:
     def get_game_state(self, game_id: GameIdType) -> GameState:
         raise NotImplementedError("")
 
+    def get_players_game(self, player_id: NetworkPlayerIdType) -> Optional[GameIdType]:
+        raise NotImplementedError("")
+
     def register_player(
         self,
         display_name: str,

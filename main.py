@@ -93,7 +93,6 @@ def start_game(game_id: str):
 
 @app.route("/game_state/<player_id>/<game_id>", methods=["get"])
 def game_state(player_id: str, game_id: str):
-
     try:
         ret_val = jsonify_game_state(game_repository.get_game_state(game_id=GameIdType(game_id)), player_id=player_id)
         return ret_val, 200
@@ -105,6 +104,9 @@ def game_state(player_id: str, game_id: str):
 def inform_move(player_id: str):
     try:
         print("making inform")
+        game_id = game_repository.get_players_game(player_id=player_id)
+        assert game_id is not None
+
         payload = request.get_json()
         action = GameAction(
             acting_player=player_id,
@@ -115,10 +117,10 @@ def inform_move(player_id: str):
             burn_card_index=None,
         )
         print(action)
-        ret_val = game_repository.perform_action(action=action)
-        print(f"return value is {ret_val}")
+        assert game_repository.perform_action(action=action)
         save_game_repository_state(game_repository)
-        return {}, 200
+
+        return jsonify_game_state(game_repository.get_game_state(game_id=GameIdType(game_id)), player_id=player_id), 200
     except KeyError:
         return "", 400
     except AssertionError as e:
@@ -130,6 +132,10 @@ def inform_move(player_id: str):
 def burn_move(player_id: str):
     try:
         payload = request.get_json()
+
+        game_id = game_repository.get_players_game(player_id=player_id)
+        assert game_id is not None
+
         ret_val = game_repository.perform_action(GameAction(
             acting_player=player_id,
             action_type="burn",
@@ -140,7 +146,9 @@ def burn_move(player_id: str):
         ))
         if ret_val:
             save_game_repository_state(game_repository)
-            return {}, 200
+
+            return jsonify_game_state(game_repository.get_game_state(game_id=GameIdType(game_id)),
+                                      player_id=player_id), 200
         return "Not your turn!", 400
     except KeyError:
         return "", 400
@@ -151,7 +159,11 @@ def place_move(player_id: str):
     try:
         payload = request.get_json()
         print(f"Handling placing with payload: {payload}")
-        ret_val = game_repository.perform_action(GameAction(
+
+        game_id = game_repository.get_players_game(player_id=player_id)
+        assert game_id is not None
+
+        assert game_repository.perform_action(GameAction(
             acting_player=player_id,
             action_type="place",
             informed_player=None,
@@ -159,9 +171,9 @@ def place_move(player_id: str):
             placed_card_index=payload["card_index"],
             burn_card_index=None,
         ))
-        print(f"Return value: {ret_val}")
+
         save_game_repository_state(game_repository)
-        return {}, 200
+        return jsonify_game_state(game_repository.get_game_state(game_id=GameIdType(game_id)), player_id=player_id), 200
     except KeyError:
         return "", 400
 
@@ -170,13 +182,18 @@ def place_move(player_id: str):
 def move_card(player_id: str):
     try:
         payload = request.get_json()
+
+        game_id = game_repository.get_players_game(player_id=player_id)
+        assert game_id is not None
+
         assert game_repository.perform_card_motion(card_motion_request=MoveCardRequest(
             player_id=player_id,
             initial_card_index=payload["move_from_index"],
             final_card_index=payload["move_to_index"],
         ))
+
         save_game_repository_state(game_repository)
-        return {}, 200
+        return jsonify_game_state(game_repository.get_game_state(game_id=GameIdType(game_id)), player_id=player_id), 200
     except KeyError:
         return "", 400
     except AssertionError:

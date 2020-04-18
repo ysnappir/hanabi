@@ -1,0 +1,1 @@
+SPECTATOR_ID = "spectator"

@@ -330,8 +330,12 @@ class HanabiGameWrapper:
         except AssertionError:
             return False
 
+    def get_game_id(self) -> GameIdType:
+        return self._game_id
+
 
 class HanabiGamesRepository(IGamesRepository):
+
     def __init__(self, card_mapper_factory: Callable[[int], ICardMapper] = None):
         self._card_mapper_factory = (
             card_mapper_factory if card_mapper_factory else CardMapper
@@ -452,3 +456,10 @@ class HanabiGamesRepository(IGamesRepository):
             return False
 
         return players_game.perform_card_motion(card_motion_request=card_motion_request)
+
+    def get_players_game(self, player_id: NetworkPlayerIdType) -> Optional[GameIdType]:
+        game = self._get_players_game(player_id=player_id)
+        if game is None:
+            return None
+
+        return game.get_game_id()
