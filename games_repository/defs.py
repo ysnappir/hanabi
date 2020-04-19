@@ -58,6 +58,10 @@ class MoveCardRequest(NamedTuple):
     final_card_index: FECardIndex
 
 
+class UndoMoveCardRequest(NamedTuple):
+    player_id: NetworkPlayerIdType
+
+
 class GameStatus(Enum):
     CREATED = "created"
     ACTIVE = "active"

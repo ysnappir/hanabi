@@ -4,6 +4,9 @@ import {cardToImageFile} from './Cards.js';
 import {UserIdContext} from './Contex.js';
 import axios from 'axios';
 import { useDrag, useDrop } from 'react-dnd';
+import IconButton from '@material-ui/core/IconButton';
+import UndoIcon from '@material-ui/icons/Undo';
+
 
 export const DraggableType = {
   DraggableOwnCard: 'OwnCard',
@@ -87,7 +90,7 @@ OwnSlot.propTypes = {
 };
 
 export function OwnHand(props) {
-  const {cards, setDraggedIndex, draggedIndex} = props;
+  const {cards, setDraggedIndex, draggedIndex, reportUndoCardMotion} = props;
 
   return (
     <div style={{
@@ -102,6 +105,7 @@ export function OwnHand(props) {
           draggedIndex={draggedIndex} 
           card={cards[index]}
         />)}
+      <IconButton onClick={reportUndoCardMotion}><UndoIcon/></IconButton>
     </div>
   );
 }
@@ -110,6 +114,7 @@ OwnHand.propTypes = {
   cards: PropTypes.array.isRequired,
   setDraggedIndex: PropTypes.func.isRequired,
   draggedIndex: PropTypes.number,
+  reportUndoCardMotion: PropTypes.func.isRequired
 };
 
 function PlayerCards(props) {

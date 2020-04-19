@@ -220,6 +220,15 @@ function HanabiBoard(props) {
     return burnActionFunc;
   };
 
+  const reportUndoCardMotion = (userId) => {
+    async function undoCardMotion(){
+      console.log('Reporting undo motion!');
+      let response = await axios.post('/undo_move_card/' + userId);
+      await handleGetGameStateResponse(response);
+    }
+    return undoCardMotion;
+  };
+
   const startNewGame = async () => {
     let response = await axios.post('/rematch/' + userId);
     await handleGetGameStateResponse(response);  
@@ -296,6 +305,7 @@ function HanabiBoard(props) {
                     onDraggedIndex={setDraggedIndex}
                     onInformCard={informCard}
                     lastAction={lastAction}
+                    reportUndoCardMotion={reportUndoCardMotion(userId)}
                   />
                 </Paper>
               </Grid>
@@ -384,7 +394,7 @@ HanabiBoard.propTypes = {
 
 
 function PlayersHands(props) {
-  const {players, activePlayer, draggedIndex, onDraggedIndex, onInformCard, lastAction} = props;
+  const {players, activePlayer, draggedIndex, onDraggedIndex, onInformCard, lastAction, reportUndoCardMotion} = props;
   const userId = useContext(UserIdContext);
   const divWidth = (getPlayerCards(players, players[0]['id']).length + 0.25) * (CARD_WIDTH + 10); // the width of a card. Not sure why I need the 0.25
 
@@ -402,7 +412,9 @@ function PlayersHands(props) {
             <OwnHand 
               cards={getPlayerCards(players, player['id'])} 
               setDraggedIndex={onDraggedIndex} 
-              draggedIndex={draggedIndex}/>
+              draggedIndex={draggedIndex}
+              reportUndoCardMotion={reportUndoCardMotion}
+            />
             :
             <Player
               userId={player['id']}
@@ -423,6 +435,7 @@ PlayersHands.propTypes = {
   onDraggedIndex: PropTypes.func.isRequired,
   onInformCard: PropTypes.func.isRequired,
   lastAction: PropTypes.object,
+  reportUndoCardMotion: PropTypes.func.isRequired,
 };
 
 function GamePlay(props) {

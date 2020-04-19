@@ -17,7 +17,7 @@ from flask import Flask, request, render_template
 from flask_cors import CORS
 
 from games_repository.contants import SPECTATOR_ID
-from games_repository.defs import GameIdType, GameAction, MoveCardRequest
+from games_repository.defs import GameIdType, GameAction, MoveCardRequest, UndoMoveCardRequest
 from games_repository.games_repository_api import IGamesRepository
 from games_repository.utils import jsonify_game_state, deck_to_game_factory
 from gcloud_datastore.gcloud_datastore_read_write import get_game_repository, save_game_repository_state
@@ -212,6 +212,22 @@ def move_card(player_id: str):
         return "", 400
     except AssertionError:
         return "Couldn't move the card", 400
+
+
+@app.route("/undo_move_card/<player_id>", methods=["post"])
+def undo_move_card(player_id: str):
+    try:
+        game_id = game_repository.get_players_game(player_id=player_id)
+        assert game_id is not None
+
+        assert game_repository.undo_card_motion(undo_card_motion_request=UndoMoveCardRequest(player_id=player_id))
+
+        save_game_repository_state(game_repository)
+        return jsonify_game_state(game_repository.get_game_state(game_id=GameIdType(game_id)), player_id=player_id), 200
+    except KeyError:
+        return "", 400
+    except AssertionError:
+        return "Couldn't undo card motion", 400
 
 
 @app.route("/rematch/<player_id>", methods=["post"])

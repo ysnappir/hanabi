@@ -4,10 +4,18 @@ from games_repository.card_mapper_api import (
     ICardMapper,
     FECardIndex,
     HanabiGameCardIndex,
-)
+    IMapperState)
+
+
+class MapperState(IMapperState):
+
+    def __init__(self, mapping: Dict[FECardIndex, HanabiGameCardIndex], pinned_cards: int):
+        self.mapping = mapping
+        self.pinned_cards = pinned_cards
 
 
 class CardMapper(ICardMapper):
+
     def __init__(self, number_of_cards: int):
         super().__init__(number_of_cards=number_of_cards)
         self._mapping: Dict[FECardIndex, HanabiGameCardIndex] = {
@@ -21,7 +29,7 @@ class CardMapper(ICardMapper):
     def get_fe_card_index(self, hanbi_card_index: HanabiGameCardIndex) -> FECardIndex:
         return next(iter(k for k, v in self._mapping.items() if v == hanbi_card_index))
 
-    def handle_dispose(self, fe_card_index: FECardIndex) -> None:
+    def _handle_dispose(self, fe_card_index: FECardIndex) -> bool:
         new_card_hanabi_index = self._mapping[fe_card_index]
 
         if fe_card_index >= self._pinned_cards:
@@ -36,7 +44,9 @@ class CardMapper(ICardMapper):
 
             self._mapping[self._pinned_cards] = new_card_hanabi_index
 
-    def move_a_card(
+        return True
+
+    def _move_a_card(
         self, fe_card_initial_index: FECardIndex, fe_card_final_index: FECardIndex
     ) -> bool:
         if fe_card_final_index > self._pinned_cards:
@@ -57,3 +67,11 @@ class CardMapper(ICardMapper):
 
     def get_flipped_indices(self) -> List[FECardIndex]:
         return list(range(self._pinned_cards))
+
+    def _state_dumps(self) -> MapperState:
+        return MapperState(mapping=self._mapping.copy(), pinned_cards=self._pinned_cards)
+
+    def _state_loads(self, state: MapperState) -> bool:
+        self._mapping = state.mapping
+        self._pinned_cards = state.pinned_cards
+        return True

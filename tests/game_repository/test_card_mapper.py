@@ -89,6 +89,41 @@ def test_correct_mapping_after_moving_and_disposing():
     assert mapper.get_hanabi_card_index(4) == 2
 
 
+def test_undo():
+    mapper: ICardMapper = CardMapper(5)
+    mapper.move_a_card(4, 0)
+
+    assert mapper.get_hanabi_card_index(4) == 3
+
+    assert mapper.undo()
+    assert mapper.get_hanabi_card_index(4) == 4
+
+
+def test_undo_only_until_dispose():
+    mapper: ICardMapper = CardMapper(5)
+    mapper.move_a_card(4, 0)
+
+    assert mapper.get_hanabi_card_index(4) == 3
+    assert mapper.handle_dispose(fe_card_index=4)
+
+    assert not mapper.undo()
+    assert mapper.get_hanabi_card_index(4) == 2
+
+
+def test_undo_stack():
+    mapper: ICardMapper = CardMapper(5)
+    mapper.move_a_card(4, 0)
+    mapper.move_a_card(4, 1)
+
+    assert mapper.get_hanabi_card_index(4) == 2
+
+    assert mapper.undo()
+    assert mapper.get_hanabi_card_index(4) == 3
+
+    assert mapper.undo()
+    assert mapper.get_hanabi_card_index(4) == 4
+
+
 def test_moving_hot_seat_to_pinned():
     game_repository = HanabiGamesRepository()
     yuval_id = game_repository.register_player(display_name="Yuval", clothes_color_number=9)

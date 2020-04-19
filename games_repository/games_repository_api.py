@@ -6,7 +6,7 @@ from games_repository.defs import (
     NetworkPlayerIdType,
     GameState,
     MoveCardRequest,
-    GameFactoryType)
+    GameFactoryType, UndoMoveCardRequest)
 
 
 class IGamesRepository:
@@ -21,6 +21,9 @@ class IGamesRepository:
         raise NotImplementedError("")
 
     def perform_card_motion(self, card_motion_request: MoveCardRequest) -> bool:
+        raise NotImplementedError("")
+
+    def undo_card_motion(self, undo_card_motion_request: UndoMoveCardRequest) -> bool:
         raise NotImplementedError("")
 
     def get_active_games(self) -> Set[GameIdType]:

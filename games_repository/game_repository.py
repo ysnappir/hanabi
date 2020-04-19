@@ -1,3 +1,4 @@
+from abc import ABC
 from typing import Set, Dict, Optional, List, Callable
 
 from games_repository.card_mapper import CardMapper
@@ -12,7 +13,7 @@ from games_repository.defs import (
     HandState,
     GameAction,
     MoveCardRequest,
-    GameFactoryType, CardInfo)
+    GameFactoryType, CardInfo, UndoMoveCardRequest)
 from games_repository.games_repository_api import (
     IGamesRepository,
     GameIdType,
@@ -126,9 +127,15 @@ class HanabiPlayerWrapper:
             fe_card_final_index=card_final_index,
         )
 
+    def undo_move_a_card(self) -> bool:
+        return self._card_mapper.undo()
+
     def unassign_to_game(self):
         self._hanabi_game_id = None
         self._card_mapper = None
+
+    def undo_card_motion(self) -> bool:
+        return self._card_mapper.undo()
 
 
 class HanabiGameWrapper:
@@ -343,6 +350,20 @@ class HanabiGameWrapper:
         for player in self._players.values():
             player.unassign_to_game()
 
+    def undo_card_motion(self, undo_card_motion_request: UndoMoveCardRequest) -> bool:
+        if self.get_status() is not GameStatus.ACTIVE:
+            return False
+
+        try:
+            ret_val = self._players[undo_card_motion_request.player_id].undo_card_motion()
+
+            if ret_val:
+                self._game_state = self._get_game_state()
+
+            return ret_val
+        except AssertionError:
+            return False
+
 
 class HanabiGamesRepository(IGamesRepository):
 
@@ -466,6 +487,13 @@ class HanabiGamesRepository(IGamesRepository):
             return False
 
         return players_game.perform_card_motion(card_motion_request=card_motion_request)
+
+    def undo_card_motion(self, undo_card_motion_request: UndoMoveCardRequest) -> bool:
+        players_game = self._get_players_game(player_id=undo_card_motion_request.player_id)
+        if players_game is None:
+            return False
+
+        return players_game.undo_card_motion(undo_card_motion_request=undo_card_motion_request)
 
     def get_players_game(self, player_id: NetworkPlayerIdType) -> Optional[GameIdType]:
         game = self._get_players_game(player_id=player_id)
