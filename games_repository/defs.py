@@ -15,6 +15,7 @@ class CardInfo(NamedTuple):
     number: HanabiNumber
     is_flipped: bool
     highlighted: bool
+    informed_values: Optional[Dict[Union[HanabiNumber, HanabiColor], bool]] = None
 
 
 TableState = Dict[HanabiColor, Optional[CardInfo]]

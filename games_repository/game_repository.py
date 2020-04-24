@@ -99,8 +99,9 @@ class HanabiPlayerWrapper:
                     card.get_color().value == last_action.information_data or
                     card.get_number().value == last_action.information_data or
                     (card.get_color() is HanabiColor.RAINBOW and isinstance(last_action.information_data, str))
-                    )))
-                    for i, card in cards.items()]
+                    )),
+            informed_values={k: v for d in card.get_informed_about() for k, v in d.items()},
+            ) for i, card in cards.items()]
 
         return HandState(
             id=self._network_id,

@@ -2,7 +2,7 @@ from typing import Any, Dict, Optional
 
 from games_repository.contants import SPECTATOR_ID
 from games_repository.defs import GameState, GameFactoryType, NetworkPlayerIdType, CardInfo
-from hanabi_game.defs import HanabiColor
+from hanabi_game.defs import HanabiColor, HanabiNumber
 from hanabi_game.hanabi_game import HanabiGame
 from hanabi_game.hanabi_game_api import IHanabiDeck
 
@@ -10,10 +10,25 @@ from hanabi_game.hanabi_game_api import IHanabiDeck
 def _jsonify_card(card: Optional[CardInfo], hide: bool = False) -> Dict[str, Any]:
     if card is None:
         return {"number": None, "color": None, "flipped": False, "highlighted": False}
-    return {"number": card.number.value if not hide and card.number is not None else None,
-            "color": card.color.value if not hide and card.color is not None else None,
-            "flipped": card.is_flipped,
-            "highlighted": card.highlighted,
+    return {**
+            {"number": card.number.value if not hide and card.number is not None else None,
+             "color": card.color.value if not hide and card.color is not None else None,
+             "flipped": card.is_flipped,
+             "highlighted": card.highlighted,
+             },
+            **(
+                {
+                    "informed_numbers": {k.value: v
+                                         for k, v in card.informed_values.items()
+                                         if isinstance(k, HanabiNumber)
+                                         },
+                    "informed_colors": {k.value: v
+                                        for k, v in card.informed_values.items()
+                                        if isinstance(k, HanabiColor)
+                                        },
+                    }
+                if card.informed_values is not None else {}
+                )
             }
 
 
