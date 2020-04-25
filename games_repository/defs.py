@@ -24,6 +24,7 @@ TableState = Dict[HanabiColor, Optional[CardInfo]]
 class HandState(NamedTuple):
     id: NetworkPlayerIdType
     display_name: str
+    total_time: float
     cards: List[CardInfo]
 
 
@@ -51,6 +52,7 @@ class GameState(NamedTuple):
     active_player: NetworkPlayerIdType
     last_action: GameAction
     result: GameVerdict
+    timestamp: float
 
 
 class MoveCardRequest(NamedTuple):

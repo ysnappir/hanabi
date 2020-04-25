@@ -1,4 +1,5 @@
 import json
+import time
 
 from games_repository.contants import SPECTATOR_ID
 from games_repository.defs import GameState, HandState, CardInfo, GameAction
@@ -25,6 +26,7 @@ if __name__ == "__main__":
             HandState(
                 id="p_0",
                 display_name="Snap",
+                total_time=1.,
                 cards=[
                     CardInfo(color=HanabiColor.RED,
                              number=HanabiNumber.THREE,
@@ -48,6 +50,7 @@ if __name__ == "__main__":
             HandState(
                 id="p_1",
                 display_name="Ethan",
+                total_time=0,
                 cards=[
                     CardInfo(HanabiColor.BLUE, HanabiNumber.FIVE, False, False),
                     CardInfo(HanabiColor.RED, HanabiNumber.THREE, False, False),
@@ -60,6 +63,7 @@ if __name__ == "__main__":
                     CardInfo(HanabiColor.YELLOW, HanabiNumber.TWO, True, False),
                     CardInfo(HanabiColor.WHITE, HanabiNumber.ONE, False, True),
                 ],
+                total_time=2.3,
             ),
         ],
         burnt_pile=[
@@ -76,6 +80,7 @@ if __name__ == "__main__":
                                burn_card_index=None,
                                ),
         result=GameVerdict.UNWINABLE,
+        timestamp=time.time(),
     )
     print(json.dumps(jsonify_game_state(game_state, player_id=SPECTATOR_ID)))
     print(json.dumps(jsonify_game_state(game_state, player_id="p_1")))

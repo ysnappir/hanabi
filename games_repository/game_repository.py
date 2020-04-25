@@ -1,4 +1,4 @@
-from abc import ABC
+import time
 from typing import Set, Dict, Optional, List, Callable
 
 from games_repository.card_mapper import CardMapper
@@ -80,6 +80,7 @@ class HanabiPlayerWrapper:
         return self._number_of_color_in_clothes
 
     def get_formatted_hand_state(self, hanabi_state: IHanabiState,
+                                 player_total_time: float,
                                  last_action: Optional[GameAction] = None,
                                  ) -> HandState:
         hand = hanabi_state.get_hand(self._hanabi_player_id)
@@ -107,6 +108,7 @@ class HanabiPlayerWrapper:
             id=self._network_id,
             display_name=self._display_name,
             cards=fe_cards,
+            total_time=player_total_time,
         )
 
     def initialize_hand_mapping(self, number_of_cards: int) -> None:
@@ -151,6 +153,8 @@ class HanabiGameWrapper:
         self._last_pile_topped: Optional[HanabiColor] = None
         self._last_action_burnt: bool = False
         self._game_state: Optional[GameState] = None
+        self._time_counters: Dict[NetworkPlayerIdType, float] = {}
+        self._last_turn_timestamp: Optional[float] = None
 
     def _clear_last_action(self) -> None:
         self._last_successful_action = None
@@ -158,10 +162,16 @@ class HanabiGameWrapper:
         self._last_action_burnt = False
 
     def _format_hands_state(self, hanabi_state: IHanabiState) -> HandsState:
-        return [self._players[player_id].get_formatted_hand_state(hanabi_state=hanabi_state,
-                                                                  last_action=self._last_successful_action,
-                                                                  )
-                for player_id in self._ordered_players]
+        return [
+            self._players[player_id].get_formatted_hand_state(
+                hanabi_state=hanabi_state,
+                player_total_time=0 if not self._last_turn_timestamp else (
+                    self._time_counters.get(player_id, 0) + (time.time() - self._last_turn_timestamp
+                                                             if player_id == self._game_state.active_player
+                                                             else 0)),
+                last_action=self._last_successful_action,
+                )
+            for player_id in self._ordered_players]
 
     def get_hanabi_state(self) -> GameState:
         return self._game_state
@@ -210,8 +220,11 @@ class HanabiGameWrapper:
             self._players[network_player_id].initialize_hand_mapping(
                 number_of_cards=self._game.get_cards_per_player()
             )
+            self._time_counters[network_player_id] = 0
 
         self._status = GameStatus.ACTIVE
+        self._last_turn_timestamp = time.time()
+
         self._game_state = self._get_game_state()
         return True
 
@@ -269,6 +282,9 @@ class HanabiGameWrapper:
             self._clear_last_action()
             self._last_successful_action = action
 
+            self._time_counters[action.acting_player] += time.time() - self._last_turn_timestamp
+            self._last_turn_timestamp = time.time()
+
             new_game_state = self._game.get_state()
 
             if action_type in [HanabiMoveType.BURN, HanabiMoveType.PLACE]:
@@ -324,6 +340,7 @@ class HanabiGameWrapper:
             active_player=self._ordered_players[hanabi_state.get_active_player()],
             last_action=self._last_successful_action,
             result=hanabi_state.get_verdict(),
+            timestamp=time.time()
         )
 
     def perform_card_motion(self, card_motion_request: MoveCardRequest) -> bool:

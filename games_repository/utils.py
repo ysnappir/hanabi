@@ -1,7 +1,7 @@
-from typing import Any, Dict, Optional
+from typing import Any, Dict, Optional, Iterable
 
 from games_repository.contants import SPECTATOR_ID
-from games_repository.defs import GameState, GameFactoryType, NetworkPlayerIdType, CardInfo
+from games_repository.defs import GameState, GameFactoryType, NetworkPlayerIdType, CardInfo, HandState
 from hanabi_game.defs import HanabiColor, HanabiNumber
 from hanabi_game.hanabi_game import HanabiGame
 from hanabi_game.hanabi_game_api import IHanabiDeck
@@ -32,24 +32,23 @@ def _jsonify_card(card: Optional[CardInfo], hide: bool = False) -> Dict[str, Any
             }
 
 
-def jsonify_game_state(game_state: GameState, player_id: NetworkPlayerIdType) -> Any:
+def _get_ordered_players_hands(game_state: GameState, player_id: NetworkPlayerIdType) -> Iterable[HandState]:
     if player_id == SPECTATOR_ID:
-        hands = [{
-                "id": player.id,
-                "display_name": player.display_name,
-                "cards": [_jsonify_card(card=card)
-                          for card in player.cards],
-            }
-            for player in game_state.hands_state]
-    else:
-        player_index = [d.id for d in game_state.hands_state].index(player_id)
-        hands = [{
-                "id": player.id,
-                "display_name": player.display_name,
-                "cards": [_jsonify_card(card=card, hide=(i == 0))
-                          for card in player.cards],
-            }
-            for i, player in enumerate(game_state.hands_state[player_index:] + game_state.hands_state[:player_index])]
+        return game_state.hands_state
+
+    player_index = [d.id for d in game_state.hands_state].index(player_id)
+    return game_state.hands_state[player_index:] + game_state.hands_state[:player_index]
+
+
+def jsonify_game_state(game_state: GameState, player_id: NetworkPlayerIdType) -> Any:
+    hands = [{
+            "id": player.id,
+            "display_name": player.display_name,
+            "total_turns_time": player.total_time,
+            "cards": [_jsonify_card(card=card, hide=(player.id == player_id))
+                      for card in player.cards],
+        }
+        for player in _get_ordered_players_hands(game_state=game_state, player_id=player_id)]
     return {
         "game_id": game_state.gamd_id,
         "status": game_state.status,
@@ -72,6 +71,7 @@ def jsonify_game_state(game_state: GameState, player_id: NetworkPlayerIdType) ->
             "placed_card_index": game_state.last_action.placed_card_index,
             "burn_card_index": game_state.last_action.burn_card_index,
         },
+        "state_timestamp": game_state.timestamp,
     }
 
 
