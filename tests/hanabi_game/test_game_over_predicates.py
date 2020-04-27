@@ -7,14 +7,7 @@ from hanabi_game.hanabi_game import is_lost_by_open_information, HanabiGame, is_
 from hanabi_game.hanabi_game_api import IHanabiCard, IHanabiDeck
 from hanabi_game.hanabi_moves import IHanabiPlaceMove
 from hanabi_game.utils import get_all_cards_list, get_amount_of_cards_per_player
-
-
-def _pop_from_cards_list(cards_list: List[IHanabiCard], color: HanabiColor, number: HanabiNumber) -> IHanabiCard:
-    requested_card = HanabiCard(color=color, number=number)
-    card_index = next(iter(filter(
-        lambda i: cards_list[i] == requested_card,
-        range(len(cards_list)))))
-    return cards_list.pop(card_index)
+from tests.hanabi_game.test_utils import pop_from_cards_list
 
 
 def test_is_card_equalization_based_only_on_content():
@@ -34,7 +27,7 @@ def test_is_exist_card_only_in_burnt_pile_false_at_start_and_not_in_table():
     first_color = cards[0].get_color()
     cards_per_player = get_amount_of_cards_per_player(n_players)
 
-    card_for_test = [_pop_from_cards_list(cards_list=cards, color=first_color, number=HanabiNumber.TWO)
+    card_for_test = [pop_from_cards_list(cards_list=cards, color=first_color, number=HanabiNumber.TWO)
                      for _ in range(2)]
 
     for i in range(1, 3):
@@ -62,9 +55,9 @@ def test_is_exist_card_only_in_burnt_pile_true_when_five_in_burnt():
 def test_is_over_by_four_rainbow_last():
     card_to_end = HanabiCard(color=HanabiColor.RAINBOW, number=HanabiNumber.FOUR)
     cards: List[IHanabiCard] = get_all_cards_list()
-    four_rainbow_card = _pop_from_cards_list(cards_list=cards,
-                                             color=card_to_end.get_color(),
-                                             number=card_to_end.get_number())
+    four_rainbow_card = pop_from_cards_list(cards_list=cards,
+                                            color=card_to_end.get_color(),
+                                            number=card_to_end.get_number())
     cards.append(four_rainbow_card)
     assert cards[-1] == card_to_end
     deck = HanabiDeck(cards=cards)
@@ -77,7 +70,7 @@ def test_is_over_by_four_rainbow_last():
 def test_is_burning_last_card_make_game_lost():
     cards: List[IHanabiCard] = get_all_cards_list()
     deck_length = len(cards)
-    two_white_cards = [_pop_from_cards_list(cards, HanabiColor.WHITE, number=HanabiNumber.TWO) for _ in range(2)]
+    two_white_cards = [pop_from_cards_list(cards, HanabiColor.WHITE, number=HanabiNumber.TWO) for _ in range(2)]
     cards.insert(0, two_white_cards.pop(0))
     cards.append(two_white_cards.pop(0))
     assert len(cards) == deck_length, "reshuffling changed deck size"
@@ -108,7 +101,7 @@ def test_not_enough_place_moves_left():
 def test_not_enough_turns_because_many_twos_at_end():
     n_players = 4
     cards: List[IHanabiCard] = get_all_cards_list()
-    two_pairs_of_cards = {color: [_pop_from_cards_list(cards, color, number=HanabiNumber.TWO)
+    two_pairs_of_cards = {color: [pop_from_cards_list(cards, color, number=HanabiNumber.TWO)
                                   for _ in range(2)]
                           for color in [c for c in HanabiColor if c is not HanabiColor.RAINBOW][:n_players]}
 
@@ -118,7 +111,7 @@ def test_not_enough_turns_because_many_twos_at_end():
         cards.append(two_cards.pop(0))
         assert len(cards) > 0
 
-    cards.append(_pop_from_cards_list(cards_list=cards, color=HanabiColor.RAINBOW, number=HanabiNumber.FIVE))
+    cards.append(pop_from_cards_list(cards_list=cards, color=HanabiColor.RAINBOW, number=HanabiNumber.FIVE))
 
     game = HanabiGame(n_players=n_players, predifined_deck=HanabiDeck(cards=cards), starting_player=0,
                       red_tokens_amount=5)

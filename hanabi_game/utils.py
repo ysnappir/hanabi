@@ -36,7 +36,7 @@ def get_all_cards_list() -> List[IHanabiCard]:
         {HanabiColor.RAINBOW: {number: 1 for number in HanabiNumber}}
     )
     cards_lists = [
-        [HanabiCard(color=color, number=number)] * amount
+        [HanabiCard(color=color, number=number) for _ in range(amount)]
         for color in amount_by_color_and_number
         for number, amount in amount_by_color_and_number[color].items()
     ]

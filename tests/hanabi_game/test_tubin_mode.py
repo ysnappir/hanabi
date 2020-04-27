@@ -1,10 +1,10 @@
 from typing import List
 
-from hanabi_game.defs import HanabiNumber, HanabiColor, GameVerdict
+from hanabi_game.defs import HanabiNumber, HanabiColor
 from hanabi_game.hanabi_deck import HanabiDeck
 from hanabi_game.hanabi_game import HanabiGame
 from hanabi_game.hanabi_game_api import IHanabiCard
-from hanabi_game.hanabi_moves import IHanabiInfromMove, HanabiUpdate, HanabiColorUpdate
+from hanabi_game.hanabi_moves import IHanabiInfromMove, HanabiColorUpdate
 from hanabi_game.utils import get_all_cards_list, get_amount_of_cards_per_player
 from tests.hanabi_game.test_utils import pop_from_cards_list
 
