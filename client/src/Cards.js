@@ -36,9 +36,14 @@ export const cardsImages = {
   rb3:  require('./img/cards/card_3rb.png'),
   rb4:  require('./img/cards/card_4rb.png'),
   rb5:  require('./img/cards/card_5rb.png'),
+
+  back:  require('./img/BackRect125.png'),
 };
 
 export const cardToImageFile = (number, color) => {
+  if (!(number && color)){
+    return cardsImages['back'];
+  }
   let cardProp = COLOR_TO_FILE_INDENTIFIER[color] + number;
   return cardsImages[cardProp];
 };

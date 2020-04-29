@@ -26,7 +26,9 @@ class HanabiCard(IHanabiCard):
     def get_informed_about(self) -> List[Dict[Union[str, int], bool]]:
         return [
             {inform.update.get_val():
-             (self.color if inform.update.update_type is InfromType.COLOR else self.number) is inform.update.get_val()}
+             (self.color is inform.update.get_val() or self.color is HanabiColor.RAINBOW
+              if inform.update.update_type is InfromType.COLOR
+              else self.number is inform.update.get_val())}
             for inform in self.informs
         ]
 

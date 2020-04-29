@@ -184,6 +184,7 @@ function HanabiBoard(props) {
   const [draggedIndex, setDraggedIndex] = useState(undefined);
   const [playerPressedId, setPlayerPressedId] = useState(undefined);
   const [indexPressedId, setIndexPressedId] = useState(undefined);
+  const [tubinMode, settubinMode] = useState(false);
   
   const onActionPopupClose = () => {
     setShowActionsPopup(false);
@@ -306,6 +307,7 @@ function HanabiBoard(props) {
                     onInformCard={informCard}
                     lastAction={lastAction}
                     reportUndoCardMotion={reportUndoCardMotion(userId)}
+                    tubinMode={tubinMode}
                   />
                 </Paper>
               </Grid>
@@ -337,6 +339,13 @@ function HanabiBoard(props) {
                   <Paper className={classes.paper}>
                     <RemainingDeck remainingCards={remainingDeckSize}/>
                   </Paper>
+                  <Grid item>
+                    <Paper className={classes.paper}>
+                      <button style={{color: tubinMode ? 'green' : 'red'}} onClick={() => settubinMode(!tubinMode)}>
+                      Tubin Mode!
+                      </button>
+                    </Paper>
+                  </Grid>
                 </Grid>
               </Grid>
             </Grid>
@@ -394,7 +403,7 @@ HanabiBoard.propTypes = {
 
 
 function PlayersHands(props) {
-  const {players, activePlayer, draggedIndex, onDraggedIndex, onInformCard, lastAction, reportUndoCardMotion} = props;
+  const {players, activePlayer, draggedIndex, onDraggedIndex, onInformCard, lastAction, reportUndoCardMotion, tubinMode} = props;
   const userId = useContext(UserIdContext);
   const divWidth = (getPlayerCards(players, players[0]['id']).length + 0.25) * (CARD_WIDTH + 10); // the width of a card. Not sure why I need the 0.25
 
@@ -414,13 +423,16 @@ function PlayersHands(props) {
               setDraggedIndex={onDraggedIndex} 
               draggedIndex={draggedIndex}
               reportUndoCardMotion={reportUndoCardMotion}
+              tubinMode={tubinMode}
             />
             :
             <Player
               userId={player['id']}
               displayName={player['display_name']} 
               cards={getPlayerCards(players, player['id'])}
-              onClick={onInformCard(player['id'])}/>
+              onClick={onInformCard(player['id'])}
+              tubinMode={tubinMode}
+            />
           }
         </div>
       )}
@@ -436,6 +448,7 @@ PlayersHands.propTypes = {
   onInformCard: PropTypes.func.isRequired,
   lastAction: PropTypes.object,
   reportUndoCardMotion: PropTypes.func.isRequired,
+  tubinMode: PropTypes.bool.isRequired,
 };
 
 function GamePlay(props) {

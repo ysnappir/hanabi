@@ -1,8 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import {cardToImageFile, CARD_WIDTH} from './Cards.js';
+import {CARD_WIDTH, CARD_HEIGHT} from './Cards.js';
 import { useDrop } from 'react-dnd';
-
+import {HanabiCard} from './Card.js';
 import { Typography } from '@material-ui/core';
 
 
@@ -31,7 +31,7 @@ export function HanabiTable(props) {
 
 
   const [{ isOver }, drop] = useDrop({
-    accept: 'OwnCard',  // DraggableType['DraggableOwnCard'], // 
+    accept: 'OwnCard', 
     drop: () => {
       placeActionFunc();
     },
@@ -43,9 +43,9 @@ export function HanabiTable(props) {
   
   const renderCards = (color, card) => {
     if(card['number'] !== null)
-      return <img src={cardToImageFile(card['number'], color)} key={color} alt='' style={{border: card['highlighted'] ? '4px solid blue' : 'none'}}/>;
+      return <HanabiCard card={card}/>;
     else
-      return <svg key={color} width="50" height="125"><rect width="40" height="100" fill={color === 'rainbow'? 'black' : color}/></svg>;
+      return <svg key={color} width={CARD_WIDTH} height={CARD_HEIGHT}><rect width={CARD_WIDTH} height={CARD_HEIGHT} fill={color === 'rainbow'? 'black' : color}/></svg>;
   };
 
   return (
@@ -79,23 +79,51 @@ export function BurntPile(props) {
   const renderCardsByNumberSortedByColor = () => {
     let numbers = [1, 2, 3, 4, 5];
     return (
-      <div ref={drop} style={{background: (isOver && isMyTurn)? '#F98A91' : 'white',}}>  
+      <div 
+        ref={drop} 
+        style={{
+          background: (isOver && isMyTurn)? '#F98A91' : 'white',
+        }}>  
         <h2>Burnt pile. length: {cardList.length}</h2>
-        {
-          numbers
-            .map((value, index) => <div key={value}>
-              {cardList.filter(item => item['number'] === value)
-                .sort((x, y) => {
-                  if(x['color'] > y['color'])
-                    return 1;
-                  else
-                    return -1;
-                })
-                .map((card, counter) => <img src={cardToImageFile(card['number'], card['color'])} 
-                  key={'burntCard_' + index + '_ś' + counter} alt='' style={{border: card['highlighted'] ? '4px solid blue' : 'none'}}/>)
-              }
-            </div>)
-        }
+        <div style={{          
+          position: 'relative',
+          top: 0,
+          left: 0,
+        }}>
+          {
+            numbers
+              .map((value, index) => 
+                <>
+                  <div 
+                    key={value} 
+                    style={{
+                      position: 'absolute',
+                      left: index * CARD_WIDTH,
+                    }}>
+                    {cardList.filter(item => item['number'] === value)
+                      .sort((x, y) => {
+                        if(x['color'] > y['color'])
+                          return 1;
+                        else
+                          return -1;
+                      })
+                      .map((card, counter) => 
+                        <div 
+                          key={'burntCard_' + index + '_ś' + counter}
+                          style={{
+                            position: 'absolute',
+                            top: counter * CARD_HEIGHT / 4,
+                          }}
+                        >
+                          <HanabiCard card={card}/>
+                        </div>
+                      )
+                    }
+                  </div>
+                </>
+              )
+          }
+        </div>
       </div>
     );  
   };
