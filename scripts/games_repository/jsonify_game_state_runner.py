@@ -1,4 +1,5 @@
 import json
+import time
 
 from games_repository.contants import SPECTATOR_ID
 from games_repository.defs import GameState, HandState, CardInfo, GameAction
@@ -13,7 +14,11 @@ if __name__ == "__main__":
         blue_token_amount=5,
         red_token_amount=2,
         table_state={
-            HanabiColor.RAINBOW: CardInfo(HanabiColor.RAINBOW, HanabiNumber.THREE, False, False),
+            HanabiColor.RAINBOW: CardInfo(color=HanabiColor.RAINBOW,
+                                          number=HanabiNumber.THREE,
+                                          is_flipped=False,
+                                          highlighted=False,
+                                          ),
             HanabiColor.BLUE: None,
             HanabiColor.RED: CardInfo(HanabiColor.RED, HanabiNumber.FIVE, False, True),
         },
@@ -21,14 +26,31 @@ if __name__ == "__main__":
             HandState(
                 id="p_0",
                 display_name="Snap",
+                total_time=1.,
                 cards=[
-                    CardInfo(HanabiColor.RED, HanabiNumber.THREE, True, True),
-                    CardInfo(HanabiColor.RED, HanabiNumber.THREE, False, True),
+                    CardInfo(color=HanabiColor.RED,
+                             number=HanabiNumber.THREE,
+                             is_flipped=True,
+                             highlighted=True,
+                             informed_values={HanabiNumber.THREE: True,
+                                              HanabiNumber.ONE: False,
+                                              HanabiColor.RED: True,
+                                              HanabiColor.BLUE: False},
+                             ),
+                    CardInfo(color=HanabiColor.RED,
+                             number=HanabiNumber.THREE,
+                             is_flipped=True,
+                             highlighted=True,
+                             informed_values={HanabiNumber.THREE: True,
+                                              HanabiNumber.ONE: False,
+                                              HanabiColor.RED: True},
+                             ),
                 ],
             ),
             HandState(
                 id="p_1",
                 display_name="Ethan",
+                total_time=0,
                 cards=[
                     CardInfo(HanabiColor.BLUE, HanabiNumber.FIVE, False, False),
                     CardInfo(HanabiColor.RED, HanabiNumber.THREE, False, False),
@@ -41,6 +63,7 @@ if __name__ == "__main__":
                     CardInfo(HanabiColor.YELLOW, HanabiNumber.TWO, True, False),
                     CardInfo(HanabiColor.WHITE, HanabiNumber.ONE, False, True),
                 ],
+                total_time=2.3,
             ),
         ],
         burnt_pile=[
@@ -57,6 +80,7 @@ if __name__ == "__main__":
                                burn_card_index=None,
                                ),
         result=GameVerdict.UNWINABLE,
+        timestamp=time.time(),
     )
     print(json.dumps(jsonify_game_state(game_state, player_id=SPECTATOR_ID)))
     print(json.dumps(jsonify_game_state(game_state, player_id="p_1")))

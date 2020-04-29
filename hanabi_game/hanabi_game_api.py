@@ -1,7 +1,7 @@
-from typing import Optional, List
+from typing import Optional, List, Union, Dict
 
 from hanabi_game.defs import HanabiColor, HanabiNumber, PlayerIdType, GameVerdict
-from hanabi_game.hanabi_moves import IHanabiMove
+from hanabi_game.hanabi_moves import IHanabiMove, IHanabiInfromMove
 
 
 class IHanabiCard:
@@ -11,6 +11,9 @@ class IHanabiCard:
     def get_number(self) -> HanabiNumber:
         raise NotImplementedError("")
 
+    def attach_inform(self, inform_move: IHanabiInfromMove) -> None:
+        pass
+
     def __hash__(self):
         # colors_len = len([color for color in HanabiColor])
         numbers_num = len([number for number in HanabiNumber])
@@ -18,6 +21,9 @@ class IHanabiCard:
 
     def __eq__(self, other):
         return hash(self) == hash(other)
+
+    def get_informed_about(self) -> List[Dict[Union[str, int], bool]]:
+        raise NotImplementedError("")
 
 
 class IHandType:

@@ -15,6 +15,7 @@ class CardInfo(NamedTuple):
     number: HanabiNumber
     is_flipped: bool
     highlighted: bool
+    informed_values: Optional[Dict[Union[HanabiNumber, HanabiColor], bool]] = None
 
 
 TableState = Dict[HanabiColor, Optional[CardInfo]]
@@ -23,6 +24,7 @@ TableState = Dict[HanabiColor, Optional[CardInfo]]
 class HandState(NamedTuple):
     id: NetworkPlayerIdType
     display_name: str
+    total_time: float
     cards: List[CardInfo]
 
 
@@ -50,6 +52,7 @@ class GameState(NamedTuple):
     active_player: NetworkPlayerIdType
     last_action: GameAction
     result: GameVerdict
+    timestamp: float
 
 
 class MoveCardRequest(NamedTuple):

@@ -227,6 +227,8 @@ class HanabiGame(IHanabiGame):
 
     def _perform_inform(self, move: IHanabiInfromMove) -> None:
         self._blue_tokens_amount -= 1
+        for card in self._players_hands[move.informed_player].get_cards():
+            card.attach_inform(inform_move=move)
 
     def _is_legal_move(self, move: IHanabiMove) -> bool:
         if self._acting_player != move.performer:

@@ -1,3 +1,5 @@
+from typing import Union
+
 from hanabi_game.defs import (
     HanabiMoveType,
     PlayerIdType,
@@ -29,17 +31,26 @@ class HanabiUpdate:
     def __init__(self, update_type: InfromType):
         self.update_type = update_type
 
+    def get_val(self) -> Union[HanabiColor, HanabiNumber]:
+        raise NotImplementedError("")
+
 
 class HanabiColorUpdate(HanabiUpdate):
     def __init__(self, color: HanabiColor):
         super().__init__(update_type=InfromType.COLOR)
         self.color = color
 
+    def get_val(self) -> HanabiColor:
+        return self.color
+
 
 class HanabiNumberUpdate(HanabiUpdate):
     def __init__(self, number: HanabiNumber):
         super().__init__(update_type=InfromType.NUMBER)
         self.number = number
+
+    def get_val(self) -> HanabiNumber:
+        return self.number
 
 
 class IHanabiInfromMove(IHanabiMove):

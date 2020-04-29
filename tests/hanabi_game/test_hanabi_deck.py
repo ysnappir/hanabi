@@ -10,6 +10,11 @@ def test_hanabi_deck_size():
     assert deck.get_size() == ORIGINAL_HANABI_SIZE
 
 
+def test_hanabi_deck_no_duplicates():
+    deck = HanabiDeck()
+    assert len(set(map(id, deck.observe_cards()))) == ORIGINAL_HANABI_SIZE
+
+
 def test_hanabi_deck_take_a_card():
     deck = HanabiDeck()
     assert deck.get_size() == ORIGINAL_HANABI_SIZE
