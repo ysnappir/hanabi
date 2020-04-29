@@ -6,7 +6,7 @@ import Player, {OwnHand} from './Player.js';
 import {UserIdContext} from './Contex.js';
 import {MAX_CLUE_TOKENS, MAX_MISS_TOKENS} from './Tokens.js';
 import RemainingDeck, {HanabiTable, BurntPile} from './CardPiles.js';
-import {CARD_WIDTH} from './Cards.js';
+import {CARD_WIDTH, CARD_HEIGHT} from './Cards.js';
 import InformPlayerOptions from './Actions';
 
 import { makeStyles } from '@material-ui/core/styles';
@@ -176,7 +176,7 @@ const getPlayerCards = (players, id) => {
 function HanabiBoard(props) {
   const classes = useStyles();
 
-  const {handleGetGameStateResponse, gameId, players, clueTokens, missTokens, remainingDeckSize, hanabiTable, activePlayer, burntPileCards, lastAction} = props;
+  const {handleGetGameStateResponse, gameId, players, clueTokens, missTokens, remainingDeckSize, hanabiTable, activePlayer, burntPileCards, lastAction, stateTimestamp} = props;
 
   const userId = useContext(UserIdContext);
 
@@ -308,6 +308,7 @@ function HanabiBoard(props) {
                     lastAction={lastAction}
                     reportUndoCardMotion={reportUndoCardMotion(userId)}
                     tubinMode={tubinMode}
+                    stateTimestamp={stateTimestamp}
                   />
                 </Paper>
               </Grid>
@@ -399,11 +400,19 @@ HanabiBoard.propTypes = {
   activePlayer: PropTypes.string.isRequired,
   burntPileCards: PropTypes.array.isRequired,
   lastAction: PropTypes.object,
+  stateTimestamp: PropTypes.number.isRequired
+};
+
+
+const stringifyTurnTime = (timeSec) => {
+  let minutes = Math.floor(timeSec / 60);
+  let seconds = Math.floor(timeSec - 60 * minutes);
+  return minutes + (seconds < 10 ? ':0' : ':') + seconds;
 };
 
 
 function PlayersHands(props) {
-  const {players, activePlayer, draggedIndex, onDraggedIndex, onInformCard, lastAction, reportUndoCardMotion, tubinMode} = props;
+  const {players, activePlayer, draggedIndex, onDraggedIndex, onInformCard, lastAction, reportUndoCardMotion, tubinMode, stateTimestamp} = props;
   const userId = useContext(UserIdContext);
   const divWidth = (getPlayerCards(players, players[0]['id']).length + 0.25) * (CARD_WIDTH + 10); // the width of a card. Not sure why I need the 0.25
 
@@ -417,6 +426,13 @@ function PlayersHands(props) {
           {lastAction && player['id'] === lastAction['informed_player'] &&
             <span><font color="blue">Be informed about: {lastAction['information_data']}</font></span>
           }
+          <h3 style={{
+            float: 'right', 
+            position: 'relative',
+            top: .5 * CARD_HEIGHT,
+          }}>
+            {stringifyTurnTime(player['total_turns_time'] + (player['id'] === activePlayer ? ((new Date()).getTime() / 1000 - stateTimestamp) : 0))}
+          </h3>
           {player['id'] === userId ?
             <OwnHand 
               cards={getPlayerCards(players, player['id'])} 
@@ -449,6 +465,7 @@ PlayersHands.propTypes = {
   lastAction: PropTypes.object,
   reportUndoCardMotion: PropTypes.func.isRequired,
   tubinMode: PropTypes.bool.isRequired,
+  stateTimestamp: PropTypes.number.isRequired
 };
 
 function GamePlay(props) {
@@ -464,6 +481,7 @@ function GamePlay(props) {
   const [burntPileCards, setBurntPileCards] = useState([]);
   const [lastAction, setLastAction] = useState(undefined);
   const [gameResult, setGameResult] = useState('ongoin');
+  const [stateTimestamp, setStateTimestamp] = useState(-1);
 
   const updateGameState = async () => {
     try {
@@ -500,6 +518,7 @@ function GamePlay(props) {
     setBurntPileCards(myJson['burnt_pile']);
     setLastAction(myJson['last_action']);
     setGameId(myJson['game_id']);
+    setStateTimestamp(myJson['state_timestamp']);
 
     if (!isGameStarted) {
       if (myJson['hands'].length > 0 && myJson['hands'][0].cards.length > 0) {
@@ -529,6 +548,7 @@ function GamePlay(props) {
           burntPileCards={burntPileCards}
           activePlayer={activePlayer}
           lastAction={lastAction}
+          stateTimestamp={stateTimestamp}
         />
       }
     </div>

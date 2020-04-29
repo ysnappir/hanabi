@@ -27,8 +27,6 @@ function OwnCard(props) {
     onDrag(index);
   }
 
-  console.log('tubin: ' + tubinMode);
-
   return (  
     <>
       <div 
