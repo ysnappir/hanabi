@@ -84,7 +84,7 @@ def save_game_repository_state(repository: IGamesRepository) -> bool:
 
 if __name__ == '__main__':
     # script for reseting db
-    # new_repository: IGamesRepository = HanabiGamesRepository()
-    # save_game_repository_state(new_repository)
-    repository = get_game_repository()
+    new_repository: IGamesRepository = HanabiGamesRepository()
+    save_game_repository_state(new_repository)
+    # repository = get_game_repository()
     print(1)

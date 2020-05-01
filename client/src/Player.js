@@ -27,8 +27,6 @@ function OwnCard(props) {
     onDrag(index);
   }
 
-  console.log('tubin: ' + tubinMode);
-
   return (  
     <>
       <div 
@@ -130,7 +128,7 @@ OwnHand.propTypes = {
   setDraggedIndex: PropTypes.func.isRequired,
   draggedIndex: PropTypes.number,
   reportUndoCardMotion: PropTypes.func.isRequired,
-  tubinMode: PropTypes.bool.isRequired,
+  tubinMode: PropTypes.number.isRequired,
 };
 
 function PlayerCards(props) {
@@ -155,7 +153,7 @@ function PlayerCards(props) {
 PlayerCards.propTypes = {
   cards: PropTypes.array.isRequired,
   onClick: PropTypes.func.isRequired,
-  tubinMode: PropTypes.bool.isRequired,
+  tubinMode: PropTypes.number.isRequired,
 };
 
 
@@ -175,7 +173,7 @@ Player.propTypes = {
   displayName: PropTypes.string.isRequired,
   cards: PropTypes.array.isRequired,
   onClick: PropTypes.func.isRequired,
-  tubinMode: PropTypes.bool.isRequired,
+  tubinMode: PropTypes.number.isRequired,
 };
 
 export default Player;

@@ -2,9 +2,10 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import {cardToImageFile} from './Cards.js';
 import './App.css';
+import tubinModes from './Enums';
 
 
-const cardToText = (card) => {
+const cardToText = (card, tubinMode) => {
   const kvToToken = (key, value) => {
     return (
       <>
@@ -16,12 +17,16 @@ const cardToText = (card) => {
   };
     
   let propList = [
-    ...Object.keys(card['informed_numbers']).map((number) => kvToToken(number.toString(), card['informed_numbers'][number])),
-    ...Object.keys(card['informed_colors']).map((color) => kvToToken(color, card['informed_colors'][color]))
+    ...Object.keys(card['informed_numbers']).map((number) => [number.toString(), card['informed_numbers'][number]]),
+    ...Object.keys(card['informed_colors']).map((color) => [color, card['informed_colors'][color]])
   ];
+
   return (
     <>
-      {propList.reduce((prev, curr) => [prev, curr], '')}
+      {propList
+        .filter((arr) => tubinModes[tubinMode].TYPE !== 'LIGHT' || arr[1])
+        .map((arr) => kvToToken(arr[0], arr[1]))
+        .reduce((prev, curr) => [prev, curr], '')}
     </>
   );
 };
@@ -39,7 +44,7 @@ export function HanabiCard(props) {
             border: card['highlighted'] ? '4px solid blue' : 'none'
           }}/>
         <div className="centered">
-          {tubinMode && cardToText(card)}
+          {tubinModes[tubinMode].TYPE !== 'NONE' && cardToText(card, tubinMode)}
         </div>
       </div>
     </>
@@ -48,9 +53,9 @@ export function HanabiCard(props) {
 
 HanabiCard.propTypes = {
   card: PropTypes.object.isRequired,
-  tubinMode: PropTypes.bool
+  tubinMode: PropTypes.number
 };
 
 HanabiCard.defaultProps = {
-  tubinMode: false,
+  tubinMode: 0,
 };
