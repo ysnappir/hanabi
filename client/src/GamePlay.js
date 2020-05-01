@@ -8,6 +8,7 @@ import {MAX_CLUE_TOKENS, MAX_MISS_TOKENS} from './Tokens.js';
 import RemainingDeck, {HanabiTable, BurntPile} from './CardPiles.js';
 import {CARD_WIDTH, CARD_HEIGHT} from './Cards.js';
 import InformPlayerOptions from './Actions';
+import tubinModes from './Enums';
 
 import { makeStyles } from '@material-ui/core/styles';
 import { Paper, Grid, Typography } from '@material-ui/core';
@@ -184,7 +185,7 @@ function HanabiBoard(props) {
   const [draggedIndex, setDraggedIndex] = useState(undefined);
   const [playerPressedId, setPlayerPressedId] = useState(undefined);
   const [indexPressedId, setIndexPressedId] = useState(undefined);
-  const [tubinMode, settubinMode] = useState(false);
+  const [tubinMode, settubinMode] = useState(0);
   
   const onActionPopupClose = () => {
     setShowActionsPopup(false);
@@ -342,7 +343,7 @@ function HanabiBoard(props) {
                   </Paper>
                   <Grid item>
                     <Paper className={classes.paper}>
-                      <button style={{color: tubinMode ? 'green' : 'red'}} onClick={() => settubinMode(!tubinMode)}>
+                      <button style={{backgroundColor: tubinModes[tubinMode].BACKCOLOR, fontWeight: 'bold'}} onClick={() => settubinMode((tubinMode + 1) % tubinModes.length)}>
                       Tubin Mode!
                       </button>
                     </Paper>
@@ -416,6 +417,10 @@ function PlayersHands(props) {
   const userId = useContext(UserIdContext);
   const divWidth = (getPlayerCards(players, players[0]['id']).length + 0.25) * (CARD_WIDTH + 10); // the width of a card. Not sure why I need the 0.25
 
+  console.log(players);
+
+  const amISnappir = (players[0]['id'] === userId && players[0]['display_name'].includes('Snap'));
+
   return (
     <>
       {players.map((player) => 
@@ -431,7 +436,7 @@ function PlayersHands(props) {
             position: 'relative',
             top: .5 * CARD_HEIGHT,
           }}>
-            {stringifyTurnTime(player['total_turns_time'] + (player['id'] === activePlayer ? ((new Date()).getTime() / 1000 - stateTimestamp) : 0))}
+            {amISnappir && stringifyTurnTime(player['total_turns_time'] + (player['id'] === activePlayer ? ((new Date()).getTime() / 1000 - stateTimestamp) : 0))}
           </h3>
           {player['id'] === userId ?
             <OwnHand 
@@ -447,7 +452,7 @@ function PlayersHands(props) {
               displayName={player['display_name']} 
               cards={getPlayerCards(players, player['id'])}
               onClick={onInformCard(player['id'])}
-              tubinMode={tubinMode}
+              tubinMode={tubinMode > 1 ? tubinMode : 0}
             />
           }
         </div>
@@ -464,7 +469,7 @@ PlayersHands.propTypes = {
   onInformCard: PropTypes.func.isRequired,
   lastAction: PropTypes.object,
   reportUndoCardMotion: PropTypes.func.isRequired,
-  tubinMode: PropTypes.bool.isRequired,
+  tubinMode: PropTypes.number.isRequired,
   stateTimestamp: PropTypes.number.isRequired
 };
 
