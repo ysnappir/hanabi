@@ -34,10 +34,10 @@ HandsState = List[HandState]
 class GameAction(NamedTuple):
     acting_player: NetworkPlayerIdType
     action_type: str
-    informed_player: Optional[NetworkPlayerIdType]
-    information_data: Optional[Union[int, str]]
-    placed_card_index: Optional[int]
-    burn_card_index: Optional[int]
+    informed_player: Optional[NetworkPlayerIdType] = None
+    information_data: Optional[Union[int, str]] = None
+    placed_card_index: Optional[int] = None
+    burn_card_index: Optional[int] = None
 
 
 class GameState(NamedTuple):
