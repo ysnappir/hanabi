@@ -1,7 +1,7 @@
 import time
 from typing import Set, Dict, Optional, List, Callable
 
-from games_repository.card_mapper import CardMapper
+from games_repository.card_mapper import CardMapper, MapperRequest
 from games_repository.card_mapper_api import (
     ICardMapper,
     FECardIndex,
@@ -119,16 +119,16 @@ class HanabiPlayerWrapper:
     ) -> HanabiGameCardIndex:
         return self._card_mapper.get_hanabi_card_index(fe_card_index=placed_card_index)
 
-    def dispose_card(self, card_hand_index: FECardIndex) -> None:
-        self._card_mapper.handle_dispose(fe_card_index=card_hand_index)
+    def dispose_card(self, card_hand_index: FECardIndex, with_replacement: bool) -> None:
+        self._card_mapper.handle_dispose(fe_card_index=card_hand_index, with_replacement=with_replacement)
 
     def move_a_card(
-        self, card_initial_index: FECardIndex, card_final_index: FECardIndex
+        self, card_initial_index: FECardIndex, card_final_index: Optional[FECardIndex]
     ) -> bool:
-        return self._card_mapper.move_a_card(
+        return self._card_mapper.move_a_card(MapperRequest(
             fe_card_initial_index=card_initial_index,
             fe_card_final_index=card_final_index,
-        )
+        ))
 
     def undo_move_a_card(self) -> bool:
         return self._card_mapper.undo()
@@ -288,7 +288,11 @@ class HanabiGameWrapper:
             new_game_state = self._game.get_state()
 
             if action_type in [HanabiMoveType.BURN, HanabiMoveType.PLACE]:
-                self._players[action.acting_player].dispose_card(disposing_index)
+                self._players[action.acting_player].dispose_card(
+                    card_hand_index=disposing_index,
+                    with_replacement=(self._game.get_state().get_hand(move.performer).get_amount_of_cards() ==
+                                      self._game.get_cards_per_player()),
+                )
 
             color_pile_changed = {color for color in HanabiColor
                                   if prev_game_state.get_pile_top(color) is not new_game_state.get_pile_top(color)}

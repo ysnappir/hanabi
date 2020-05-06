@@ -1,3 +1,5 @@
+/*eslint linebreak-style: ["error", "unix"]*/
+
 import React, { useEffect, useContext, useState } from 'react';
 import axios from 'axios';
 import PropTypes from 'prop-types';
@@ -222,6 +224,17 @@ function HanabiBoard(props) {
     return burnActionFunc;
   };
 
+  const reportCardMotion = (userId) => {
+    async function moveCard(indexFrom, indexTo){
+      console.log('Reporting motion!');
+      let response = await axios.post(`/move_card/${userId}`,
+        {'move_from_index': indexFrom, 'move_to_index': indexTo}
+      );
+      await handleGetGameStateResponse(response);
+    }
+    return moveCard;
+  };
+
   const reportUndoCardMotion = (userId) => {
     async function undoCardMotion(){
       console.log('Reporting undo motion!');
@@ -307,6 +320,7 @@ function HanabiBoard(props) {
                     onDraggedIndex={setDraggedIndex}
                     onInformCard={informCard}
                     lastAction={lastAction}
+                    reportCardMotion={reportCardMotion(userId)}
                     reportUndoCardMotion={reportUndoCardMotion(userId)}
                     tubinMode={tubinMode}
                     stateTimestamp={stateTimestamp}
@@ -413,7 +427,7 @@ const stringifyTurnTime = (timeSec) => {
 
 
 function PlayersHands(props) {
-  const {players, activePlayer, draggedIndex, onDraggedIndex, onInformCard, lastAction, reportUndoCardMotion, tubinMode, stateTimestamp} = props;
+  const {players, activePlayer, draggedIndex, onDraggedIndex, onInformCard, lastAction, reportCardMotion, reportUndoCardMotion, tubinMode, stateTimestamp} = props;
   const userId = useContext(UserIdContext);
   const divWidth = (getPlayerCards(players, players[0]['id']).length + 0.25) * (CARD_WIDTH + 10); // the width of a card. Not sure why I need the 0.25
 
@@ -443,6 +457,7 @@ function PlayersHands(props) {
               cards={getPlayerCards(players, player['id'])} 
               setDraggedIndex={onDraggedIndex} 
               draggedIndex={draggedIndex}
+              reportCardMotion={reportCardMotion}
               reportUndoCardMotion={reportUndoCardMotion}
               tubinMode={tubinMode}
             />
@@ -468,6 +483,7 @@ PlayersHands.propTypes = {
   onDraggedIndex: PropTypes.func.isRequired,
   onInformCard: PropTypes.func.isRequired,
   lastAction: PropTypes.object,
+  reportCardMotion: PropTypes.func.isRequired,
   reportUndoCardMotion: PropTypes.func.isRequired,
   tubinMode: PropTypes.number.isRequired,
   stateTimestamp: PropTypes.number.isRequired

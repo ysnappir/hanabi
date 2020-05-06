@@ -4,6 +4,10 @@ FECardIndex = int
 HanabiGameCardIndex = int
 
 
+class ICardMapperRequest:
+    pass
+
+
 class IMapperState:
     pass
 
@@ -19,27 +23,27 @@ class ICardMapper:
     def get_fe_card_index(self, hanbi_card_index: HanabiGameCardIndex) -> FECardIndex:
         raise NotImplementedError("")
 
-    def _handle_dispose(self, fe_card_index: FECardIndex) -> bool:
+    def _handle_dispose(self, fe_card_index: FECardIndex, with_replacement: bool = True) -> bool:
         raise NotImplementedError("")
 
-    def handle_dispose(self, fe_card_index: FECardIndex) -> bool:
-        if self._handle_dispose(fe_card_index=fe_card_index):
+    def handle_dispose(self, fe_card_index: FECardIndex, with_replacement: bool = True) -> bool:
+        if self._handle_dispose(fe_card_index=fe_card_index, with_replacement=with_replacement):
             self._state_log = []
             return True
 
         return False
 
     def _move_a_card(
-        self, fe_card_initial_index: FECardIndex, fe_card_final_index: FECardIndex
+        self, request: ICardMapperRequest,
     ) -> bool:
         raise NotImplementedError("")
 
     def move_a_card(
-        self, fe_card_initial_index: FECardIndex, fe_card_final_index: FECardIndex
+        self, request: ICardMapperRequest
     ) -> bool:
         current_state = self._state_dumps()
 
-        if self._move_a_card(fe_card_initial_index=fe_card_initial_index, fe_card_final_index=fe_card_final_index):
+        if self._move_a_card(request=request):
             self._state_log.append(current_state)
             return True
 

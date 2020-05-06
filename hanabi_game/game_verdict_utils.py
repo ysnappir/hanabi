@@ -60,6 +60,9 @@ def is_lost_by_open_information(game_state: IHanabiState, deck_cards: List[IHana
 
 
 def _is_lost_by_last_card_being_single_not_burnt(game_state: IHanabiState, deck_cards: List[IHanabiCard]) -> bool:
+    if len(deck_cards) == 0:
+        return False
+
     last_card = deck_cards[-1]
 
     if last_card.get_number() is HanabiNumber.FIVE:

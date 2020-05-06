@@ -203,7 +203,7 @@ def move_card(player_id: str):
         assert game_repository.perform_card_motion(card_motion_request=MoveCardRequest(
             player_id=player_id,
             initial_card_index=payload["move_from_index"],
-            final_card_index=payload["move_to_index"],
+            final_card_index=payload.get("move_to_index"),
         ))
 
         save_game_repository_state(game_repository)

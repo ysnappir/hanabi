@@ -54,25 +54,18 @@ OwnCard.propTypes = {
 };
 
 function OwnSlot(props) {
-  const {slotIndex, onDrag, draggedIndex, card, tubinMode} = props;
-  const userId = useContext(UserIdContext);
+  const {slotIndex, reportCardMotion, onDrag, draggedIndex, card, tubinMode} = props;
 
   const [{ isOver }, drop] = useDrop({
     accept: DraggableType.DraggableOwnCard,
     drop: () => {
-      moveCard(draggedIndex, slotIndex);
+      reportCardMotion(draggedIndex, slotIndex);
     },
     canDrop: () => draggedIndex !== slotIndex,
     collect: monitor => ({
       isOver: !!monitor.isOver(),
     }),
   });
-
-  const moveCard = (indexFrom, indexTo) => {
-    axios.post( `/move_card/${userId}`, 
-      {'move_from_index': indexFrom, 'move_to_index': indexTo}
-    );
-  };
 
   return (  
     <span 
@@ -84,7 +77,7 @@ function OwnSlot(props) {
       <OwnCard 
         index={slotIndex} 
         onDrag={onDrag} 
-        onDoubleClick={() => moveCard(slotIndex, slotIndex)} 
+        onDoubleClick={() => reportCardMotion(slotIndex, null)} 
         card={card}
         tubinMode={tubinMode}
       />
@@ -95,6 +88,7 @@ function OwnSlot(props) {
 
 OwnSlot.propTypes = {
   slotIndex: PropTypes.number.isRequired,
+  reportCardMotion: PropTypes.func.isRequired,
   onDrag: PropTypes.func.isRequired,
   draggedIndex: PropTypes.number,
   card: PropTypes.object.isRequired,
@@ -102,7 +96,7 @@ OwnSlot.propTypes = {
 };
 
 export function OwnHand(props) {
-  const {cards, setDraggedIndex, draggedIndex, reportUndoCardMotion, tubinMode} = props;
+  const {cards, setDraggedIndex, draggedIndex, reportCardMotion, reportUndoCardMotion, tubinMode} = props;
 
   return (
     <div style={{
@@ -113,6 +107,7 @@ export function OwnHand(props) {
         <OwnSlot
           slotIndex={index}
           key={'slot' + index}
+          reportCardMotion={reportCardMotion}
           onDrag={setDraggedIndex}
           draggedIndex={draggedIndex} 
           card={cards[index]}
@@ -127,6 +122,7 @@ OwnHand.propTypes = {
   cards: PropTypes.array.isRequired,
   setDraggedIndex: PropTypes.func.isRequired,
   draggedIndex: PropTypes.number,
+  reportCardMotion: PropTypes.func.isRequired,
   reportUndoCardMotion: PropTypes.func.isRequired,
   tubinMode: PropTypes.number.isRequired,
 };
