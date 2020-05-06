@@ -1,4 +1,4 @@
-from games_repository.card_mapper import CardMapper
+from games_repository.card_mapper import CardMapper, MapperRequest
 from games_repository.card_mapper_api import ICardMapper
 from games_repository.defs import GameAction, MoveCardRequest
 from games_repository.game_repository import HanabiGamesRepository
@@ -10,7 +10,7 @@ from hanabi_game.utils import get_all_cards_list
 def test_correct_mapping_after_moving():
     mapper: ICardMapper = CardMapper(5)
 
-    mapper.move_a_card(3, 0)
+    mapper.move_a_card(MapperRequest(3, 0))
 
     assert mapper.get_hanabi_card_index(0) == 3
     assert mapper.get_hanabi_card_index(1) == 0
@@ -20,7 +20,7 @@ def test_correct_mapping_after_moving():
 def test_flipping():
     mapper: ICardMapper = CardMapper(5)
 
-    mapper.move_a_card(0, 0)
+    mapper.move_a_card(MapperRequest(0, 0))
     mapper.handle_dispose(4)
     assert mapper.get_hanabi_card_index(0) == 0
     assert mapper.get_hanabi_card_index(1) == 4
@@ -44,15 +44,15 @@ def test_correct_mapping_after_disposing():
 def test_move_only_to_pinned_section():
     mapper: ICardMapper = CardMapper(5)
 
-    mapper.move_a_card(4, 0)
-    assert mapper.move_a_card(4, 2) is False
-    assert mapper.move_a_card(4, 1)
+    mapper.move_a_card(MapperRequest(4, 0))
+    assert mapper.move_a_card(MapperRequest(4, 2)) is False
+    assert mapper.move_a_card(MapperRequest(4, 1))
 
 
 def test_correct_mapping_after_moving_and_disposing():
     mapper: ICardMapper = CardMapper(5)
 
-    mapper.move_a_card(4, 0)
+    mapper.move_a_card(MapperRequest(4, 0))
 
     assert mapper.get_hanabi_card_index(4) == 3
     assert mapper.get_hanabi_card_index(0) == 4
@@ -64,7 +64,7 @@ def test_correct_mapping_after_moving_and_disposing():
     assert mapper.get_hanabi_card_index(0) == 4
     assert mapper.get_hanabi_card_index(4) == 3
 
-    mapper.move_a_card(4, 1)
+    mapper.move_a_card(MapperRequest(4, 1))
 
     assert mapper.get_hanabi_card_index(0) == 4
     assert mapper.get_hanabi_card_index(1) == 3
@@ -72,7 +72,7 @@ def test_correct_mapping_after_moving_and_disposing():
     assert mapper.get_hanabi_card_index(3) == 0
     assert mapper.get_hanabi_card_index(4) == 2
 
-    mapper.move_a_card(1, 0)
+    mapper.move_a_card(MapperRequest(1, 0))
 
     assert mapper.get_hanabi_card_index(0) == 3
     assert mapper.get_hanabi_card_index(1) == 4
@@ -91,7 +91,7 @@ def test_correct_mapping_after_moving_and_disposing():
 
 def test_undo():
     mapper: ICardMapper = CardMapper(5)
-    mapper.move_a_card(4, 0)
+    mapper.move_a_card(MapperRequest(4, 0))
 
     assert mapper.get_hanabi_card_index(4) == 3
 
@@ -101,7 +101,7 @@ def test_undo():
 
 def test_undo_only_until_dispose():
     mapper: ICardMapper = CardMapper(5)
-    mapper.move_a_card(4, 0)
+    mapper.move_a_card(MapperRequest(4, 0))
 
     assert mapper.get_hanabi_card_index(4) == 3
     assert mapper.handle_dispose(fe_card_index=4)
@@ -112,8 +112,8 @@ def test_undo_only_until_dispose():
 
 def test_undo_stack():
     mapper: ICardMapper = CardMapper(5)
-    mapper.move_a_card(4, 0)
-    mapper.move_a_card(4, 1)
+    mapper.move_a_card(MapperRequest(4, 0))
+    mapper.move_a_card(MapperRequest(4, 1))
 
     assert mapper.get_hanabi_card_index(4) == 2
 

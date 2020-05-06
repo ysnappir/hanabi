@@ -1,10 +1,17 @@
-from typing import Dict, List
+from typing import Dict, List, Optional
 
 from games_repository.card_mapper_api import (
     ICardMapper,
     FECardIndex,
     HanabiGameCardIndex,
-    IMapperState)
+    IMapperState, ICardMapperRequest)
+
+
+class MapperRequest(ICardMapperRequest):
+
+    def __init__(self, fe_card_initial_index: FECardIndex, fe_card_final_index: Optional[FECardIndex]):
+        self.fe_card_final_index = fe_card_final_index
+        self.fe_card_initial_index = fe_card_initial_index
 
 
 class MapperState(IMapperState):
@@ -29,7 +36,7 @@ class CardMapper(ICardMapper):
     def get_fe_card_index(self, hanbi_card_index: HanabiGameCardIndex) -> FECardIndex:
         return next(iter(k for k, v in self._mapping.items() if v == hanbi_card_index))
 
-    def _handle_dispose(self, fe_card_index: FECardIndex) -> bool:
+    def _handle_dispose(self, fe_card_index: FECardIndex, with_replacement: bool = True) -> bool:
         new_card_hanabi_index = self._mapping[fe_card_index]
 
         if fe_card_index >= self._pinned_cards:
@@ -44,11 +51,17 @@ class CardMapper(ICardMapper):
 
             self._mapping[self._pinned_cards] = new_card_hanabi_index
 
+        if not with_replacement:
+            for i in range(fe_card_index, len(self._mapping) - 1):
+                self._mapping[i] = self._mapping.pop(i + 1)
+
         return True
 
-    def _move_a_card(
-        self, fe_card_initial_index: FECardIndex, fe_card_final_index: FECardIndex
-    ) -> bool:
+    def _move_a_card(self, request: MapperRequest) -> bool:
+        fe_card_initial_index = request.fe_card_initial_index
+        fe_card_final_index = (request.fe_card_final_index if request.fe_card_final_index is not None
+                               else self._pinned_cards)
+
         if fe_card_final_index > self._pinned_cards:
             return False
 

@@ -58,7 +58,7 @@ class GameState(NamedTuple):
 class MoveCardRequest(NamedTuple):
     player_id: NetworkPlayerIdType
     initial_card_index: FECardIndex
-    final_card_index: FECardIndex
+    final_card_index: Optional[FECardIndex]
 
 
 class UndoMoveCardRequest(NamedTuple):
