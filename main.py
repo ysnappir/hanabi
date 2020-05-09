@@ -267,8 +267,7 @@ def rematch(player_id: str):
 def restart():
     new_game_repository: IGamesRepository = HanabiGamesRepository()
     save_game_repository_state(new_game_repository)
-    return 200, ""
-
+    return "", 200
 
 
 if __name__ == '__main__':
