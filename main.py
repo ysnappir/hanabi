@@ -18,6 +18,7 @@ from flask_cors import CORS
 
 from games_repository.contants import SPECTATOR_ID
 from games_repository.defs import GameIdType, GameAction, MoveCardRequest, UndoMoveCardRequest
+from games_repository.game_repository import HanabiGamesRepository
 from games_repository.games_repository_api import IGamesRepository
 from games_repository.utils import jsonify_game_state, deck_to_game_factory
 from gcloud_datastore.gcloud_datastore_read_write import get_game_repository, save_game_repository_state
@@ -260,6 +261,14 @@ def rematch(player_id: str):
         return "", 400
     except AssertionError:
         return "Couldn't find a game to restart", 400
+
+
+@app.route("/restart_server", methods=["post"])
+def restart():
+    new_game_repository: IGamesRepository = HanabiGamesRepository()
+    save_game_repository_state(new_game_repository)
+    return 200, ""
+
 
 
 if __name__ == '__main__':
