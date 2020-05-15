@@ -8,7 +8,7 @@ from games_repository.game_repository import HanabiGamesRepository
 from games_repository.games_repository_api import IGamesRepository
 
 DB_KIND = 'Repository'
-DB_NAME = "hanabi_repository"
+DB_NAME = "hanabi_repository_1"
 try:
     datastore_client = datastore.Client()
 except Exception as e:
@@ -40,7 +40,8 @@ def _read_game_repository() -> Optional[IGamesRepository]:
     query = datastore_client.query(kind=DB_KIND)
     for entity in query.fetch():
         try:
-            return dict_to_obj(entity)
+            if entity.key.name == DB_NAME:
+                return dict_to_obj(entity)
         except Exception:
             print("Couldn't load some entries")
 
@@ -85,6 +86,6 @@ def save_game_repository_state(repository: IGamesRepository) -> bool:
 if __name__ == '__main__':
     # script for reseting db
     new_repository: IGamesRepository = HanabiGamesRepository()
-    save_game_repository_state(new_repository)
-    # repository = get_game_repository()
+    # save_game_repository_state(new_repository)
+    repository = get_game_repository()
     print(1)
