@@ -53,12 +53,19 @@ export function HanabiTable(props) {
   let splitIndex = colorPiles.length / 2;
 
   return (
-    <div ref={drop} style={{background: (isOver && isMyTurn)? 'lightblue' : 'white',}}>  
+    <>
       <h2>Hanabi Board</h2>
-      {colorPiles.slice(0, splitIndex)}
-      <br/>
-      {colorPiles.slice(splitIndex)}
-    </div>
+      <div ref={drop} 
+        style={{
+          background: (isOver && isMyTurn)? 'lightblue' : 'white',
+          height: CARD_HEIGHT * 2.2,
+          width: 4 * CARD_WIDTH,
+        }}>  
+        {colorPiles.slice(0, splitIndex)}
+        <br/>
+        {colorPiles.slice(splitIndex)}
+      </div>
+    </>
   );
 }
 
