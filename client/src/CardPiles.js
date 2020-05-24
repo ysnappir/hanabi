@@ -59,7 +59,7 @@ export function HanabiTable(props) {
         style={{
           background: (isOver && isMyTurn)? 'lightblue' : 'white',
           height: CARD_HEIGHT * 2.2,
-          width: 4 * CARD_WIDTH,
+          width: 5 * CARD_WIDTH,
         }}>  
         {colorPiles.slice(0, splitIndex)}
         <br/>
