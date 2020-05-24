@@ -15,13 +15,14 @@ if __name__ == '__main__':
                                                                   "number_of_colors_in_clothes": 2})
     ethan_id = reply.json()["id"]
 
-    reply = requests.post(f"{SERVER_BASE_URL}/create_game/{yuval_id}", json={"test_game": True})
+    reply = requests.post(f"{SERVER_BASE_URL}/create_game/{yuval_id}", json={"test_game": "sorted"})
     assert reply.status_code == 200
 
     game_id = reply.json().get("game_id")
     reply = requests.post(f"{SERVER_BASE_URL}/join_game/{ethan_id}/{game_id}")
     assert reply.status_code == 200
 
+    # TODO 23/05/2020 ysnappir: DEPRECATION!!! changed game state to player state and not fixed!
     reply = requests.get(f"{SERVER_BASE_URL}/game_state/{yuval_id}/{game_id}")
     assert reply.status_code == 200
 

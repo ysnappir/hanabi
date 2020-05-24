@@ -6,8 +6,7 @@ from hanabi_game.hanabi_deck import HanabiDeck
 from hanabi_game.hanabi_game import is_lost_by_open_information, HanabiGame, is_lost_by_concealed_information
 from hanabi_game.hanabi_game_api import IHanabiCard, IHanabiDeck
 from hanabi_game.hanabi_moves import IHanabiPlaceMove
-from hanabi_game.utils import get_all_cards_list, get_amount_of_cards_per_player
-from tests.hanabi_game.test_utils import pop_from_cards_list
+from hanabi_game.utils import get_all_cards_list, get_amount_of_cards_per_player, pop_from_cards_list
 
 
 def test_is_card_equalization_based_only_on_content():

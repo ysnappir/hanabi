@@ -23,7 +23,7 @@ from games_repository.games_repository_api import IGamesRepository
 from games_repository.utils import jsonify_game_state, deck_to_game_factory
 from gcloud_datastore.gcloud_datastore_read_write import get_game_repository, save_game_repository_state
 from hanabi_game.hanabi_deck import HanabiDeck
-from hanabi_game.utils import get_all_cards_list
+from hanabi_game.utils import get_all_cards_list, get_winnig_cards_list
 
 app = Flask(__name__, template_folder="client/build", static_folder="client/build/static")
 cors = CORS(app, resources={r"/*": {"origins": "*"}})
@@ -59,11 +59,17 @@ def register():
 @app.route("/create_game/<player_id>", methods=["post"])
 def create_game(player_id: str):
     try:
-        is_test_game = request.get_json().get("test_game", False) is True
+        is_test_game = len(request.get_json().get("test_game", "")) > 0
         if is_test_game:
-
-            game_id = game_repository.create_game(
-                game_factory=deck_to_game_factory(deck=HanabiDeck(cards=get_all_cards_list())))
+            if request.get_json()["test_game"] == "sorted":
+                game_id = game_repository.create_game(
+                    game_factory=deck_to_game_factory(deck=HanabiDeck(cards=get_all_cards_list())))
+            elif request.get_json()["test_game"] == "winning":
+                game_id = game_repository.create_game(
+                    game_factory=deck_to_game_factory(deck=HanabiDeck(cards=get_winnig_cards_list())
+                                                      ))
+            else:
+                return f"test game {request.get_json()['test_game']} is not defined", 400
         else:
             game_id = game_repository.create_game()
         assert game_repository.assign_player_to_game(player_id=player_id, game_id=game_id)
