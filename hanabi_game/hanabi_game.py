@@ -135,13 +135,14 @@ class HanabiHand(IHandType):
 class HanabiGame(IHanabiGame):
 
     def __init__(
-        self,
-        n_players: int,
-        predifined_deck: IHanabiDeck = None,
-        starting_player: PlayerIdType = None,
-        red_tokens_amount: int = INITIAL_RED_TOKENS,
+            self,
+            n_players: int,
+            predifined_deck: IHanabiDeck = None,
+            starting_player: PlayerIdType = None,
+            red_tokens_amount: int = INITIAL_RED_TOKENS,
     ):
         self._blue_tokens_amount: int = INITIAL_BLUE_TOKENS
+        self._initial_tokens_amount: int = self._blue_tokens_amount
         self._red_tokens_amount: int = red_tokens_amount
         self._n_players = n_players
         self._acting_player: PlayerIdType = 0 if starting_player is None else starting_player
@@ -202,7 +203,7 @@ class HanabiGame(IHanabiGame):
                 card=self._deck.take_a_card(), index=move.card_hand_index
             )
 
-        self._blue_tokens_amount += 1
+        self._add_blue_token()
         # TODO 20/03/2020 ysnappir: Consider check if game is over
 
     def _perform_place(self, move: IHanabiPlaceMove) -> None:
@@ -216,7 +217,7 @@ class HanabiGame(IHanabiGame):
         if self._piles.get(placed_card.get_color()) is required_top:
             self._piles[placed_card.get_color()] = placed_card.get_number()
             if placed_card.get_number() is HanabiNumber.FIVE:
-                self._blue_tokens_amount += 1
+                self._add_blue_token()
                 if all(self._piles.get(color) is HanabiNumber.FIVE for color in HanabiColor):
                     self._game_verdict = GameVerdict.WON
         else:
@@ -224,6 +225,10 @@ class HanabiGame(IHanabiGame):
             self._red_tokens_amount -= 1
             if self._red_tokens_amount == 0:
                 self._game_verdict = GameVerdict.LOST
+
+    def _add_blue_token(self):
+        if self._blue_tokens_amount < self._initial_tokens_amount:
+            self._blue_tokens_amount += 1
 
     def _perform_inform(self, move: IHanabiInfromMove) -> None:
         self._blue_tokens_amount -= 1
@@ -237,16 +242,12 @@ class HanabiGame(IHanabiGame):
         return self._is_legal[move.move_type](move)
 
     def _is_legal_burn(self, move: IHanabiBurnMove) -> bool:
-        return (
-            self._blue_tokens_amount < INITIAL_BLUE_TOKENS
-            and move.card_hand_index
-            < self._players_hands[move.performer].get_amount_of_cards()
-        )
+        return move.card_hand_index < self._players_hands[move.performer].get_amount_of_cards()
 
     def _is_legal_place(self, move: IHanabiPlaceMove) -> bool:
         return (
-            move.card_hand_index
-            < self._players_hands[move.performer].get_amount_of_cards()
+                move.card_hand_index
+                < self._players_hands[move.performer].get_amount_of_cards()
         )
 
     def _is_legal_inform(self, move: IHanabiInfromMove) -> bool:
