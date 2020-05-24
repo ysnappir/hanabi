@@ -8,7 +8,7 @@ from games_repository.game_repository import HanabiGamesRepository
 from games_repository.games_repository_api import IGamesRepository
 
 DB_KIND = 'Repository'
-DB_NAME = "hanabi_repository_1"
+DB_NAME = "hanabi_repository_2"
 try:
     datastore_client = datastore.Client()
 except Exception as e:
