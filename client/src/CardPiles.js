@@ -58,7 +58,7 @@ export function HanabiTable(props) {
       <div ref={drop} 
         style={{
           background: (isOver && isMyTurn)? 'lightblue' : 'white',
-          height: CARD_HEIGHT * 2.2,
+          height: CARD_HEIGHT * 3,
           width: 5 * CARD_WIDTH,
         }}>  
         {colorPiles.slice(0, splitIndex)}
