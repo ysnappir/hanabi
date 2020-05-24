@@ -124,6 +124,17 @@ def test_undo_stack():
     assert mapper.get_hanabi_card_index(4) == 4
 
 
+def test_remove_no_replacement():
+    mapper: ICardMapper = CardMapper(4)
+    mapper.move_a_card(MapperRequest(3, 0))
+
+    mapper.handle_dispose(fe_card_index=3, with_replacement=False)
+
+    assert mapper.get_hanabi_card_index(0) == 2
+    assert mapper.get_hanabi_card_index(1) == 0
+    assert mapper.get_hanabi_card_index(2) == 1
+
+
 def test_moving_hot_seat_to_pinned():
     game_repository = HanabiGamesRepository()
     yuval_id = game_repository.register_player(display_name="Yuval", clothes_color_number=9)

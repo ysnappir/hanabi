@@ -279,6 +279,12 @@ class HanabiGameWrapper:
 
         ret_val = self._game.perform_move(move=move)
         if ret_val:
+            if action_type in [HanabiMoveType.BURN, HanabiMoveType.PLACE]:
+                self._players[action.acting_player].dispose_card(
+                    card_hand_index=disposing_index,
+                    with_replacement=prev_game_state.get_deck_size() > 0,
+                )
+
             self._clear_last_action()
             self._last_successful_action = action
 
@@ -286,13 +292,6 @@ class HanabiGameWrapper:
             self._last_turn_timestamp = time.time()
 
             new_game_state = self._game.get_state()
-
-            if action_type in [HanabiMoveType.BURN, HanabiMoveType.PLACE]:
-                self._players[action.acting_player].dispose_card(
-                    card_hand_index=disposing_index,
-                    with_replacement=(self._game.get_state().get_hand(move.performer).get_amount_of_cards() ==
-                                      self._game.get_cards_per_player()),
-                )
 
             color_pile_changed = {color for color in HanabiColor
                                   if prev_game_state.get_pile_top(color) is not new_game_state.get_pile_top(color)}

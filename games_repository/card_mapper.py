@@ -52,8 +52,14 @@ class CardMapper(ICardMapper):
             self._mapping[self._pinned_cards] = new_card_hanabi_index
 
         if not with_replacement:
-            for i in range(fe_card_index, len(self._mapping) - 1):
-                self._mapping[i] = self._mapping.pop(i + 1)
+            for i in range(self._pinned_cards, len(self._mapping) - 1):
+                self._mapping[i] = self._mapping[i + 1]
+
+            self._mapping.pop(len(self._mapping) - 1)
+
+            for i in self._mapping.keys():
+                if self._mapping[i] >= new_card_hanabi_index:
+                    self._mapping[i] = self._mapping[i] - 1
 
         return True
 
