@@ -48,9 +48,17 @@ export function HanabiTable(props) {
       return <svg key={color} width={CARD_WIDTH} height={CARD_HEIGHT}><rect width={CARD_WIDTH} height={CARD_HEIGHT} fill={color === 'rainbow'? 'black' : color}/></svg>;
   };
 
-
-  let colorPiles = Object.keys(table).map((color) => renderCards(color, table[color]));
-  let splitIndex = colorPiles.length / 2;
+  let colorPiles = Object.keys(table).map((color, index) =>
+    <>
+      <div style={{
+        position: 'absolute',
+        left: (1 + (index % 3)) * CARD_WIDTH, 
+        top: Math.floor(index / 3) * CARD_HEIGHT,
+      }} key={color + '_' + index}>
+        {renderCards(color, table[color])}
+      </div>
+    </>
+  );
 
   return (
     <>
@@ -58,12 +66,12 @@ export function HanabiTable(props) {
       <div ref={drop} 
         style={{
           background: (isOver && isMyTurn)? 'lightblue' : 'white',
-          height: CARD_HEIGHT * 3,
+          height: CARD_HEIGHT * 2.2,
           width: 5 * CARD_WIDTH,
-        }}>  
-        {colorPiles.slice(0, splitIndex)}
-        <br/>
-        {colorPiles.slice(splitIndex)}
+          position: 'relative',
+          top: 0,
+        }}>
+        {colorPiles}
       </div>
     </>
   );
