@@ -48,10 +48,16 @@ export function HanabiTable(props) {
       return <svg key={color} width={CARD_WIDTH} height={CARD_HEIGHT}><rect width={CARD_WIDTH} height={CARD_HEIGHT} fill={color === 'rainbow'? 'black' : color}/></svg>;
   };
 
+
+  let colorPiles = Object.keys(table).map((color) => renderCards(color, table[color]));
+  let splitIndex = colorPiles.length / 2;
+
   return (
     <div ref={drop} style={{background: (isOver && isMyTurn)? 'lightblue' : 'white',}}>  
       <h2>Hanabi Board</h2>
-      {Object.keys(table).map((color) => renderCards(color, table[color]))}
+      {colorPiles.slice(0, splitIndex)}
+      <br/>
+      {colorPiles.slice(splitIndex)}
     </div>
   );
 }
@@ -78,53 +84,72 @@ export function BurntPile(props) {
   
   const renderCardsByNumberSortedByColor = () => {
     let numbers = [1, 2, 3, 4, 5];
+
+    let numberPile = null;
+
+    const numberBurntPile = (value, index) => {
+      if (!cardList.map((item) => item['number']).includes(value)){
+        numberPile = (
+          <svg key={value} width={CARD_WIDTH} height={2 * CARD_HEIGHT} >
+            <rect width={CARD_WIDTH} height={2 * CARD_HEIGHT} fillOpacity={0}/>
+          </svg>
+        );
+      }
+      else{
+        numberPile = cardList.filter(item => item['number'] === value)
+          .sort((x, y) => {
+            if(x['color'] > y['color'])
+              return 1;
+            else
+              return -1;
+          })
+          .map((card, counter) => 
+            <div 
+              key={'burntCard_' + index + '_' + counter}
+              style={{
+                position: 'absolute',
+                top: counter * CARD_HEIGHT / 4,
+              }}
+            >
+              <HanabiCard card={card}/>
+            </div>
+          );
+      }
+
+      return (
+        <>
+          <div 
+            key={value} 
+            style={{
+              position: 'absolute',
+              left: (value - 1) * CARD_WIDTH,
+            }}>
+            {numberPile}
+          </div>
+        </>
+      );
+
+    };
+
     return (
-      <div 
-        ref={drop} 
-        style={{
-          background: (isOver && isMyTurn)? '#F98A91' : 'white',
-        }}>  
-        <h2>Burnt pile. length: {cardList.length}</h2>
+      <>
+        <center><h2>Burnt pile. length: {cardList.length}</h2></center>
         <div style={{          
           position: 'relative',
           top: 0,
-          left: 0,
-        }}>
+          backgroundColor: (isOver && isMyTurn)? '#F98A91' : 'white',
+          // borderStyle: 'double',
+          height: 2 * CARD_HEIGHT,
+          width: 5 * CARD_WIDTH,
+        }}
+        ref={drop}
+        >
           {
             numbers
-              .map((value, index) => 
-                <>
-                  <div 
-                    key={value} 
-                    style={{
-                      position: 'absolute',
-                      left: index * CARD_WIDTH,
-                    }}>
-                    {cardList.filter(item => item['number'] === value)
-                      .sort((x, y) => {
-                        if(x['color'] > y['color'])
-                          return 1;
-                        else
-                          return -1;
-                      })
-                      .map((card, counter) => 
-                        <div 
-                          key={'burntCard_' + index + '_ś' + counter}
-                          style={{
-                            position: 'absolute',
-                            top: counter * CARD_HEIGHT / 4,
-                          }}
-                        >
-                          <HanabiCard card={card}/>
-                        </div>
-                      )
-                    }
-                  </div>
-                </>
-              )
+              .map((value, index) => numberBurntPile(value, index,))
           }
         </div>
-      </div>
+      </>
     );  
   };
   
