@@ -1,3 +1,4 @@
+import random
 import time
 from typing import Set, Dict, Optional, List, Callable
 
@@ -200,15 +201,15 @@ class HanabiGameWrapper:
 
     def start(self) -> bool:
         print(f"Starting game {self._game_id}")
-        index_of_player_with_most_colors: int = max(
-            range(self.get_number_of_players()),
-            key=lambda i: self._players[
-                self._ordered_players[i]
-            ].get_number_of_cloth_colors(),
-        )
+        # index_of_player_with_most_colors: int = max(
+        #     range(self.get_number_of_players()),
+        #     key=lambda i: self._players[
+        #         self._ordered_players[i]
+        #     ].get_number_of_cloth_colors(),
+        # )
         self._game = self._game_factory(
             n_players=self.get_number_of_players(),
-            starting_player=index_of_player_with_most_colors,
+            starting_player=random.choice(range(self.get_number_of_players())),
         )
         hanabi_player_ids = self._game.get_players_ids()
         for network_player_id, hanabi_player_id in zip(
