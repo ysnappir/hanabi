@@ -178,6 +178,7 @@ class HanabiGame(IHanabiGame):
         self._game_verdict: GameVerdict = GameVerdict.ONGOING
         self._update_verdict()
         self._moves_log = []
+        self._turns_since_deck_is_empty: int = 0
 
     def last_move(self) -> Optional[IHanabiMove]:
         if len(self._moves_log) == 0:
@@ -185,8 +186,11 @@ class HanabiGame(IHanabiGame):
         return self._moves_log[-1]
 
     def perform_move(self, move: IHanabiMove) -> bool:
-        if not self._is_legal_move(move):
+        if not self._is_legal_move(move) and self._turns_since_deck_is_empty < self._n_players:
             return False
+
+        if self._deck.get_size() == 0:
+            self._turns_since_deck_is_empty += 1
 
         self._moves_log.append(move)
         self._perform_move[move.move_type](move)
